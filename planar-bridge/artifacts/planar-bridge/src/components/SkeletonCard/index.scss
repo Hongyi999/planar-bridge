@@ -1,0 +1,98 @@
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.skeleton-card {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  animation: fadeIn 0.4s ease both;
+
+  &__image {
+    width: 100%;
+    padding-top: 140%;
+    background: linear-gradient(
+      90deg,
+      var(--bg-tertiary) 25%,
+      rgba(155, 134, 68, 0.1) 50%,
+      var(--bg-tertiary) 75%
+    );
+    background-size: 200% auto;
+    animation: shimmer 1.8s ease-in-out infinite, skeleton-pulse 2s ease-in-out infinite;
+  }
+
+  &__body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__pitch-strip {
+    height: 4px;
+    width: 40%;
+    border-radius: 2px;
+    background: linear-gradient(
+      90deg,
+      var(--bg-tertiary) 25%,
+      rgba(155, 134, 68, 0.1) 50%,
+      var(--bg-tertiary) 75%
+    );
+    background-size: 200% auto;
+    animation: shimmer 1.8s ease-in-out infinite;
+  }
+
+  &__name {
+    height: 28px;
+    width: 80%;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(
+      90deg,
+      var(--bg-tertiary) 25%,
+      rgba(155, 134, 68, 0.1) 50%,
+      var(--bg-tertiary) 75%
+    );
+    background-size: 200% auto;
+    animation: shimmer 1.8s ease-in-out infinite;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__rarity-badge {
+    height: 22px;
+    width: 60px;
+    border-radius: 100px;
+    background: linear-gradient(
+      90deg,
+      var(--bg-tertiary) 25%,
+      rgba(155, 134, 68, 0.1) 50%,
+      var(--bg-tertiary) 75%
+    );
+    background-size: 200% auto;
+    animation: shimmer 1.8s ease-in-out infinite;
+  }
+
+  &__price {
+    height: 24px;
+    width: 50%;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(
+      90deg,
+      var(--bg-tertiary) 25%,
+      rgba(155, 134, 68, 0.1) 50%,
+      var(--bg-tertiary) 75%
+    );
+    background-size: 200% auto;
+    animation: shimmer 1.8s ease-in-out infinite;
+  }
+}

@@ -1,0 +1,306 @@
+# PlanarBridge — AI-Powered Flesh and Blood Card Intelligence App
+
+## Prompt / Product Requirement Document
+
+---
+
+### For: Replit Agent / Google AI Studio / Cursor / Vibe-Coding Tools
+
+---
+
+## 🎯 One-Liner
+
+Build a mobile-first AI-powered web app called **"PlanarBridge"** that lets Flesh and Blood TCG players search cards in natural language, browse rich card data and live pricing from TCGPlayer, and curate personal favorite lists — all wrapped in a premium, agentic UI inspired by Anthropic's hero page and The Browser Company's Dia landing page.
+
+---
+
+## 1. Core Functionality
+
+### 1.1 AI-Powered Natural Language Card Search
+
+- Users type queries in natural language, not exact card names. Examples:
+  - "Show me all Bravo Guardian equipment with Arcane Barrier"
+  - "What are the most expensive Majestic rarity cards from Uprising?"
+  - "Find me cheap generic attack actions with go again under $2"
+  - "All legendary weapons for Katsu"
+  - "Compare Enlightened Strike across all printings"
+- The AI agent interprets intent, extracts filters (hero, class, type, set, rarity, keywords, price range), and returns matching cards.
+- Support batch/multi-card queries: "Show me all the key staples for a Lexi Ranger deck"
+- Show a "thinking" or "reasoning" step visually — the user should SEE the agent working (parsing query → searching → fetching prices → composing results). This is the "agentic vibe."
+
+### 1.2 Card Information Display
+
+For each card result, display:
+- **Card image** (high resolution, with hover/tap zoom)
+- **Card name, pitch value (color strip: red/yellow/blue), type, class, talent**
+- **Set name + set code, rarity, card number**
+- **Card text / abilities** (formatted with keyword bolding and icons where possible)
+- **Power / Defense / Cost / Intellect** stats as clean visual chips
+- **TCGPlayer market price, low price, mid price** (live or cached)
+- **Price trend indicator** (up/down/stable arrow with %)
+- **Link to TCGPlayer product page**
+
+### 1.3 Favorite Lists (Collections)
+
+- Users can create named lists: "My Bravo Deck", "Trade Binder", "Wishlist", "Budget Picks"
+- From any search result, tap a card → "Add to list" → pick or create a list
+- Bulk add: after a search, "Add all these to my Wishlist"
+- Each list shows:
+  - Total cards, total estimated value (sum of market prices)
+  - Sortable by name, price, rarity, date added
+  - Swipe to remove
+- Lists persist in local storage (MVP) with optional cloud sync later
+- Export list as text/CSV
+
+---
+
+## 2. Data Source
+
+- All card data and pricing sourced from **TCGPlayer** (https://www.tcgplayer.com/) for the **Flesh and Blood** category.
+- Use the **TCGPlayer API** if accessible, or build a scraping/caching layer.
+- Fallback: Use the community FAB card database (https://fabdb.net or the official card JSON from fabtcg.com) for card metadata, and TCGPlayer for pricing.
+- Cache pricing data with a TTL of ~1 hour to avoid excessive requests.
+- Show a "last updated" timestamp on each price.
+
+---
+
+## 3. UI/UX Design Direction
+
+### 3.1 Design DNA — "Agentic Luxury"
+
+The visual identity blends three references:
+
+| Reference | What to borrow |
+|-----------|---------------|
+| **Anthropic.com hero section** | The sense of vast, intelligent space. Subtle gradient backgrounds (deep blacks → warm ambers → muted earth tones). Typography-driven hierarchy. Generous whitespace. The feeling that something powerful is thinking behind the glass. |
+| **Dia Browser landing page (The Browser Company)** | Playful-yet-premium micro-interactions. Cards/elements that feel alive — subtle parallax, smooth spring animations, elements that respond to hover/scroll with personality. The "show don't tell" approach to demonstrating AI capability. Rounded, friendly geometry. |
+| **Card game premium feel** | Dark mode by default (like a game table). Foil/holographic shimmer effects on rare cards. Rarity-coded color accents (Common=white, Rare=blue, Majestic=gold, Legendary=rainbow gradient). The cards themselves should feel tactile and collectible on screen. |
+
+### 3.2 Color Palette
+
+```
+--bg-primary:        #0A0A0C        /* near-black, deep void */
+--bg-secondary:      #141418        /* card surface, panels */
+--bg-tertiary:       #1E1E24        /* elevated surfaces */
+--accent-primary:    #E8A838        /* warm gold — FAB-inspired */
+--accent-secondary:  #C06AE0        /* mystic purple for AI actions */
+--accent-success:    #34D399        /* green for price drops, confirmations */
+--accent-danger:     #EF4444        /* red for price spikes, removals */
+--text-primary:      #F5F5F7        /* high-contrast white */
+--text-secondary:    #8E8E93        /* muted descriptions */
+--text-tertiary:     #48484A        /* timestamps, metadata */
+--rarity-common:     #B0B0B0
+--rarity-rare:       #3B82F6
+--rarity-majestic:   #F59E0B
+--rarity-legendary:  linear-gradient(135deg, #F59E0B, #EC4899, #8B5CF6)
+--foil-shimmer:      linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3), rgba(255,255,255,0.1))
+```
+
+### 3.3 Typography
+
+- **Headlines:** Inter or Satoshi — bold, tight letter-spacing (-0.02em), large (28-40px mobile)
+- **Body:** Inter — regular, 15-16px, comfortable line-height (1.5)
+- **Mono/Data:** JetBrains Mono — for prices, card numbers, stats
+- **Card names:** slightly larger, semi-bold, with a subtle text-shadow on dark backgrounds
+
+### 3.4 Layout & Components
+
+#### Hero / Landing State (Empty State)
+- Full-screen dark gradient background with a very subtle animated particle/aurora effect (think slow-moving light, NOT flashy)
+- Large centered text: **"What cards are you looking for?"** in 32px bold
+- Below: a single, prominent, rounded search input with a glowing gold border and a pulsing AI icon
+- Below the input: 3-4 pill-shaped suggestion chips ("Majestic equipment under $5", "Fai Ninja staples", "Most expensive Legendaries") that auto-fill the search
+- The entire vibe: calm, powerful, inviting — like talking to an oracle
+
+#### Search Experience
+- When the user submits a query, the search bar rises to the top (smooth spring animation)
+- Below it, an **"Agent Thinking" strip** appears: a horizontal animated bar showing steps:
+  - 🧠 "Understanding your query..."
+  - 🔍 "Searching FAB card database..."
+  - 💰 "Fetching live prices from TCGPlayer..."
+  - ✅ "Found 12 cards"
+- Each step animates in with a subtle typewriter or fade-slide effect
+- This strip is NOT a modal — it's inline, part of the conversational flow
+
+#### Search Results
+- Cards display in a **responsive grid** (2 columns on mobile, 3-4 on tablet/desktop)
+- Each card is a **glass-morphism tile** with:
+  - Card image (top 60% of tile, with rounded corners and subtle shadow)
+  - Card name + rarity badge (color-coded dot or gradient border)
+  - Price prominently shown in mono font with trend arrow
+  - A small heart/bookmark icon in the top-right corner for quick-add to favorites
+- Tap a card → **bottom sheet slides up** (iOS-style) with full card details, all printings, price chart, and "Add to List" button
+- The grid has a **subtle stagger animation** on load (each card fades in 50ms after the previous)
+
+#### Favorites / Lists
+- Accessed via a bottom tab or a slide-out drawer
+- Lists shown as horizontal scrollable cards at the top (like Spotify playlists)
+- Tap a list → vertical scrollable list of cards with inline prices
+- Swipe actions: swipe left to delete, swipe right to move to another list
+- Empty list state: friendly illustration + "Start adding cards from search"
+
+#### Conversational Continuation
+- After results display, the search bar remains active with a prompt: "Ask a follow-up or refine..."
+- Users can say: "Now filter only the cold foil versions" or "Sort by price descending" or "Add the top 3 to my Wishlist"
+- The app responds inline, updating results with smooth animations
+- This creates a **conversation-like flow** without a full chatbot UI — it's search-first, chat-augmented
+
+### 3.5 Micro-Interactions & Animations
+
+- **Search input glow:** The gold border subtly pulses when idle, intensifies when focused
+- **Card hover/tap:** Slight 3D tilt effect (CSS perspective transform) + shadow elevation increase
+- **Foil effect on Legendaries/Majestics:** An animated gradient overlay that shifts with device gyroscope or mouse movement
+- **Price update:** Numbers animate (count up/down) when new data loads
+- **List addition:** Card thumbnail does a playful "shrink + fly" animation to the favorites icon
+- **Thinking states:** Shimmer/skeleton loaders with a warm gold tint, NOT generic grey
+- **Page transitions:** Shared element transitions where possible (card image stays persistent when opening detail view)
+- **Pull to refresh:** Custom animation — a card icon "flips" as you pull down
+
+### 3.6 Mobile-First Responsive Design
+
+- Primary target: **mobile web (PWA-ready)**
+- Bottom navigation bar with 3 tabs: **Search** (magnifying glass + sparkle) | **Lists** (bookmark) | **Settings** (gear)
+- Safe area padding for notched phones
+- Touch targets minimum 44x44px
+- Haptic feedback hints on key actions (if supported)
+- Dark mode only for V1 (light mode as future enhancement)
+
+---
+
+## 4. Technical Stack (Suggested)
+
+| Layer | Choice | Rationale |
+|-------|--------|-----------|
+| Frontend | **React + TypeScript** or **Next.js** | Component-driven, great ecosystem |
+| Styling | **Tailwind CSS + Framer Motion** | Rapid styling + premium animations |
+| AI Layer | **Google Gemini API** (via AI Studio) or **Anthropic Claude API** | Natural language understanding for query parsing |
+| Card Data | **FAB official JSON** + **TCGPlayer API/scraper** | Metadata + live pricing |
+| State | **Zustand** or React Context | Lightweight state for lists, search history |
+| Storage | **localStorage** (MVP) → **Supabase/Firebase** (V2) | Persistence for favorites |
+| Deployment | **Replit** (dev) → **Vercel** (prod) | Fast iteration + edge deployment |
+
+---
+
+## 5. AI Agent Prompt Design (Internal)
+
+When the user submits a natural language query, send it to the AI model with a system prompt like:
+
+```
+You are PlanarBridge, an AI assistant specialized in the Flesh and Blood trading card game.
+
+Given a user's natural language query about FAB cards, extract structured search parameters:
+
+- card_name (partial or full)
+- hero (e.g., Bravo, Katsu, Lexi)
+- class (e.g., Guardian, Ninja, Ranger, Generic)
+- talent (e.g., Elemental, Shadow, Light)
+- card_type (e.g., Attack Action, Defense Reaction, Equipment, Weapon, Aura)
+- subtype (e.g., Arrow, Sword, Staff)
+- set_code (e.g., WTR, ARC, MON, ELE, UPR, OUT, DTD, EVO)
+- rarity (Common, Rare, Majestic, Legendary, Fabled)
+- keywords (e.g., "go again", "arcane barrier", "dominate", "intimidate")
+- pitch_value (1=red, 2=yellow, 3=blue)
+- price_min, price_max (USD)
+- sort_by (price_asc, price_desc, name, rarity)
+- limit (default 20)
+
+Respond ONLY in JSON. Example:
+{
+  "intent": "search",
+  "params": {
+    "hero": "Bravo",
+    "class": "Guardian",
+    "card_type": "Equipment",
+    "keywords": ["arcane barrier"],
+    "rarity": null,
+    "price_max": null,
+    "sort_by": "price_desc",
+    "limit": 20
+  },
+  "explanation": "Searching for all Guardian equipment cards associated with Bravo that have the Arcane Barrier keyword."
+}
+
+If the user asks to add cards to a list, respond with:
+{
+  "intent": "add_to_list",
+  "list_name": "Wishlist",
+  "card_ids": ["all_results" or specific IDs],
+  "explanation": "Adding all 12 results to your Wishlist."
+}
+
+If the user asks to refine or follow up, respond with the updated search params (merge with previous context).
+```
+
+---
+
+## 6. User Flows
+
+### Flow 1: First-Time Search
+```
+Open app → Hero screen with search bar
+→ Type: "Best Majestic attacks for Fai under $10"
+→ Agent thinking strip animates
+→ Grid of matching cards appears with prices
+→ Tap a card → Bottom sheet with full details
+→ Tap "Add to List" → Create "Fai Deck" list → Card added with animation
+→ Return to results → Continue browsing
+```
+
+### Flow 2: Conversational Refinement
+```
+Search: "Show me all Legendary weapons"
+→ Results appear (8 cards)
+→ Type: "Which ones are under $50?"
+→ Results filter down (3 cards) with smooth animation
+→ Type: "Add them all to my Wishlist"
+→ Agent confirms: "Added 3 Legendary weapons to Wishlist ✓"
+```
+
+### Flow 3: List Management
+```
+Tap Lists tab → See all lists as horizontal cards
+→ Tap "Trade Binder" → See all cards with prices
+→ See total collection value: "$234.50"
+→ Swipe left on a card → Delete with confirmation
+→ Pull down → Prices refresh with animation
+```
+
+---
+
+## 7. V1 MVP Scope
+
+For the first build, focus on:
+- [ ] Hero/landing page with search bar and suggestion chips
+- [ ] AI-powered natural language → structured query parsing
+- [ ] Card search results grid with images, names, rarity, prices
+- [ ] Card detail bottom sheet
+- [ ] Favorites list (create, add, remove, view)
+- [ ] Agent thinking animation strip
+- [ ] Responsive mobile-first dark theme
+- [ ] Local storage persistence for lists
+
+### Out of scope for V1:
+- User authentication / cloud sync
+- Price history charts
+- Deck building / deck validation
+- Social features / sharing
+- Push notifications for price alerts
+- Light mode
+
+---
+
+## 8. Vibe Check
+
+If I handed this app to a Flesh and Blood player at a local armory event, they should:
+
+1. **Feel impressed** — "This looks like a real product, not a side project"
+2. **Feel smart** — "I can just describe what I want and it finds it"
+3. **Feel in control** — "My lists, my prices, my collection"
+4. **Feel delighted** — "These little animations and the foil effect are sick"
+5. **Want to show friends** — "Look at this thing"
+
+The app should feel like what would happen if **Anthropic designed a TCG companion app** — intelligent, beautiful, respectful of the user's time, and quietly magical.
+
+---
+
+*End of prompt. Copy this entire document into Replit Agent, Cursor, or Google AI Studio as a starting prompt for your project.*

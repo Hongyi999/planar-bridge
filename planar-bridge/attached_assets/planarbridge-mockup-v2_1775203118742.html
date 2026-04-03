@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlanarBridge Mockup V2</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#2C2A26;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:'DM Sans',sans-serif;overflow-x:hidden}
+
+.wrap{display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px 0}
+.tabs{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.tabs button{font-size:11px;padding:6px 14px;border-radius:18px;cursor:pointer;border:1px solid #9B864440;background:transparent;color:#9B8644;font-family:'DM Sans',sans-serif;transition:all .25s}
+.tabs button.on{background:#9B8644;color:#F7F4ED;border-color:#9B8644;font-weight:600}
+
+.phone{width:375px;background:#1C1B18;border-radius:46px;padding:11px;box-shadow:0 30px 80px rgba(0,0,0,.45),inset 0 0 0 1px #3a3830}
+.inner{background:#F2EFE4;border-radius:36px;overflow:hidden;height:760px;position:relative}
+
+/* STATUS BAR */
+.status{position:absolute;top:0;left:0;right:0;z-index:30;padding:10px 24px 0;display:flex;justify-content:space-between;align-items:center}
+.status .t{font-size:13px;font-weight:600;color:#3C3828}
+.status .ic{display:flex;gap:4px}
+.status .ic svg{width:14px;height:14px}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:30px;background:#1C1B18;border-radius:0 0 18px 18px;z-index:31}
+
+/* WECHAT NAV */
+.wnav{position:absolute;top:30px;left:0;right:0;z-index:25;padding:4px 10px;display:flex;justify-content:space-between;align-items:center;height:44px}
+.wnav-l{display:flex;gap:0}
+.wnav-l .nb{width:30px;height:30px;display:flex;align-items:center;justify-content:center;background:#F2EFE420;backdrop-filter:blur(10px);border:1px solid #9B864420;cursor:pointer}
+.wnav-l .nb:first-child{border-radius:15px 0 0 15px;border-right:0}
+.wnav-l .nb:last-child{border-radius:0 15px 15px 0}
+.wnav-tt{position:absolute;left:50%;transform:translateX(-50%);font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:#3C3828;letter-spacing:.06em}
+.wcap{display:flex;border:1px solid #9B864425;border-radius:15px;overflow:hidden;background:#F2EFE430;backdrop-filter:blur(8px)}
+.wcap .cb{width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.wcap .cd{width:1px;height:14px;background:#9B864430;align-self:center}
+
+/* BOTTOM TAB */
+.btab{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-around;padding:6px 0 22px;background:linear-gradient(transparent,#F2EFE4 20%);z-index:20}
+.ti{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;opacity:.3;transition:.2s}
+.ti.on{opacity:1}
+.ti svg{width:21px;height:21px}
+.ti span{font-size:9px;font-weight:500;color:#3C3828;font-family:'DM Sans',sans-serif}
+
+/* SCREENS */
+.sc{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden}
+.sc.on{display:flex}
+
+/* ========== HERO ========== */
+#hero{justify-content:center;align-items:center;padding:20px;background:#F2EFE4;overflow:hidden}
+#hero .bg-lines{position:absolute;inset:0;opacity:.04;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,#9B8644 39px,#9B8644 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,#9B8644 39px,#9B8644 40px)}
+#hero .bg-glow{position:absolute;top:35%;left:50%;width:280px;height:280px;transform:translate(-50%,-50%);background:radial-gradient(circle,#9B864412 0%,transparent 70%);pointer-events:none}
+#hero .orb{position:absolute;width:6px;height:6px;border-radius:50%;background:#9B8644;opacity:.15}
+#hero .orb:nth-child(1){top:20%;left:15%;animation:float 6s ease-in-out infinite}
+#hero .orb:nth-child(2){top:60%;right:12%;animation:float 8s ease-in-out infinite 1s;width:4px;height:4px}
+#hero .orb:nth-child(3){top:35%;right:25%;animation:float 7s ease-in-out infinite 2s;width:8px;height:8px;opacity:.08}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+#hero .hc{position:relative;z-index:2;text-align:center;max-width:320px}
+#hero .logo-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:36px}
+#hero .logo-row span{font-family:'Cinzel',serif;font-size:14px;font-weight:600;color:#9B8644;letter-spacing:.15em;text-transform:uppercase}
+#hero h1{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:#2C2A22;line-height:1.15;letter-spacing:-.01em;margin-bottom:8px}
+#hero .sub{font-family:'Noto Serif SC',serif;font-size:13px;color:#8C8474;line-height:1.5;margin-bottom:32px}
+#hero .sbox{background:#FDFCF8;border:1.5px solid #9B864435;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:10px;margin-bottom:20px;box-shadow:0 2px 20px #9B864408;transition:border-color .3s,box-shadow .3s}
+#hero .sbox:hover{border-color:#9B864460;box-shadow:0 4px 30px #9B864415}
+#hero .sbox svg{flex-shrink:0}
+#hero .sbox span{color:#B8AD96;font-size:13px;font-family:'DM Sans',sans-serif}
+#hero .chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
+#hero .chip{padding:7px 13px;border-radius:20px;font-size:11px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+#hero .chip:hover{transform:translateY(-1px)}
+.cg{background:#9B86440D;border:1px solid #9B864425;color:#8B7A3E}
+.cp{background:#6B4C8A0D;border:1px solid #6B4C8A20;color:#6B4C8A}
+.ct{background:#3D7A5E0D;border:1px solid #3D7A5E20;color:#3D7A5E}
+
+/* ========== THINKING ========== */
+#think{padding:80px 18px 80px;background:#F2EFE4;overflow-y:auto}
+#think .qb{background:#FDFCF8;border:1.5px solid #D6D0C2;border-radius:14px;padding:11px 14px;display:flex;align-items:center;gap:10px;margin-bottom:24px}
+#think .qb span{font-size:13px;color:#3C3828}
+.ts{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px;padding:12px 14px;border-radius:14px;background:#FDFCF8;border:1px solid #E8E3D8;position:relative;overflow:hidden}
+.ts .shine{position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,#9B864408,transparent);animation:shimmer 2.5s infinite}
+@keyframes shimmer{0%{left:-100%}100%{left:200%}}
+.ts-icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ts-icon svg{width:15px;height:15px}
+.ts-body{flex:1}
+.ts-body .lab{font-size:12px;font-weight:600;margin-bottom:1px}
+.ts-body .met{font-size:10px;color:#A09A8C;font-family:'JetBrains Mono',monospace;letter-spacing:.02em}
+.ts-check{margin-left:auto;flex-shrink:0;align-self:center}
+.ts-check svg{width:16px;height:16px}
+.spn{width:14px;height:14px;border:2px solid #3D7A5E;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;margin-left:auto;align-self:center}
+@keyframes spin{to{transform:rotate(360deg)}}
+#think .summary{background:#FDFCF8;border:1.5px solid #9B864420;border-radius:16px;padding:16px;margin-top:6px}
+#think .summary .sr{display:flex;justify-content:space-between;margin-bottom:8px}
+#think .summary .sr span:first-child{font-family:'Cinzel',serif;font-size:11px;color:#A09A8C;letter-spacing:.08em;text-transform:uppercase}
+#think .summary .sr span:last-child{font-family:'JetBrains Mono',monospace;font-size:12px;color:#9B8644;font-weight:600}
+#think .summary p{font-size:12.5px;color:#4A4636;line-height:1.6;font-family:'Noto Serif SC',serif}
+
+/* ========== RESULTS ========== */
+#results{padding:80px 14px 80px;background:#F2EFE4;overflow-y:auto}
+#results .qsm{background:#FDFCF8;border:1px solid #D6D0C2;border-radius:12px;padding:9px 12px;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+#results .qsm span{font-size:12px;color:#3C3828}
+#results .rmeta{display:flex;justify-content:space-between;padding:0 4px;margin-bottom:10px}
+#results .rmeta span{font-size:11px;color:#A09A8C}
+#results .rmeta .fu{color:#6B4C8A;font-weight:500}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ctile{background:#FDFCF8;border-radius:16px;overflow:hidden;border:1px solid #E8E3D8;position:relative;transition:transform .2s,box-shadow .2s;cursor:pointer}
+.ctile:hover{transform:translateY(-2px);box-shadow:0 8px 24px #9B864412}
+.ctile .cimg{height:155px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.ctile .cimg .ph{width:78px;height:109px;border-radius:5px;border:1px solid #9B864430;display:flex;align-items:center;justify-content:center;font-size:9px;color:#9B8644;text-align:center;padding:4px;font-family:'Cinzel',serif;font-weight:600;letter-spacing:.02em;line-height:1.3}
+.rbadge{position:absolute;top:8px;left:8px;padding:2px 7px;border-radius:6px;font-size:8px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.rb-M{background:#9B86441A;border:1px solid #9B864430;color:#8B7A3E}
+.rb-L{background:linear-gradient(135deg,#9B86441A,#6B4C8A1A);border:1px solid #9B864430;color:#8B7A3E}
+.hbtn{position:absolute;top:8px;right:8px;width:26px;height:26px;background:#FDFCF880;backdrop-filter:blur(4px);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid #E8E3D8}
+.ctile .cinf{padding:10px 12px}
+.ctile .cn{font-family:'Cinzel',serif;font-size:11px;font-weight:600;color:#2C2A22;margin-bottom:2px;letter-spacing:.01em}
+.ctile .cm{font-size:10px;color:#A09A8C;margin-bottom:5px}
+.ctile .cpr{display:flex;justify-content:space-between;align-items:center}
+.ctile .pr{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:14px}
+.ctile .tr{font-size:9px;font-weight:500}
+.pup{color:#3D7A5E}
+.pdn{color:#C4544A}
+.pfl{color:#A09A8C}
+
+/* ========== DETAIL ========== */
+#detail{background:#F2EFE4}
+.dhero{height:290px;display:flex;align-items:center;justify-content:center;position:relative;padding-top:44px;background:linear-gradient(180deg,#EBE7DA 0%,#F2EFE4 100%)}
+.dhero .deco-line{position:absolute;width:200px;height:200px;border:1px solid #9B864410;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%)}
+.dhero .deco-line:nth-child(2){width:260px;height:260px;border-color:#9B864408}
+.dback{position:absolute;top:48px;left:14px;width:32px;height:32px;background:#FDFCF8;border:1px solid #D6D0C2;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5}
+.dcard{width:145px;height:203px;border-radius:10px;border:2px solid #9B864450;display:flex;align-items:center;justify-content:center;box-shadow:0 16px 48px #9B864420;position:relative;z-index:3;font-family:'Cinzel',serif;font-weight:600;text-align:center;color:#9B8644;font-size:13px;line-height:1.3;transition:transform .3s}
+.dcard:hover{transform:perspective(500px) rotateY(5deg) scale(1.02)}
+.dsheet{background:#FDFCF8;border-radius:24px 24px 0 0;flex:1;padding:18px 16px 90px;margin-top:-18px;position:relative;z-index:4;overflow-y:auto;border:1px solid #E8E3D8;border-bottom:0}
+.dsheet .hdl{width:36px;height:3px;background:#D6D0C2;border-radius:2px;margin:0 auto 14px}
+.dh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.dh .nm{font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:#2C2A22;letter-spacing:-.01em}
+.dh .tp{font-size:12px;color:#A09A8C;margin-top:2px}
+.dh .tp .rar{color:#9B8644;font-weight:600}
+.dh .pbk{text-align:right}
+.dh .pbig{font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:600;color:#3D7A5E}
+.dh .ptr{font-size:10px;color:#3D7A5E;margin-top:1px}
+.srow{display:flex;gap:7px;margin-bottom:14px}
+.schip{background:#F2EFE4;border-radius:10px;padding:8px 0;text-align:center;flex:1;border:1px solid #E8E3D8}
+.schip .sl{font-size:9px;color:#A09A8C;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.schip .sv{font-size:15px;font-weight:700;color:#2C2A22}
+.ctxt{background:#F2EFE4;border-radius:12px;padding:12px 14px;margin-bottom:14px;border:1px solid #E8E3D8}
+.ctxt p{font-family:'Noto Serif SC','Cormorant Garamond',serif;font-size:12px;line-height:1.65;color:#4A4636}
+.ctxt .kw{font-weight:600;color:#9B8644}
+.prow{display:flex;gap:7px;margin-bottom:14px}
+.pcell{background:#F2EFE4;border-radius:10px;padding:8px 10px;flex:1;border:1px solid #E8E3D8}
+.pcell .pl{font-size:9px;color:#A09A8C}
+.pcell .pv{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#2C2A22;margin-top:2px}
+.arow{display:flex;gap:8px}
+.btn-p{flex:1;background:#9B8644;color:#FDFCF8;border:none;border-radius:13px;padding:13px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Noto Serif SC','DM Sans',sans-serif;transition:all .2s;letter-spacing:.02em}
+.btn-p:hover{background:#8B7A3E;transform:translateY(-1px)}
+.btn-s{width:48px;background:#F2EFE4;border:1.5px solid #D6D0C2;border-radius:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
+.btn-s:hover{border-color:#9B8644}
+
+/* ========== LISTS ========== */
+#lists{padding:80px 16px 80px;background:#F2EFE4;overflow-y:auto}
+#lists h2{font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#2C2A22;letter-spacing:-.01em;margin-bottom:3px}
+#lists .lsub{font-size:12px;color:#A09A8C;margin-bottom:18px}
+.lcrow{display:flex;gap:10px;overflow-x:auto;margin-bottom:22px;padding-bottom:4px}
+.lc{min-width:128px;border-radius:14px;padding:14px;flex-shrink:0;transition:transform .2s;cursor:pointer}
+.lc:hover{transform:translateY(-2px)}
+.lc .ln{font-size:12px;font-weight:600;margin-bottom:3px}
+.lc .lk{font-size:10px;color:#A09A8C;margin-bottom:8px}
+.lc .lv{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:#2C2A22}
+.lcg{background:#9B86440A;border:1.5px solid #9B864420}.lcg .ln{color:#8B7A3E}
+.lcp{background:#6B4C8A08;border:1.5px solid #6B4C8A18}.lcp .ln{color:#6B4C8A}
+.lcc{background:#3D7A5E08;border:1.5px solid #3D7A5E18}.lcc .ln{color:#3D7A5E}
+.lst{font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:#2C2A22;letter-spacing:.02em;margin-bottom:10px}
+.lis{display:flex;flex-direction:column;gap:8px}
+.li{background:#FDFCF8;border-radius:12px;padding:9px 11px;display:flex;align-items:center;gap:11px;border:1px solid #E8E3D8;transition:all .2s;cursor:pointer}
+.li:hover{border-color:#9B864430;box-shadow:0 2px 12px #9B864408}
+.li .th{width:40px;height:56px;border-radius:6px;flex-shrink:0;border:1px solid #9B864420;display:flex;align-items:center;justify-content:center;font-size:6px;color:#9B8644;text-align:center;font-family:'Cinzel',serif;font-weight:600}
+.li .ii{flex:1;min-width:0}
+.li .in{font-family:'Cinzel',serif;font-size:11.5px;font-weight:600;color:#2C2A22;letter-spacing:.01em}
+.li .im{font-size:10px;color:#A09A8C;margin-top:1px}
+.li .ip{text-align:right;flex-shrink:0}
+.li .ip .ipv{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:13px;color:#2C2A22}
+.li .ip .ipt{font-size:9px;margin-top:1px}
+
+/* ========== SERIES ========== */
+#series{padding:80px 16px 80px;background:#F2EFE4;overflow-y:auto}
+#series h2{font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#2C2A22;letter-spacing:-.01em;margin-bottom:3px}
+#series .ssub{font-size:12px;color:#A09A8C;margin-bottom:14px}
+.stog{display:flex;gap:0;margin-bottom:16px}
+.sb{padding:8px 18px;font-size:12px;border:1.5px solid #D6D0C2;cursor:pointer;font-family:'Noto Serif SC','DM Sans',sans-serif;transition:all .2s;background:#FDFCF8;color:#A09A8C}
+.sb:first-child{border-radius:10px 0 0 10px}
+.sb:last-child{border-radius:0 10px 10px 0;border-left:0}
+.sb.on{background:#9B8644;color:#FDFCF8;border-color:#9B8644;font-weight:600}
+.slist{display:flex;flex-direction:column;gap:0}
+.syear{padding:10px 0 4px;font-family:'Cinzel',serif;font-size:11px;font-weight:600;color:#9B8644;letter-spacing:.1em;text-transform:uppercase;border-bottom:1.5px solid #9B864418;margin-bottom:2px}
+.si{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid #E8E3D8;cursor:pointer;transition:background .15s}
+.si:hover{background:#9B864406}
+.si-icon{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:11px;font-weight:700;color:#8B7A3E;background:#9B86440A;border:1.5px solid #9B864418}
+.si .sinf{flex:1}
+.si .sn{font-family:'Cinzel',serif;font-size:12.5px;font-weight:600;color:#2C2A22;letter-spacing:.01em}
+.si .sk{font-size:10px;color:#A09A8C;margin-top:1px}
+.si .sc-code{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:#A09A8C;flex-shrink:0}
+.si .sa{color:#C8C2B4;font-size:16px;margin-left:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="tabs">
+<button class="on" onclick="go('hero',this)">首页</button>
+<button onclick="go('think',this)">AI 思考</button>
+<button onclick="go('results',this)">搜索结果</button>
+<button onclick="go('detail',this)">卡牌详情</button>
+<button onclick="go('lists',this)">收藏列表</button>
+<button onclick="go('series',this)">全部系列</button>
+</div>
+
+<div class="phone"><div class="inner">
+
+<!-- NOTCH + STATUS -->
+<div class="notch"></div>
+<div class="status">
+<span class="t">9:41</span>
+<span></span>
+<div class="ic">
+<svg viewBox="0 0 24 24" fill="none" stroke="#3C3828" stroke-width="2"><path d="M1 1l22 22"/><path d="M16.72 11.06A10.94 10.94 0 0119 12.55"/><circle cx="12" cy="20" r="1"/></svg>
+<svg viewBox="0 0 24 24" fill="none" stroke="#3C3828" stroke-width="2"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="10" x2="23" y2="14"/></svg>
+</div>
+</div>
+
+<!-- WECHAT NAV -->
+<div class="wnav" id="wnav">
+<div class="wnav-l">
+<div class="nb"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B6355" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></div>
+<div class="nb"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B6355" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+</div>
+<span class="wnav-tt" id="nvtt">Planar Bridge</span>
+<div class="wcap">
+<div class="cb"><svg width="14" height="4" viewBox="0 0 16 4"><circle cx="4" cy="2" r="1.5" fill="#6B6355"/><circle cx="12" cy="2" r="1.5" fill="#6B6355"/></svg></div>
+<div class="cd"></div>
+<div class="cb"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6B6355" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+</div>
+</div>
+
+<!-- ===== HERO ===== -->
+<div class="sc on" id="hero">
+<div class="bg-lines"></div>
+<div class="bg-glow"></div>
+<div class="orb"></div><div class="orb"></div><div class="orb"></div>
+<div class="hc">
+<div class="logo-row">
+<svg width="26" height="26" viewBox="0 0 30 30"><path d="M15 3L5 10L5 22L10 25L15 20L20 25L25 22L25 10Z" fill="none" stroke="#9B8644" stroke-width="1.5"/><path d="M10 10L15 14L20 10" fill="none" stroke="#9B8644" stroke-width="1.2"/><circle cx="15" cy="8" r="1.5" fill="#9B8644" opacity=".5"/></svg>
+<span>Planar Bridge</span>
+</div>
+<h1>What cards are<br>you looking for?</h1>
+<p class="sub">用自然语言搜索 Flesh and Blood 卡牌<br>实时价格 · 系列浏览 · 个人收藏</p>
+<div class="sbox">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9B8644" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+<span>Legendary equipment for Ninja...</span>
+</div>
+<div class="chips">
+<span class="chip cg">Legendary 装备</span>
+<span class="chip cp">Majestic 攻击</span>
+<span class="chip ct">$5 以下好牌</span>
+<span class="chip cg">Uprising 热卡</span>
+</div>
+</div>
+</div>
+
+<!-- ===== THINKING ===== -->
+<div class="sc" id="think">
+<div class="qb"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A09A8C" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg><span>Legendary equipment for Ninja class</span></div>
+<div class="ts"><div class="shine"></div><div class="ts-icon" style="background:#6B4C8A10;border:1px solid #6B4C8A18"><svg viewBox="0 0 24 24" fill="none" stroke="#6B4C8A" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div class="ts-body"><div class="lab" style="color:#6B4C8A">Understanding query intent...</div><div class="met">class=Ninja · type=Equipment · rarity=Legendary</div></div><div class="ts-check"><svg viewBox="0 0 24 24" fill="none" stroke="#3D7A5E" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+<div class="ts"><div class="shine"></div><div class="ts-icon" style="background:#9B86440A;border:1px solid #9B864418"><svg viewBox="0 0 24 24" fill="none" stroke="#9B8644" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg></div><div class="ts-body"><div class="lab" style="color:#8B7A3E">Searching FAB database...</div><div class="met">4,200+ cards · filtering by class + rarity</div></div><div class="ts-check"><svg viewBox="0 0 24 24" fill="none" stroke="#3D7A5E" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+<div class="ts"><div class="shine"></div><div class="ts-icon" style="background:#3D7A5E0A;border:1px solid #3D7A5E18"><svg viewBox="0 0 24 24" fill="none" stroke="#3D7A5E" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div class="ts-body"><div class="lab" style="color:#3D7A5E">Fetching TCGPlayer market prices...</div><div class="met">4 cards found · pulling live pricing data</div></div><div class="spn"></div></div>
+<div class="summary"><div class="sr"><span>Agent Summary</span><span>4 results</span></div><p>找到 4 张 Ninja 职业传奇装备，包括 Mask of Momentum (头)、Snapdragon Scalers (脚)、Breaking Scales (脚)，以及 Fyendal's Spring Tunic (通用胸甲)。已获取 TCGPlayer 最新市价。</p></div>
+</div>
+
+<!-- ===== RESULTS ===== -->
+<div class="sc" id="results">
+<div class="qsm"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#A09A8C" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg><span>Legendary equipment for Ninja</span></div>
+<div class="rmeta"><span>4 results · by price desc</span><span class="fu">继续追问...</span></div>
+<div class="cgrid">
+<div class="ctile">
+<div class="cimg" style="background:linear-gradient(135deg,#EBE7DA,#E0DBCC)"><div class="ph">Mask of<br>Momentum</div><span class="rbadge rb-L">L</span><div class="hbtn"><svg width="11" height="11" viewBox="0 0 24 24" fill="#9B8644" stroke="#9B8644" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div></div>
+<div class="cinf"><div class="cn">Mask of Momentum</div><div class="cm">Ninja · Equipment — Head · WTR</div><div class="cpr"><span class="pr pup">$18.49</span><span class="tr pup">▲ 8%</span></div></div>
+</div>
+<div class="ctile">
+<div class="cimg" style="background:linear-gradient(135deg,#E8E4D6,#DDD8C8)"><div class="ph">Snapdragon<br>Scalers</div><span class="rbadge rb-L">L</span><div class="hbtn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A09A8C" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div></div>
+<div class="cinf"><div class="cn">Snapdragon Scalers</div><div class="cm">Ninja · Equipment — Legs · WTR</div><div class="cpr"><span class="pr pdn">$14.75</span><span class="tr pdn">▼ 3%</span></div></div>
+</div>
+<div class="ctile">
+<div class="cimg" style="background:linear-gradient(135deg,#E5E1D2,#DBD6C6)"><div class="ph">Fyendal's<br>Spring<br>Tunic</div><span class="rbadge rb-L">L</span><div class="hbtn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A09A8C" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div></div>
+<div class="cinf"><div class="cn">Fyendal's Spring Tunic</div><div class="cm">Generic · Equipment — Chest · CRU</div><div class="cpr"><span class="pr pup">$22.30</span><span class="tr pup">▲ 12%</span></div></div>
+</div>
+<div class="ctile">
+<div class="cimg" style="background:linear-gradient(135deg,#E9E5D8,#DFD9CA)"><div class="ph">Breaking<br>Scales</div><span class="rbadge rb-L">L</span><div class="hbtn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A09A8C" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div></div>
+<div class="cinf"><div class="cn">Breaking Scales</div><div class="cm">Ninja · Equipment — Legs · CRU</div><div class="cpr"><span class="pr pfl">$5.20</span><span class="tr pfl">— 0%</span></div></div>
+</div>
+</div>
+</div>
+
+<!-- ===== DETAIL ===== -->
+<div class="sc" id="detail">
+<div class="dhero">
+<div class="deco-line"></div><div class="deco-line"></div>
+<div class="dback"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B6355" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></div>
+<div class="dcard" style="background:linear-gradient(145deg,#EDE9DC,#E4DFCF)">Mask of<br>Momentum<br><small style="font-weight:400;font-size:9px;opacity:.5;font-family:'DM Sans'">WTR · Legendary</small></div>
+</div>
+<div class="dsheet">
+<div class="hdl"></div>
+<div class="dh"><div><div class="nm">Mask of Momentum</div><div class="tp">Ninja · Equipment — Head · <span class="rar">Legendary</span></div></div><div class="pbk"><div class="pbig">$18.49</div><div class="ptr">▲ 8% this week</div></div></div>
+<div class="srow">
+<div class="schip"><div class="sl">Cost</div><div class="sv">0</div></div>
+<div class="schip"><div class="sl">Defense</div><div class="sv" style="color:#4A82B5">2</div></div>
+<div class="schip"><div class="sl">Intellect</div><div class="sv">—</div></div>
+<div class="schip"><div class="sl">Life</div><div class="sv">—</div></div>
+</div>
+<div class="ctxt"><p><span class="kw">Once per Turn Effect</span> — When an attack action card you control is the third or higher chain link in a row to hit, draw a card.<br><br><span class="kw">Blade Break</span> — If you defend with Mask of Momentum, destroy it when the combat chain closes.</p></div>
+<div class="prow">
+<div class="pcell"><div class="pl">TCG Low</div><div class="pv">$14.99</div></div>
+<div class="pcell"><div class="pl">TCG Mid</div><div class="pv">$18.49</div></div>
+<div class="pcell"><div class="pl">TCG Market</div><div class="pv">$17.85</div></div>
+</div>
+<div class="arow">
+<button class="btn-p">加入收藏列表</button>
+<button class="btn-s"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B6355" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg></button>
+</div>
+</div>
+</div>
+
+<!-- ===== LISTS ===== -->
+<div class="sc" id="lists">
+<h2>My Collections</h2>
+<p class="lsub">3 lists · 18 cards · est. $247.60</p>
+<div class="lcrow">
+<div class="lc lcg"><div class="ln">Ninja 套牌</div><div class="lk">8 cards</div><div class="lv">$124.40</div></div>
+<div class="lc lcp"><div class="ln">心愿单</div><div class="lk">6 cards</div><div class="lv">$89.20</div></div>
+<div class="lc lcc"><div class="ln">交换册</div><div class="lk">4 cards</div><div class="lv">$34.00</div></div>
+</div>
+<div class="lst">Ninja 套牌</div>
+<div class="lis">
+<div class="li"><div class="th" style="background:#EDE9DC">MoM</div><div class="ii"><div class="in">Mask of Momentum</div><div class="im">Legendary · Equipment — Head · WTR</div></div><div class="ip"><div class="ipv">$18.49</div><div class="ipt pup">▲ 8%</div></div></div>
+<div class="li"><div class="th" style="background:#E8E4D6">SS</div><div class="ii"><div class="in">Snapdragon Scalers</div><div class="im">Legendary · Equipment — Legs · WTR</div></div><div class="ip"><div class="ipv">$14.75</div><div class="ipt pdn">▼ 3%</div></div></div>
+<div class="li"><div class="th" style="background:#E5E1D2">ES</div><div class="ii"><div class="in">Enlightened Strike</div><div class="im">Majestic · Generic Attack Action · WTR</div></div><div class="ip"><div class="ipv">$6.25</div><div class="ipt pup">▲ 5%</div></div></div>
+<div class="li"><div class="th" style="background:#E9E5D8">C&C</div><div class="ii"><div class="in">Command and Conquer</div><div class="im">Majestic · Generic Attack Action · ARC</div></div><div class="ip"><div class="ipv">$4.80</div><div class="ipt pfl">— 0%</div></div></div>
+</div>
+</div>
+
+<!-- ===== SERIES ===== -->
+<div class="sc" id="series">
+<h2>All Sets</h2>
+<p class="ssub">Booster · Supplementary · History · Chronological</p>
+<div class="stog"><button class="sb on" onclick="this.parentElement.querySelectorAll('.sb').forEach(b=>b.classList.remove('on'));this.classList.add('on')">按时间顺序</button><button class="sb" onclick="this.parentElement.querySelectorAll('.sb').forEach(b=>b.classList.remove('on'));this.classList.add('on')">按字母顺序</button></div>
+<div class="slist">
+<div class="syear">2025</div>
+<div class="si"><div class="si-icon">HS</div><div class="sinf"><div class="sn">High Seas</div><div class="sk">Pirate · Necromancer · 236 cards</div></div><div class="sc-code">SEA</div><span class="sa">›</span></div>
+<div class="si"><div class="si-icon">HN</div><div class="sinf"><div class="sn">The Hunted</div><div class="sk">Ninja · Warrior · Assassin · 226 cards</div></div><div class="sc-code">HNT</div><span class="sa">›</span></div>
+<div class="syear">2024</div>
+<div class="si"><div class="si-icon">RO</div><div class="sinf"><div class="sn">Rosetta</div><div class="sk">Earth · Ice · Lightning · 226 cards</div></div><div class="sc-code">ROS</div><span class="sa">›</span></div>
+<div class="si"><div class="si-icon">PM</div><div class="sinf"><div class="sn">Part the Mistveil</div><div class="sk">Mystic · Illusionist · 226 cards</div></div><div class="sc-code">MST</div><span class="sa">›</span></div>
+<div class="si"><div class="si-icon">HH</div><div class="sinf"><div class="sn">Heavy Hitters</div><div class="sk">Guardian · Brute · 226 cards</div></div><div class="sc-code">HVY</div><span class="sa">›</span></div>
+<div class="syear">2023</div>
+<div class="si"><div class="si-icon">BL</div><div class="sinf"><div class="sn">Bright Lights</div><div class="sk">Mechanologist · 226 cards</div></div><div class="sc-code">BRI</div><span class="sa">›</span></div>
+<div class="si"><div class="si-icon">DD</div><div class="sinf"><div class="sn">Dusk Till Dawn</div><div class="sk">Light · Shadow · 226 cards</div></div><div class="sc-code">DTD</div><span class="sa">›</span></div>
+<div class="si"><div class="si-icon">OS</div><div class="sinf"><div class="sn">Outsiders</div><div class="sk">Assassin · Ranger · Ninja · 226 cards</div></div><div class="sc-code">OUT</div><span class="sa">›</span></div>
+<div class="syear">2022</div>
+<div class="si"><div class="si-icon">DY</div><div class="sinf"><div class="sn">Dynasty</div><div class="sk">Royal · Emperor · 226 cards</div></div><div class="sc-code">DYN</div><span class="sa">›</span></div>
+<div class="si"><div class="si-icon">UP</div><div class="sinf"><div class="sn">Uprising</div><div class="sk">Draconic · Illusionist · 226 cards</div></div><div class="sc-code">UPR</div><span class="sa">›</span></div>
+<div class="si"><div class="si-icon">EF</div><div class="sinf"><div class="sn">Everfest</div><div class="sk">Multi-class · Carnival · 226 cards</div></div><div class="sc-code">EVE</div><span class="sa">›</span></div>
+<div class="syear">2021</div>
+<div class="si"><div class="si-icon">TA</div><div class="sinf"><div class="sn">Tales of Aria</div><div class="sk">Elemental · Ranger · Guardian · 226 cards</div></div><div class="sc-code">ELE</div><span class="sa">›</span></div>
+<div class="si"><div class="si-icon">MO</div><div class="sinf"><div class="sn">Monarch</div><div class="sk">Light · Shadow · 303 cards</div></div><div class="sc-code">MON</div><span class="sa">›</span></div>
+<div class="syear">2019 – 2020</div>
+<div class="si"><div class="si-icon">CW</div><div class="sinf"><div class="sn">Crucible of War</div><div class="sk">Supplementary · 198 cards</div></div><div class="sc-code">CRU</div><span class="sa">›</span></div>
+<div class="si"><div class="si-icon">AR</div><div class="sinf"><div class="sn">Arcane Rising</div><div class="sk">Mechanologist · Wizard · Ranger · 226 cards</div></div><div class="sc-code">ARC</div><span class="sa">›</span></div>
+<div class="si"><div class="si-icon">WR</div><div class="sinf"><div class="sn">Welcome to Rathe</div><div class="sk">Brute · Guardian · Ninja · Warrior · 226 cards</div></div><div class="sc-code">WTR</div><span class="sa">›</span></div>
+</div>
+</div>
+
+<!-- BOTTOM TAB -->
+<div class="btab">
+<div class="ti on" id="t-s" onclick="go('hero')"><svg viewBox="0 0 24 24" fill="none" stroke="#9B8644" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg><span>搜索</span></div>
+<div class="ti" id="t-se" onclick="go('series')"><svg viewBox="0 0 24 24" fill="none" stroke="#3C3828" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>系列</span></div>
+<div class="ti" id="t-l" onclick="go('lists')"><svg viewBox="0 0 24 24" fill="none" stroke="#3C3828" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg><span>收藏</span></div>
+<div class="ti" id="t-st" onclick="go('hero')"><svg viewBox="0 0 24 24" fill="none" stroke="#3C3828" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9"/></svg><span>设置</span></div>
+</div>
+
+</div></div>
+</div>
+
+<script>
+const T={hero:'Planar Bridge',think:'Planar Bridge',results:'搜索结果',detail:'卡牌详情',lists:'My Collections',series:'All Sets'};
+const M={hero:'t-s',think:'t-s',results:'t-s',detail:'t-s',lists:'t-l',series:'t-se'};
+function go(id,btn){
+document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
+document.getElementById(id).classList.add('on');
+document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));
+if(btn)btn.classList.add('on');
+else document.querySelectorAll('.tabs button').forEach(b=>{if(b.textContent.includes(id==='hero'?'首页':id==='think'?'思考':id))b.classList.add('on')});
+document.getElementById('nvtt').textContent=T[id]||'Planar Bridge';
+document.querySelectorAll('.ti').forEach(t=>{t.classList.remove('on');t.querySelector('svg').style.stroke='#3C3828'});
+let at=document.getElementById(M[id]);
+if(at){at.classList.add('on');at.querySelector('svg').style.stroke='#9B8644'}
+document.getElementById('wnav').style.opacity=id==='hero'?'0':'1';
+}
+</script>
+</body>
+</html>
