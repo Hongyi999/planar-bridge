@@ -1,5 +1,5 @@
 import { View, Text, Image } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useLoad } from '@tarojs/taro';
 import { useEffect } from 'react';
 import { useApp } from '../../store/AppContext';
 import './index.scss';
@@ -16,7 +16,10 @@ interface SettingItem {
   readonly?: boolean;
 }
 
+const NAV_COLOR = { frontColor: '#000000' as '#000000', backgroundColor: '#F2EFE4' };
+
 export default function Settings() {
+  useLoad(() => { Taro.setNavigationBarColor(NAV_COLOR); });
   const { state, dispatch } = useApp();
   const { user } = state;
 

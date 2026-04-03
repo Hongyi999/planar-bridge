@@ -258,6 +258,31 @@
     }
   }
 
+  &__brand {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding-top: 64px;
+    animation: fadeIn 0.5s ease both;
+  }
+
+  &__brand-logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  &__brand-name {
+    font-family: Georgia, 'Cinzel', serif;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: #9B8644;
+    text-transform: uppercase;
+  }
+
   &__hero {
     text-align: center;
     animation: fadeInUp 0.5s ease;
@@ -270,6 +295,15 @@
     color: var(--text-primary);
     letter-spacing: -0.02em;
     line-height: 1.2;
+    margin-bottom: 24px;
+  }
+
+  &__hero-sub {
+    font-family: -apple-system, 'PingFang SC', 'Noto Serif SC', sans-serif;
+    font-size: 26px;
+    color: #A09A8C;
+    line-height: 1.6;
+    text-align: center;
   }
 
   &__search-bar-wrap {

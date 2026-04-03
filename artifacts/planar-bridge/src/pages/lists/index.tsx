@@ -1,14 +1,17 @@
 import { View, Text, ScrollView, Image, Input } from '@tarojs/components';
 import type { ITouchEvent } from '@tarojs/components';
 import type { BaseEventOrig, InputProps } from '@tarojs/components/types/Input';
-import Taro from '@tarojs/taro';
+import Taro, { useLoad } from '@tarojs/taro';
 import { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../store/AppContext';
 import type { FabList } from '../../types';
 import { RarityColors } from '../../constants/colors';
 import './index.scss';
 
+const NAV_COLOR = { frontColor: '#000000' as '#000000', backgroundColor: '#F2EFE4' };
+
 export default function Lists() {
+  useLoad(() => { Taro.setNavigationBarColor(NAV_COLOR); });
   const { state, dispatch } = useApp();
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
   const [showNewListModal, setShowNewListModal] = useState(false);

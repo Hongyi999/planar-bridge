@@ -1,4 +1,5 @@
 import { View, Text, ScrollView } from '@tarojs/components';
+import Taro, { useLoad } from '@tarojs/taro';
 import { useState } from 'react';
 import './index.scss';
 
@@ -63,7 +64,10 @@ const ALL_SETS: YearGroup[] = [
   },
 ];
 
+const NAV_COLOR = { frontColor: '#000000' as '#000000', backgroundColor: '#F2EFE4' };
+
 export default function Series() {
+  useLoad(() => { Taro.setNavigationBarColor(NAV_COLOR); });
   const [sortMode, setSortMode] = useState<'chrono' | 'alpha'>('chrono');
 
   const displayGroups = sortMode === 'chrono'

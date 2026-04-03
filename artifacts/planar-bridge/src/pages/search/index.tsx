@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, Image, Input } from '@tarojs/components';
 import type { BaseEventOrig, InputProps } from '@tarojs/components/types/Input';
-import Taro from '@tarojs/taro';
+import Taro, { useLoad } from '@tarojs/taro';
 import { useState, useCallback } from 'react';
 import SearchBar from '../../components/SearchBar';
 import AgentThinkingStrip from '../../components/AgentThinkingStrip';
@@ -26,6 +26,14 @@ export default function Search() {
   const { state, dispatch, openCardDetail, closeCardDetail, addCardToList, createList } = useApp();
   const [query, setQuery] = useState('');
   const [searchState, setSearchState] = useState<SearchState>('idle');
+
+  useLoad(() => {
+    Taro.setNavigationBarColor({
+      frontColor: '#000000',
+      backgroundColor: '#F2EFE4',
+    });
+  });
+
   const [isThinking, setIsThinking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [favoritedCards, setFavoritedCards] = useState<Set<string>>(new Set());
@@ -198,11 +206,21 @@ export default function Search() {
       <View className='search-page__aurora' />
       <View className='search-page__aurora-2' />
 
+      {!showResults && (
+        <View className='search-page__brand'>
+          <Image className='search-page__brand-logo' src={LOGO_ICON} mode='aspectFit' />
+          <Text className='search-page__brand-name'>Planar Bridge</Text>
+        </View>
+      )}
+
       <View className={`search-page__search-area ${showResults ? 'search-page__search-area--compact' : ''}`}>
         {!showResults && (
           <View className='search-page__hero'>
             <Text className='search-page__hero-headline'>
               What cards are{'\n'}you looking for?
+            </Text>
+            <Text className='search-page__hero-sub'>
+              用自然语言搜索 Flesh and Blood 卡牌{'\n'}实时价格 · 系列浏览 · 个人收藏
             </Text>
           </View>
         )}
