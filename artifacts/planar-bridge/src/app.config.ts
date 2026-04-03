@@ -13,6 +13,7 @@ export default defineAppConfig({
     navigationBarTextStyle: 'black',
     backgroundColor: '#F2EFE4',
     enablePullDownRefresh: false,
+    homeButton: true,
   },
   tabBar: {
     color: '#A09A8C',
