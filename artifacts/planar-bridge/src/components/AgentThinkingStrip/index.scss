@@ -1,0 +1,108 @@
+.thinking-strip {
+  margin: 16px 0;
+  animation: fadeIn 0.3s ease;
+
+  &__inner {
+    background: var(--bg-tertiary);
+    border: 1px solid rgba(192, 106, 224, 0.2);
+    border-radius: var(--radius-lg);
+    padding: 24px 28px;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-secondary), transparent);
+      animation: shimmer 2s linear infinite;
+      background-size: 200% auto;
+    }
+  }
+
+  &__steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0.3;
+    transition: all 0.3s ease;
+
+    &--active {
+      opacity: 1;
+      animation: thinking-step 0.3s ease;
+
+      .thinking-strip__step-text {
+        color: var(--accent-secondary);
+      }
+
+      .thinking-strip__step-icon {
+        animation: spin 1s linear infinite;
+      }
+    }
+
+    &--done {
+      opacity: 0.7;
+
+      .thinking-strip__step-text {
+        color: var(--text-secondary);
+        text-decoration: line-through;
+        text-decoration-color: rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+
+  &__step-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  &__step-text {
+    font-size: 26px;
+    color: var(--text-secondary);
+    letter-spacing: -0.01em;
+    transition: color 0.3s ease;
+  }
+
+  &__done {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: fadeIn 0.4s ease;
+  }
+
+  &__done-icon {
+    font-size: 28px;
+    color: var(--accent-primary);
+  }
+
+  &__done-text {
+    font-size: 28px;
+    color: var(--accent-primary);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  &__progress {
+    margin-top: 20px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  &__progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary));
+    border-radius: 2px;
+    transition: width 0.8s ease;
+  }
+}
