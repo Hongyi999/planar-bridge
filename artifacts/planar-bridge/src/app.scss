@@ -1,4 +1,3 @@
-:root,
 page {
   --bg-primary: #F2EFE4;
   --bg-secondary: #FDFCF8;
@@ -30,11 +29,6 @@ page {
   --shadow-glow-purple: 0 4px 24px rgba(107, 76, 138, 0.2);
   --font-serif: Georgia, 'Palatino Linotype', 'PingFang SC', serif;
   --font-mono: 'SF Mono', 'Menlo', 'Consolas', monospace;
-}
-
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
 }
 
 page {
