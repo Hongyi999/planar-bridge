@@ -26,15 +26,17 @@
     </view>
   </view>
 
-  <!-- Pull-up sheet -->
-  <scroll-view scroll-y enhanced show-scrollbar="{{false}}" class="detail-sheet" style="height: calc(100vh - {{heroHeight}}rpx);">
-    <!-- Drag handle -->
-    <view class="sheet-handle"
-      bindtouchstart="onHandleTouchStart"
-      bindtouchmove="onHandleTouchMove"
-      bindtouchend="onHandleTouchEnd"
-    ></view>
+  <!-- Drag handle (outside scroll-view for visibility) -->
+  <view class="sheet-handle-wrap"
+    bindtouchstart="onHandleTouchStart"
+    bindtouchmove="onHandleTouchMove"
+    bindtouchend="onHandleTouchEnd"
+  >
+    <view class="sheet-handle-bar"></view>
+  </view>
 
+  <!-- Pull-up sheet -->
+  <scroll-view scroll-y enhanced show-scrollbar="{{false}}" class="detail-sheet" style="height: calc(100vh - {{heroHeight}}rpx - 56rpx);">
     <!-- Header: name + price -->
     <view class="detail-header">
       <view class="dh-left">

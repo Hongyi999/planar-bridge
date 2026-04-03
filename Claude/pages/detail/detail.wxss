@@ -120,29 +120,37 @@
   font-family: -apple-system, "Helvetica Neue", "PingFang SC", sans-serif;
 }
 
-/* Sheet */
-.detail-sheet {
+/* Handle wrap — sits between hero and sheet */
+.sheet-handle-wrap {
   background: #FDFCF8;
   border-radius: 48rpx 48rpx 0 0;
-  flex: 1;
-  padding: 0 32rpx 40rpx;
   margin-top: -36rpx;
   position: relative;
-  z-index: 4;
+  z-index: 5;
   border-top: 2rpx solid #E8E3D8;
-  box-sizing: border-box;
-  overflow-x: hidden;
-  width: 100%;
+  padding: 20rpx 0 12rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.sheet-handle {
+.sheet-handle-bar {
   width: 72rpx;
   height: 8rpx;
   background: #C8C2B4;
   border-radius: 4rpx;
-  margin: 20rpx auto 24rpx;
-  padding: 14rpx 60rpx;
-  background-clip: content-box;
+}
+
+/* Sheet */
+.detail-sheet {
+  background: #FDFCF8;
+  flex: 1;
+  padding: 0 32rpx 40rpx;
+  position: relative;
+  z-index: 4;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 /* Hide scrollbar */
