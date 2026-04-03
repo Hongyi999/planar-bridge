@@ -38,5 +38,4 @@ export default defineAppConfig({
       },
     ],
   },
-  animation: true,
 });
