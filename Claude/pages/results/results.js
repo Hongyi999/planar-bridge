@@ -4,6 +4,9 @@ var aiParser = require('../../utils/aiParser.js');
 Page({
   data: {
     statusBarHeight: 20,
+    navTop: 0,
+    navHeight: 32,
+    navFullHeight: 64,
     query: '',
     filters: {},
     thinkingSteps: [],
@@ -14,6 +17,7 @@ Page({
   },
   onLoad(options) {
     var sysInfo = wx.getSystemInfoSync();
+    var menuBtn = wx.getMenuButtonBoundingClientRect();
     var query = decodeURIComponent(options.query || '');
     var filters = aiParser.parseQuery(query);
     var results = cardData.searchCards(filters);
@@ -26,6 +30,9 @@ Page({
 
     this.setData({
       statusBarHeight: sysInfo.statusBarHeight || 20,
+      navTop: menuBtn.top,
+      navHeight: menuBtn.height,
+      navFullHeight: menuBtn.bottom + 8,
       query: query,
       filters: filters,
       thinkingSteps: steps,

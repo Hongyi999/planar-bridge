@@ -4,6 +4,8 @@ var storageUtil = require('../../utils/storage.js');
 Page({
   data: {
     statusBarHeight: 20,
+    navTop: 0,
+    navHeight: 32,
     card: null,
     highlightedText: '',
     heroHeight: 560,
@@ -12,11 +14,14 @@ Page({
   },
   onLoad(options) {
     var sysInfo = wx.getSystemInfoSync();
+    var menuBtn = wx.getMenuButtonBoundingClientRect();
     var card = cardData.getCardById(options.id);
     if (card) {
       var highlighted = this.highlightKeywords(card.text, card.keywords);
       this.setData({
         statusBarHeight: sysInfo.statusBarHeight || 20,
+        navTop: menuBtn.top,
+        navHeight: menuBtn.height,
         card: card,
         highlightedText: highlighted
       });

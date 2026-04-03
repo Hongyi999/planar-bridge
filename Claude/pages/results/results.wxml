@@ -1,15 +1,15 @@
 <view class="results-page">
   <!-- Custom navigation bar -->
-  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
-    <view class="nav-btn-group">
-      <view class="nav-btn" bindtap="goBack">
+  <view class="custom-nav" style="top: {{navTop}}px; height: {{navHeight}}px;">
+    <view class="nav-btn-group" style="height: {{navHeight}}px; border-radius: {{navHeight / 2}}px;">
+      <view class="nav-btn" style="width: {{navHeight * 1.2}}px; height: {{navHeight}}px;" bindtap="goBack">
         <view class="nav-arrow-back"></view>
       </view>
       <view class="nav-divider"></view>
-      <view class="nav-btn" bindtap="goHome">
+      <view class="nav-btn" style="width: {{navHeight * 1.2}}px; height: {{navHeight}}px;" bindtap="goHome">
         <view class="nav-home-icon">
-          <view class="home-roof"></view>
-          <view class="home-body"></view>
+          <view class="home-base"></view>
+          <view class="home-roof-line"></view>
         </view>
       </view>
     </view>
@@ -17,7 +17,7 @@
   </view>
 
   <!-- Scrollable content -->
-  <scroll-view scroll-y class="results-scroll" style="padding-top: {{statusBarHeight + 44}}px;">
+  <scroll-view scroll-y class="results-scroll" style="padding-top: {{navFullHeight}}px;">
     <!-- Search bar compact -->
     <view class="search-compact">
       <search-bar value="{{query}}" compact="{{true}}" bind:search="onSearch" />
