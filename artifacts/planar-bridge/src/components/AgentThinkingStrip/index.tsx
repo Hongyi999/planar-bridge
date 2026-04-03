@@ -1,6 +1,5 @@
 import { View, Text } from '@tarojs/components';
 import { useEffect, useState } from 'react';
-import type { ThinkingStep } from '../../types';
 import './index.scss';
 
 interface AgentThinkingStripProps {
@@ -9,94 +8,119 @@ interface AgentThinkingStripProps {
   onComplete?: () => void;
 }
 
-const STEPS: ThinkingStep[] = [
-  { icon: '🧠', text: 'Understanding your query...', status: 'pending' },
-  { icon: '🔍', text: 'Searching FAB card database...', status: 'pending' },
-  { icon: '💰', text: 'Checking prices...', status: 'pending' },
+interface Step {
+  id: string;
+  label: string;
+  meta: string;
+  status: 'pending' | 'active' | 'done';
+  colorVar: string;
+}
+
+const STEPS: Omit<Step, 'status'>[] = [
+  {
+    id: 'intent',
+    label: 'Understanding query intent...',
+    meta: 'class=Ninja · type=Equipment · rarity=Legendary',
+    colorVar: '#6B4C8A',
+  },
+  {
+    id: 'search',
+    label: 'Searching FAB database...',
+    meta: '4,200+ cards · filtering by class + rarity',
+    colorVar: '#9B8644',
+  },
+  {
+    id: 'price',
+    label: 'Fetching TCGPlayer market prices...',
+    meta: 'cards found · pulling live pricing data',
+    colorVar: '#3D7A5E',
+  },
 ];
 
-export default function AgentThinkingStrip({ visible, resultCount, onComplete }: AgentThinkingStripProps) {
-  const [steps, setSteps] = useState<ThinkingStep[]>(STEPS.map(s => ({ ...s })));
-  const [currentStep, setCurrentStep] = useState(0);
+export default function AgentThinkingStrip({
+  visible,
+  resultCount,
+  onComplete,
+}: AgentThinkingStripProps) {
+  const [steps, setSteps] = useState<Step[]>(
+    STEPS.map(s => ({ ...s, status: 'pending' as const }))
+  );
   const [done, setDone] = useState(false);
 
   useEffect(() => {
     if (!visible) {
-      setSteps(STEPS.map(s => ({ ...s })));
-      setCurrentStep(0);
+      setSteps(STEPS.map(s => ({ ...s, status: 'pending' })));
       setDone(false);
       return;
     }
 
     setSteps(STEPS.map((s, i) => ({ ...s, status: i === 0 ? 'active' : 'pending' })));
-    setCurrentStep(0);
     setDone(false);
 
-    const timers: ReturnType<typeof setTimeout>[] = [];
-
-    timers.push(setTimeout(() => {
+    const t1 = setTimeout(() => {
       setSteps(prev => prev.map((s, i) => ({
         ...s,
         status: i === 0 ? 'done' : i === 1 ? 'active' : 'pending',
       })));
-      setCurrentStep(1);
-    }, 800));
+    }, 800);
 
-    timers.push(setTimeout(() => {
+    const t2 = setTimeout(() => {
       setSteps(prev => prev.map((s, i) => ({
         ...s,
         status: i <= 1 ? 'done' : i === 2 ? 'active' : 'pending',
       })));
-      setCurrentStep(2);
-    }, 1600));
+    }, 1600);
 
-    timers.push(setTimeout(() => {
+    const t3 = setTimeout(() => {
       setSteps(prev => prev.map(s => ({ ...s, status: 'done' })));
       setDone(true);
       onComplete?.();
-    }, 2400));
+    }, 2400);
 
-    return () => timers.forEach(clearTimeout);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, [visible]);
 
   if (!visible) return null;
 
   return (
-    <View className='thinking-strip'>
-      <View className='thinking-strip__inner'>
-        {!done ? (
-          <View className='thinking-strip__steps'>
-            {steps.map((step, i) => (
-              <View
-                key={i}
-                className={`thinking-strip__step thinking-strip__step--${step.status}`}
-              >
-                <Text className='thinking-strip__step-icon'>{step.icon}</Text>
-                <Text className='thinking-strip__step-text'>{step.text}</Text>
-              </View>
-            ))}
+    <View className='ts-wrap'>
+      {steps.map(step => (
+        <View key={step.id} className={`ts-row ts-row--${step.status}`}>
+          <View className='ts-shine' />
+          <View className='ts-icon-box' style={{ background: `${step.colorVar}12`, borderColor: `${step.colorVar}20` }}>
+            <View className='ts-icon-dot' style={{ background: step.colorVar }} />
           </View>
-        ) : (
-          <View className='thinking-strip__done'>
-            <Text className='thinking-strip__done-icon'>✦</Text>
-            <Text className='thinking-strip__done-text'>
-              {resultCount !== undefined
-                ? resultCount > 0
-                  ? `Found ${resultCount} card${resultCount !== 1 ? 's' : ''}`
-                  : 'No cards found'
-                : 'Search complete'}
+          <View className='ts-body'>
+            <Text className='ts-label' style={{ color: step.status === 'active' ? step.colorVar : undefined }}>
+              {step.label}
+            </Text>
+            <Text className='ts-meta'>{step.meta}</Text>
+          </View>
+          {step.status === 'done' ? (
+            <View className='ts-check'>
+              <Text className='ts-check-icon'>✓</Text>
+            </View>
+          ) : step.status === 'active' ? (
+            <View className='ts-spinner' />
+          ) : null}
+        </View>
+      ))}
+
+      {done && (
+        <View className='ts-summary'>
+          <View className='ts-summary-row'>
+            <Text className='ts-summary-label'>Agent Summary</Text>
+            <Text className='ts-summary-count'>
+              {resultCount !== undefined ? `${resultCount} results` : '—'}
             </Text>
           </View>
-        )}
-        {!done && (
-          <View className='thinking-strip__progress'>
-            <View
-              className='thinking-strip__progress-bar'
-              style={{ width: `${((currentStep + 1) / STEPS.length) * 100}%` }}
-            />
-          </View>
-        )}
-      </View>
+          <Text className='ts-summary-body'>
+            {resultCount
+              ? `Found ${resultCount} card${resultCount !== 1 ? 's' : ''} matching your query. Tap any card to see details.`
+              : 'No cards matched. Try adjusting your search.'}
+          </Text>
+        </View>
+      )}
     </View>
   );
 }

@@ -4,7 +4,7 @@
   &__inner {
     display: flex;
     flex-direction: row;
-    gap: 16px;
+    gap: 14px;
     padding: 4px 0;
     white-space: nowrap;
   }
@@ -13,8 +13,8 @@
     display: inline-flex;
     align-items: center;
     padding: 14px 28px;
-    background: var(--bg-tertiary);
-    border: 1px solid rgba(232, 168, 56, 0.25);
+    background: var(--bg-secondary);
+    border: 1px solid rgba(155, 134, 68, 0.2);
     border-radius: 100px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -22,7 +22,7 @@
     flex-shrink: 0;
 
     &:active {
-      background: rgba(232, 168, 56, 0.1);
+      background: rgba(155, 134, 68, 0.06);
       border-color: var(--accent-primary);
       transform: scale(0.96);
     }

@@ -13,7 +13,7 @@
     width: 80%;
     height: 70%;
     border-radius: 50%;
-    background: radial-gradient(ellipse, rgba(232, 168, 56, 0.07) 0%, transparent 65%);
+    background: radial-gradient(ellipse, rgba(155, 134, 68, 0.06) 0%, transparent 65%);
     animation: aurora-drift 20s ease-in-out infinite;
     pointer-events: none;
     z-index: 0;
@@ -26,7 +26,7 @@
     width: 70%;
     height: 60%;
     border-radius: 50%;
-    background: radial-gradient(ellipse, rgba(192, 106, 224, 0.06) 0%, transparent 65%);
+    background: radial-gradient(ellipse, rgba(107, 76, 138, 0.04) 0%, transparent 65%);
     animation: aurora-drift 25s ease-in-out infinite reverse;
     pointer-events: none;
     z-index: 0;
@@ -53,19 +53,16 @@
   }
 
   &__hero-headline {
-    font-size: 56px;
-    font-weight: 800;
+    font-family: var(--font-serif);
+    font-size: 52px;
+    font-weight: 600;
     color: var(--text-primary);
-    letter-spacing: -0.03em;
-    line-height: 1.15;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
   }
 
   &__search-bar-wrap {
     transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-
-    &--compact {
-      transform: none;
-    }
   }
 
   &__suggestions {
@@ -104,8 +101,9 @@
   }
 
   &__results-count {
+    font-family: var(--font-serif);
     font-size: 28px;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text-primary);
     letter-spacing: -0.01em;
   }
@@ -152,8 +150,9 @@
   }
 
   &__empty-title {
+    font-family: var(--font-serif);
     font-size: 36px;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text-primary);
     letter-spacing: -0.02em;
     text-align: center;
@@ -169,14 +168,14 @@
 
   &__empty-retry {
     padding: 16px 32px;
-    background: var(--bg-tertiary);
+    background: var(--bg-secondary);
     border: 1px solid var(--glass-border);
     border-radius: 100px;
     cursor: pointer;
     margin-top: 8px;
 
     &:active {
-      background: rgba(232, 168, 56, 0.1);
+      background: rgba(155, 134, 68, 0.08);
     }
   }
 
@@ -191,8 +190,8 @@
     align-items: center;
     gap: 12px;
     padding: 20px 24px;
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(196, 84, 74, 0.08);
+    border: 1px solid rgba(196, 84, 74, 0.2);
     border-radius: var(--radius-md);
     margin-bottom: 16px;
     animation: fadeIn 0.3s ease;
@@ -222,7 +221,7 @@
   &__orbit {
     width: 200px;
     height: 200px;
-    border: 1px solid rgba(232, 168, 56, 0.1);
+    border: 1px solid rgba(155, 134, 68, 0.12);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -232,7 +231,7 @@
 
   &__orbit-symbol {
     font-size: 80px;
-    color: rgba(232, 168, 56, 0.2);
+    color: rgba(155, 134, 68, 0.15);
     animation: aurora-drift 6s ease-in-out infinite reverse;
   }
 }

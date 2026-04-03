@@ -47,7 +47,7 @@
   &__handle {
     width: 48px;
     height: 5px;
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--border-mid);
     border-radius: 3px;
     margin: 16px auto 0;
     flex-shrink: 0;
@@ -363,7 +363,7 @@
 
     &:active {
       transform: scale(0.98);
-      background: #d4922e;
+      background: var(--rarity-legendary);
     }
   }
 
@@ -405,14 +405,14 @@
     padding: 18px 20px;
     cursor: pointer;
     transition: background 0.2s ease;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid var(--glass-border);
 
     &:last-child {
       border-bottom: none;
     }
 
     &:active {
-      background: rgba(232, 168, 56, 0.08);
+      background: rgba(155, 134, 68, 0.06);
     }
   }
 

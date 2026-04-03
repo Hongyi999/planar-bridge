@@ -106,7 +106,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 24px 24px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid var(--glass-border);
     transition: background 0.2s ease;
 
     &:last-child {
@@ -117,7 +117,7 @@
       cursor: pointer;
 
       &:active {
-        background: rgba(255, 255, 255, 0.04);
+        background: rgba(155, 134, 68, 0.05);
       }
     }
 

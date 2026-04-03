@@ -2,7 +2,6 @@ import { View, Text, Image } from '@tarojs/components';
 import type { ITouchEvent } from '@tarojs/components';
 import { useState } from 'react';
 import type { FabCard } from '../../types';
-import { RarityColors, RarityLabels, PitchColors } from '../../constants/colors';
 import './index.scss';
 
 interface CardTileProps {
@@ -13,6 +12,26 @@ interface CardTileProps {
   onFavorite?: (card: FabCard) => void;
 }
 
+const RARITY_LABEL: Record<string, string> = {
+  L: 'L', M: 'M', R: 'R', C: 'C', T: 'T', F: 'F', P: 'P',
+};
+
+const IMG_GRADIENTS = [
+  'linear-gradient(135deg, #EBE7DA, #E0DBCC)',
+  'linear-gradient(135deg, #E8E4D6, #DDD8C8)',
+  'linear-gradient(135deg, #E5E1D2, #DBD6C6)',
+  'linear-gradient(135deg, #E9E5D8, #DFD9CA)',
+];
+
+function getCardType(card: FabCard): string {
+  const parts: string[] = [];
+  if (card.class) parts.push(card.class.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
+  if (card.type) parts.push(card.type.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
+  const setCode = card.printings?.[0]?.set?.code || card.set;
+  if (setCode) parts.push(setCode.toUpperCase());
+  return parts.join(' · ') || '—';
+}
+
 export default function CardTile({
   card,
   index = 0,
@@ -21,17 +40,8 @@ export default function CardTile({
   onFavorite,
 }: CardTileProps) {
   const [imgError, setImgError] = useState(false);
-  const [pressed, setPressed] = useState(false);
-
-  const rarityColor = RarityColors[card.rarity] || '#8E8E93';
-  const pitchColor = card.pitch ? PitchColors[card.pitch] : null;
-  const isLegendaryOrMajestic = card.rarity === 'L' || card.rarity === 'M';
-
-  const handlePress = () => {
-    setPressed(true);
-    setTimeout(() => setPressed(false), 150);
-    onPress?.(card);
-  };
+  const isLM = card.rarity === 'L' || card.rarity === 'M';
+  const gradient = IMG_GRADIENTS[index % IMG_GRADIENTS.length];
 
   const handleFavorite = (e: ITouchEvent) => {
     e.stopPropagation();
@@ -40,57 +50,48 @@ export default function CardTile({
 
   return (
     <View
-      className={`card-tile ${pressed ? 'card-tile--pressed' : ''} ${isLegendaryOrMajestic ? 'card-tile--foil' : ''}`}
+      className={`ctile ${isLM ? 'ctile--foil' : ''}`}
       style={{ animationDelay: `${index * 60}ms` }}
-      onClick={handlePress}
+      onClick={() => onPress?.(card)}
     >
-      {pitchColor && (
-        <View
-          className='card-tile__pitch-strip'
-          style={{ backgroundColor: pitchColor }}
-        />
-      )}
-
-      <View className='card-tile__image-wrap'>
+      <View className='ctile__img' style={{ background: gradient }}>
         {card.image && !imgError ? (
           <Image
-            className='card-tile__image'
+            className='ctile__img-src'
             src={card.image}
             mode='aspectFill'
             onError={() => setImgError(true)}
             lazyLoad
           />
         ) : (
-          <View className='card-tile__image-fallback'>
-            <Text className='card-tile__image-fallback-text'>
-              {card.name.charAt(0)}
-            </Text>
+          <View className='ctile__img-ph'>
+            <Text className='ctile__img-ph-text'>{card.name}</Text>
           </View>
         )}
-        {isLegendaryOrMajestic && (
-          <View className='card-tile__foil-overlay' />
+
+        {isLM && <View className='ctile__foil-overlay' />}
+
+        {card.rarity && (
+          <View className={`ctile__rbadge ctile__rbadge--${card.rarity}`}>
+            <Text className='ctile__rbadge-text'>{RARITY_LABEL[card.rarity] || card.rarity}</Text>
+          </View>
         )}
-        <View className='card-tile__favorite' onClick={handleFavorite}>
-          <Text className={`card-tile__favorite-icon ${isFavorited ? 'card-tile__favorite-icon--active' : ''}`}>
-            {isFavorited ? '♥' : '♡'}
-          </Text>
+
+        <View className='ctile__heart' onClick={handleFavorite}>
+          {isFavorited ? (
+            <Text className='ctile__heart-icon ctile__heart-icon--active'>♥</Text>
+          ) : (
+            <Text className='ctile__heart-icon'>♡</Text>
+          )}
         </View>
       </View>
 
-      <View className='card-tile__body'>
-        <View className='card-tile__meta'>
-          <View
-            className='card-tile__rarity-badge'
-            style={{ color: rarityColor, borderColor: rarityColor }}
-          >
-            <Text className='card-tile__rarity-text'>
-              {RarityLabels[card.rarity] || card.rarity}
-            </Text>
-          </View>
-        </View>
-        <Text className='card-tile__name'>{card.name}</Text>
-        <View className='card-tile__price-row'>
-          <Text className='card-tile__price'>Price TBD</Text>
+      <View className='ctile__info'>
+        <Text className='ctile__name'>{card.name}</Text>
+        <Text className='ctile__meta'>{getCardType(card)}</Text>
+        <View className='ctile__price-row'>
+          <Text className='ctile__price ctile__price--flat'>Price TBD</Text>
+          <Text className='ctile__trend ctile__trend--flat'>—</Text>
         </View>
       </View>
     </View>

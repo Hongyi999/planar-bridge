@@ -1,108 +1,139 @@
-.thinking-strip {
+.ts-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
   margin: 16px 0;
   animation: fadeIn 0.3s ease;
+}
 
-  &__inner {
-    background: var(--bg-tertiary);
-    border: 1px solid rgba(192, 106, 224, 0.2);
-    border-radius: var(--radius-lg);
-    padding: 24px 28px;
-    position: relative;
-    overflow: hidden;
+.ts-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 24px 28px;
+  border-radius: 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  position: relative;
+  overflow: hidden;
+  transition: opacity 0.3s ease;
 
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent-secondary), transparent);
-      animation: shimmer 2s linear infinite;
-      background-size: 200% auto;
-    }
+  &--pending {
+    opacity: 0.4;
   }
-
-  &__steps {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  &--active {
+    opacity: 1;
   }
-
-  &__step {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    opacity: 0.3;
-    transition: all 0.3s ease;
-
-    &--active {
-      opacity: 1;
-      animation: thinking-step 0.3s ease;
-
-      .thinking-strip__step-text {
-        color: var(--accent-secondary);
-      }
-
-      .thinking-strip__step-icon {
-        animation: spin 1s linear infinite;
-      }
-    }
-
-    &--done {
-      opacity: 0.7;
-
-      .thinking-strip__step-text {
-        color: var(--text-secondary);
-        text-decoration: line-through;
-        text-decoration-color: rgba(255, 255, 255, 0.2);
-      }
-    }
+  &--done {
+    opacity: 0.85;
   }
+}
 
-  &__step-icon {
-    font-size: 28px;
-    flex-shrink: 0;
-  }
+.ts-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(155, 134, 68, 0.05), transparent);
+  animation: shimmer-scan 2.5s infinite;
+  pointer-events: none;
+}
 
-  &__step-text {
-    font-size: 26px;
-    color: var(--text-secondary);
-    letter-spacing: -0.01em;
-    transition: color 0.3s ease;
-  }
+.ts-icon-box {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+}
 
-  &__done {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    animation: fadeIn 0.4s ease;
-  }
+.ts-icon-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  opacity: 0.7;
+}
 
-  &__done-icon {
-    font-size: 28px;
-    color: var(--accent-primary);
-  }
+.ts-body {
+  flex: 1;
+  min-width: 0;
+}
 
-  &__done-text {
-    font-size: 28px;
-    color: var(--accent-primary);
-    font-weight: 600;
-    letter-spacing: -0.01em;
-  }
+.ts-label {
+  display: block;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+  transition: color 0.3s;
+}
 
-  &__progress {
-    margin-top: 20px;
-    height: 2px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 2px;
-    overflow: hidden;
-  }
+.ts-meta {
+  display: block;
+  font-size: 20px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
 
-  &__progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary));
-    border-radius: 2px;
-    transition: width 0.8s ease;
-  }
+.ts-check {
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.ts-check-icon {
+  font-size: 28px;
+  color: var(--accent-success);
+  font-weight: 700;
+}
+
+.ts-spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--accent-success);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.ts-summary {
+  background: var(--bg-secondary);
+  border: 1.5px solid rgba(155, 134, 68, 0.2);
+  border-radius: 16px;
+  padding: 32px;
+  margin-top: 6px;
+  animation: fadeIn 0.4s ease;
+}
+
+.ts-summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.ts-summary-label {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ts-summary-count {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.ts-summary-body {
+  font-size: 25px;
+  color: var(--text-secondary);
+  line-height: 1.6;
 }
