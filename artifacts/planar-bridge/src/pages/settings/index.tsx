@@ -1,5 +1,6 @@
 import { View, Text, Image } from '@tarojs/components';
-import Taro, { useLoad } from '@tarojs/taro';
+import Taro from '@tarojs/taro';
+import { useEffect } from 'react';
 import { useApp } from '../../store/AppContext';
 import './index.scss';
 
@@ -19,11 +20,11 @@ export default function Settings() {
   const { state, dispatch } = useApp();
   const { user } = state;
 
-  useLoad(() => {
+  useEffect(() => {
     if (state.hydrated && !state.user?.authenticated) {
-      Taro.redirectTo({ url: '/pages/welcome/index' });
+      Taro.reLaunch({ url: '/pages/welcome/index' });
     }
-  });
+  }, [state.hydrated, state.user?.authenticated]);
 
   const handleSignOut = () => {
     Taro.showModal({

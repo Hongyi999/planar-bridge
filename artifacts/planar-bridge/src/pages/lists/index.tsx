@@ -1,8 +1,8 @@
 import { View, Text, ScrollView, Image, Input } from '@tarojs/components';
 import type { ITouchEvent } from '@tarojs/components';
 import type { BaseEventOrig, InputProps } from '@tarojs/components/types/Input';
-import Taro, { useLoad } from '@tarojs/taro';
-import { useState, useRef } from 'react';
+import Taro from '@tarojs/taro';
+import { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../store/AppContext';
 import type { FabList } from '../../types';
 import { RarityColors } from '../../constants/colors';
@@ -16,11 +16,11 @@ export default function Lists() {
   const [swipedCardId, setSwipedCardId] = useState<string | null>(null);
   const touchStartXRef = useRef<number | null>(null);
 
-  useLoad(() => {
+  useEffect(() => {
     if (state.hydrated && !state.user?.authenticated) {
-      Taro.redirectTo({ url: '/pages/welcome/index' });
+      Taro.reLaunch({ url: '/pages/welcome/index' });
     }
-  });
+  }, [state.hydrated, state.user?.authenticated]);
 
   const selectedList = state.lists.find(l => l.id === selectedListId) || null;
 

@@ -1,6 +1,6 @@
 import { View, Text, ScrollView } from '@tarojs/components';
-import Taro, { useLoad } from '@tarojs/taro';
-import { useState, useCallback } from 'react';
+import Taro from '@tarojs/taro';
+import { useState, useCallback, useEffect } from 'react';
 import SearchBar from '../../components/SearchBar';
 import AgentThinkingStrip from '../../components/AgentThinkingStrip';
 import CardTile from '../../components/CardTile';
@@ -20,11 +20,11 @@ export default function Search() {
   const [error, setError] = useState<string | null>(null);
   const [favoritedCards, setFavoritedCards] = useState<Set<string>>(new Set());
 
-  useLoad(() => {
+  useEffect(() => {
     if (state.hydrated && !state.user?.authenticated) {
-      Taro.redirectTo({ url: '/pages/welcome/index' });
+      Taro.reLaunch({ url: '/pages/welcome/index' });
     }
-  });
+  }, [state.hydrated, state.user?.authenticated]);
 
   const runSearch = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) return;
