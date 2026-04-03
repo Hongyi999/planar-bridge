@@ -1,6 +1,14 @@
+.results-page,
+.results-page view,
+.results-page scroll-view {
+  box-sizing: border-box;
+}
+
 .results-page {
   min-height: 100vh;
   background: #F2EFE4;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 /* Navigation */

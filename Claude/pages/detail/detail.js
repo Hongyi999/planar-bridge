@@ -5,7 +5,10 @@ Page({
   data: {
     statusBarHeight: 20,
     card: null,
-    highlightedText: ''
+    highlightedText: '',
+    heroHeight: 560,
+    _touchStartY: 0,
+    _startHeroHeight: 560
   },
   onLoad(options) {
     var sysInfo = wx.getSystemInfoSync();
@@ -28,6 +31,23 @@ Page({
   },
   goHome() {
     wx.switchTab({ url: '/pages/index/index' });
+  },
+  onHandleTouchStart(e) {
+    this._touchStartY = e.touches[0].clientY;
+    this._startHeroHeight = this.data.heroHeight;
+    this._pxToRpx = 750 / wx.getSystemInfoSync().windowWidth;
+  },
+  onHandleTouchMove(e) {
+    var deltaY = e.touches[0].clientY - this._touchStartY;
+    var deltaRpx = deltaY * this._pxToRpx;
+    var newHeight = this._startHeroHeight + deltaRpx;
+    // Clamp between 560 (default) and 900 (expanded)
+    newHeight = Math.max(560, Math.min(900, newHeight));
+    this.setData({ heroHeight: newHeight });
+  },
+  onHandleTouchEnd() {
+    // Snap back to default height
+    this.setData({ heroHeight: 560 });
   },
   onAddToList() {
     var that = this;

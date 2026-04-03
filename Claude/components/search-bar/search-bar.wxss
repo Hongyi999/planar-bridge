@@ -50,6 +50,7 @@
   font-size: 26rpx;
   color: #2C2A22;
   font-family: -apple-system, "Helvetica Neue", "PingFang SC", sans-serif;
+  text-align: left;
 }
 
 .search-placeholder {

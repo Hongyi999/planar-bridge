@@ -15,7 +15,6 @@
 
 /* Hero */
 .detail-hero {
-  height: 560rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -167,9 +166,7 @@
   margin-top: -36rpx;
   position: relative;
   z-index: 4;
-  border: 2rpx solid #E8E3D8;
-  border-bottom: none;
-  height: calc(100vh - 524rpx);
+  border-top: 2rpx solid #E8E3D8;
   box-sizing: border-box;
   overflow-x: hidden;
   width: 100%;
@@ -181,6 +178,8 @@
   background: #D6D0C2;
   border-radius: 4rpx;
   margin: 24rpx auto 28rpx;
+  padding: 16rpx 0;
+  background-clip: content-box;
 }
 
 /* Header */
