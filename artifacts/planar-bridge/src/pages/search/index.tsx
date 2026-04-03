@@ -14,10 +14,10 @@ import type { FabCard, SearchState, UserProfile } from '../../types';
 import './index.scss';
 
 const HERO_CHIPS = [
-  { label: 'Legendary 装备', variant: 'gold' },
-  { label: 'Majestic 攻击', variant: 'purple' },
-  { label: '$5 以下好牌', variant: 'green' },
-  { label: 'Uprising 热卡', variant: 'gold' },
+  { label: '传奇装备', query: 'Legendary equipment', variant: 'gold' },
+  { label: '神话攻击牌', query: 'Majestic attack', variant: 'purple' },
+  { label: '$5 以下好牌', query: 'cheap budget cards under 5 dollars', variant: 'green' },
+  { label: '起义系列热卡', query: 'Uprising set popular cards', variant: 'gold' },
 ];
 
 const LOGO_ICON = require('../../images/logo-icon.png');
@@ -87,7 +87,7 @@ export default function Search() {
         payload: { results: result.data || [], query: searchQuery },
       });
     } catch (err) {
-      setError('Unable to search cards. Please check your connection.');
+      setError('搜索失败，请检查网络连接后重试。');
       dispatch({ type: 'SET_SEARCH_RESULTS', payload: { results: [], query: searchQuery } });
     }
   }, [dispatch]);
@@ -101,12 +101,12 @@ export default function Search() {
     runSearch(q);
   }, [state.user, doLogin, runSearch]);
 
-  const handleHeroChip = useCallback(async (label: string) => {
+  const handleHeroChip = useCallback(async (chip: { label: string; query: string }) => {
     if (!state.user?.authenticated) {
       const ok = await doLogin();
       if (!ok) return;
     }
-    runSearch(label);
+    runSearch(chip.query);
   }, [state.user, doLogin, runSearch]);
 
   const handleThinkingComplete = useCallback(() => {
@@ -132,7 +132,7 @@ export default function Search() {
         } else {
           addCardToList(state.lists[0].id, card);
         }
-        Taro.showToast({ title: 'Added to list', icon: 'success', duration: 1500 });
+        Taro.showToast({ title: '已加入收藏', icon: 'success', duration: 1500 });
       }
       return next;
     });
@@ -157,12 +157,14 @@ export default function Search() {
             <Text className='hero__logo-text'>Planar Bridge</Text>
           </View>
 
-          <Text className='hero__headline'>
-            What cards are{'\n'}you looking for?
-          </Text>
-          <Text className='hero__sub'>
-            用自然语言搜索 Flesh and Blood 卡牌{'\n'}实时价格 · 系列浏览 · 个人收藏
-          </Text>
+          <View className='hero__headline-wrap'>
+            <Text className='hero__headline'>你在寻找什么卡牌？</Text>
+          </View>
+          <View className='hero__sub-wrap'>
+            <Text className='hero__sub'>
+              用自然语言搜索 Flesh and Blood 卡牌{'\n'}实时价格 · 系列浏览 · 个人收藏
+            </Text>
+          </View>
 
           <View className='hero__sbox'>
             <View className='hero__sbox-icon'>
@@ -173,7 +175,7 @@ export default function Search() {
             <Input
               className='hero__sbox-input'
               placeholderClass='hero__sbox-placeholder'
-              placeholder='Legendary equipment for Ninja...'
+              placeholder='忍者专属传奇装备...'
               value={heroInput}
               onInput={(e: BaseEventOrig<InputProps.inputEventDetail>) => setHeroInput(e.detail.value)}
               confirmType='search'
@@ -186,7 +188,7 @@ export default function Search() {
               <View
                 key={i}
                 className={`hero__chip hero__chip--${chip.variant}`}
-                onClick={() => handleHeroChip(chip.label)}
+                onClick={() => handleHeroChip(chip)}
               >
                 <Text className='hero__chip-text'>{chip.label}</Text>
               </View>
@@ -194,7 +196,7 @@ export default function Search() {
           </View>
         </View>
 
-        <Text className='hero__legal'>Card data · fabdb.net community database</Text>
+        <Text className='hero__legal'>卡牌数据 · fabdb.net 社区数据库</Text>
       </View>
     );
   }
@@ -216,12 +218,14 @@ export default function Search() {
       <View className={`search-page__search-area ${showResults ? 'search-page__search-area--compact' : ''}`}>
         {!showResults && (
           <View className='search-page__hero'>
-            <Text className='search-page__hero-headline'>
-              What cards are{'\n'}you looking for?
-            </Text>
-            <Text className='search-page__hero-sub'>
-              用自然语言搜索 Flesh and Blood 卡牌{'\n'}实时价格 · 系列浏览 · 个人收藏
-            </Text>
+            <View className='search-page__hero-headline-wrap'>
+              <Text className='search-page__hero-headline'>你在寻找什么卡牌？</Text>
+            </View>
+            <View className='search-page__hero-sub-wrap'>
+              <Text className='search-page__hero-sub'>
+                用自然语言搜索 Flesh and Blood 卡牌{'\n'}实时价格 · 系列浏览 · 个人收藏
+              </Text>
+            </View>
           </View>
         )}
 
@@ -231,7 +235,7 @@ export default function Search() {
             onInput={setQuery}
             onSearch={runSearch}
             isCompact={showResults}
-            placeholder={showResults ? 'Refine your search...' : 'Describe the cards you want...'}
+            placeholder={showResults ? '继续细化搜索...' : '描述你想要的卡牌...'}
           />
         </View>
 
@@ -267,7 +271,7 @@ export default function Search() {
                 <ScrollView className='search-page__scroll' scrollY enableFlex>
                   <View className='search-page__results-header'>
                     <Text className='search-page__results-count'>
-                      {state.searchResults.length} result{state.searchResults.length !== 1 ? 's' : ''}
+                      共 {state.searchResults.length} 张卡牌
                     </Text>
                     <Text className='search-page__results-query'>"{state.lastQuery}"</Text>
                   </View>
@@ -288,12 +292,12 @@ export default function Search() {
               ) : (
                 <View className='search-page__empty'>
                   <Text className='search-page__empty-icon'>🔮</Text>
-                  <Text className='search-page__empty-title'>No cards found</Text>
+                  <Text className='search-page__empty-title'>未找到相关卡牌</Text>
                   <Text className='search-page__empty-subtitle'>
-                    Try a different search or browse our suggestions
+                    换个关键词试试，或点击下方推荐词搜索
                   </Text>
                   <View className='search-page__empty-retry' onClick={() => setSearchState('idle')}>
-                    <Text className='search-page__empty-retry-text'>← New Search</Text>
+                    <Text className='search-page__empty-retry-text'>← 重新搜索</Text>
                   </View>
                 </View>
               )}

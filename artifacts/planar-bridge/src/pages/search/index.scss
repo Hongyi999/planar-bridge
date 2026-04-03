@@ -285,7 +285,16 @@
 
   &__hero {
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
     animation: fadeInUp 0.5s ease;
+  }
+
+  &__hero-headline-wrap {
+    display: block;
+    width: 100%;
   }
 
   &__hero-headline {
@@ -295,7 +304,12 @@
     color: var(--text-primary);
     letter-spacing: -0.02em;
     line-height: 1.2;
-    margin-bottom: 24px;
+    display: block;
+  }
+
+  &__hero-sub-wrap {
+    display: block;
+    width: 100%;
   }
 
   &__hero-sub {
@@ -304,6 +318,7 @@
     color: #A09A8C;
     line-height: 1.6;
     text-align: center;
+    display: block;
   }
 
   &__search-bar-wrap {

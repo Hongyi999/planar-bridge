@@ -14,7 +14,7 @@ export default function SearchBar({
   value,
   onInput,
   onSearch,
-  placeholder = 'What cards are you looking for?',
+  placeholder = '描述你想要的卡牌...',
   isCompact = false,
 }: SearchBarProps) {
   const [focused, setFocused] = useState(false);

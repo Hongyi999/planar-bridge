@@ -136,22 +136,22 @@ export function parseQueryToParams(query: string): SearchParams {
 
 export const SUGGESTION_QUERIES: Array<{ label: string; query: string; params: SearchParams }> = [
   {
-    label: 'Majestic equipment',
+    label: '神话级装备',
     query: 'Majestic equipment',
     params: { rarity: 'M', type: 'equipment', per_page: 20 },
   },
   {
-    label: 'Fai Ninja cards',
+    label: 'Fai 忍者卡牌',
     query: 'Fai Ninja staples',
     params: { keywords: 'fai', per_page: 20 },
   },
   {
-    label: 'Legendary weapons',
+    label: '传奇武器',
     query: 'All Legendary weapons',
     params: { rarity: 'L', type: 'weapon', per_page: 20 },
   },
   {
-    label: 'Bravo Guardian',
+    label: '布拉沃守护者',
     query: 'Bravo Guardian staples',
     params: { keywords: 'bravo', per_page: 20 },
   },
