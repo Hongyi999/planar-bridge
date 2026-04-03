@@ -1,4 +1,6 @@
-import { View, Text, ScrollView, Image } from '@tarojs/components';
+import { View, Text, ScrollView, Image, Input } from '@tarojs/components';
+import type { ITouchEvent } from '@tarojs/components';
+import type { BaseEventOrig, InputProps } from '@tarojs/components/types/Input';
 import Taro, { useLoad } from '@tarojs/taro';
 import { useState } from 'react';
 import BottomNav from '../../components/BottomNav';
@@ -220,14 +222,16 @@ export default function Lists() {
 
       {showNewListModal && (
         <View className='lists-page__modal-overlay' onClick={() => setShowNewListModal(false)}>
-          <View className='lists-page__modal' onClick={e => e.stopPropagation?.()}>
+          <View className='lists-page__modal' onClick={(e: ITouchEvent) => e.stopPropagation()}>
             <Text className='lists-page__modal-title'>Create New List</Text>
-            <input
+            <Input
               className='lists-page__modal-input'
               placeholder='e.g. Fai Deck, Trade Binder...'
               value={newListName}
-              onChange={(e: any) => setNewListName(e.target.value)}
-              autoFocus
+              focus
+              onInput={(e: BaseEventOrig<InputProps.inputEventDetail>) =>
+                setNewListName(e.detail.value)
+              }
             />
             <View className='lists-page__modal-actions'>
               <View

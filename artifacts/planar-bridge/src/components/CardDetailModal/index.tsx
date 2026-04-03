@@ -1,4 +1,5 @@
-import { View, Text, Image, ScrollView } from '@tarojs/components';
+import { View, Text, Image, ScrollView, Input } from '@tarojs/components';
+import type { BaseEventOrig, InputProps } from '@tarojs/components/types/Input';
 import { useState } from 'react';
 import type { FabCard, FabList } from '../../types';
 import { RarityColors, RarityLabels, PitchColors, PitchLabels } from '../../constants/colors';
@@ -29,7 +30,7 @@ export default function CardDetailModal({
 
   const rarityColor = RarityColors[card.rarity] || '#8E8E93';
   const pitchColor = card.pitch ? PitchColors[card.pitch] : null;
-  const isLegendaryOrMajestic = card.rarity === 'L' || card.rarity === 'F';
+  const isLegendaryOrMajestic = card.rarity === 'L' || card.rarity === 'M';
 
   const handleAddToList = (listId: string) => {
     onAddToList(listId, card);
@@ -228,11 +229,13 @@ export default function CardDetailModal({
                     <View className='card-detail-modal__new-list'>
                       <Text className='card-detail-modal__picker-label'>Create New List</Text>
                       <View className='card-detail-modal__new-list-input-row'>
-                        <input
+                        <Input
                           className='card-detail-modal__new-list-input'
                           placeholder='List name...'
                           value={newListName}
-                          onChange={(e: any) => setNewListName(e.target.value)}
+                          onInput={(e: BaseEventOrig<InputProps.inputEventDetail>) =>
+                            setNewListName(e.detail.value)
+                          }
                         />
                         <View
                           className='card-detail-modal__new-list-create'

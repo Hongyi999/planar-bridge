@@ -1,4 +1,5 @@
 import { View, Text, Image } from '@tarojs/components';
+import type { ITouchEvent } from '@tarojs/components';
 import { useState } from 'react';
 import type { FabCard } from '../../types';
 import { RarityColors, RarityLabels, PitchColors } from '../../constants/colors';
@@ -24,7 +25,7 @@ export default function CardTile({
 
   const rarityColor = RarityColors[card.rarity] || '#8E8E93';
   const pitchColor = card.pitch ? PitchColors[card.pitch] : null;
-  const isLegendaryOrMajestic = card.rarity === 'L' || card.rarity === 'F';
+  const isLegendaryOrMajestic = card.rarity === 'L' || card.rarity === 'M';
 
   const handlePress = () => {
     setPressed(true);
@@ -32,8 +33,8 @@ export default function CardTile({
     onPress?.(card);
   };
 
-  const handleFavorite = (e: any) => {
-    e.stopPropagation?.();
+  const handleFavorite = (e: ITouchEvent) => {
+    e.stopPropagation();
     onFavorite?.(card);
   };
 

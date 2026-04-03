@@ -6,6 +6,16 @@ import './index.scss';
 
 const APP_VERSION = '1.0.0';
 
+interface SettingItem {
+  label: string;
+  description: string;
+  icon: string;
+  action: (() => void) | null;
+  accent: boolean;
+  danger?: boolean;
+  readonly?: boolean;
+}
+
 export default function Settings() {
   const { state, dispatch } = useApp();
   const { user } = state;
@@ -64,7 +74,7 @@ export default function Settings() {
     Taro.showToast({ title: 'Copied all lists!', icon: 'success', duration: 2000 });
   };
 
-  const settingSections = [
+  const settingSections: Array<{ title: string; items: SettingItem[] }> = [
     {
       title: 'Collections',
       items: [
@@ -160,12 +170,12 @@ export default function Settings() {
             {section.items.map((item, i) => (
               <View
                 key={i}
-                className={`settings-page__item ${item.action ? 'settings-page__item--clickable' : ''} ${(item as any).readonly ? 'settings-page__item--readonly' : ''}`}
+                className={`settings-page__item ${item.action ? 'settings-page__item--clickable' : ''} ${item.readonly ? 'settings-page__item--readonly' : ''}`}
                 onClick={() => item.action?.()}
               >
                 <View className='settings-page__item-left'>
                   <Text
-                    className={`settings-page__item-label ${(item as any).danger ? 'settings-page__item-label--danger' : ''}`}
+                    className={`settings-page__item-label ${item.danger ? 'settings-page__item-label--danger' : ''}`}
                   >
                     {item.label}
                   </Text>
@@ -175,12 +185,12 @@ export default function Settings() {
                 </View>
                 {item.action && (
                   <Text
-                    className={`settings-page__item-arrow ${(item as any).danger ? 'settings-page__item-arrow--danger' : ''}`}
+                    className={`settings-page__item-arrow ${item.danger ? 'settings-page__item-arrow--danger' : ''}`}
                   >
                     {item.icon}
                   </Text>
                 )}
-                {(item as any).readonly && (
+                {item.readonly && (
                   <Text className='settings-page__item-readonly-val'>{item.icon}</Text>
                 )}
               </View>
