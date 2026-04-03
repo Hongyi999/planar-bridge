@@ -77,46 +77,9 @@
   background: #D6D0C2;
 }
 
-/* Back arrow — clean chevron */
-.nav-arrow-back {
-  width: 18rpx;
-  height: 18rpx;
-  border-left: 3rpx solid #555249;
-  border-bottom: 3rpx solid #555249;
-  transform: rotate(45deg);
-  margin-left: 4rpx;
-  border-radius: 1rpx;
-}
-
-/* Home icon — house shape */
-.nav-home-icon {
-  position: relative;
-  width: 30rpx;
-  height: 28rpx;
-}
-
-.home-base {
-  position: absolute;
-  bottom: 0;
-  left: 4rpx;
-  width: 22rpx;
-  height: 14rpx;
-  border: 2.5rpx solid #555249;
-  border-top: none;
-  border-radius: 0 0 4rpx 4rpx;
-  background: transparent;
-}
-
-.home-roof-line {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 17rpx solid transparent;
-  border-right: 17rpx solid transparent;
-  border-bottom: 13rpx solid #555249;
+.nav-icon {
+  width: 36rpx;
+  height: 36rpx;
 }
 
 /* Card placeholder */

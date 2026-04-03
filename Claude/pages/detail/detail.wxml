@@ -9,14 +9,11 @@
     <view class="custom-nav" style="top: {{navTop}}px; height: {{navHeight}}px;">
       <view class="nav-btn-group" style="height: {{navHeight}}px; border-radius: {{navHeight / 2}}px;">
         <view class="nav-btn" style="width: {{navHeight * 1.2}}px; height: {{navHeight}}px;" bindtap="goBack">
-          <view class="nav-arrow-back"></view>
+          <image class="nav-icon" src="/assets/icons/nav-back.svg" mode="aspectFit" />
         </view>
         <view class="nav-divider"></view>
         <view class="nav-btn" style="width: {{navHeight * 1.2}}px; height: {{navHeight}}px;" bindtap="goHome">
-          <view class="nav-home-icon">
-            <view class="home-base"></view>
-            <view class="home-roof-line"></view>
-          </view>
+          <image class="nav-icon" src="/assets/icons/nav-home.svg" mode="aspectFit" />
         </view>
       </view>
     </view>
