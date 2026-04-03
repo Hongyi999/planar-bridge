@@ -30,10 +30,10 @@
   font-weight: 500;
   padding: 0 8rpx;
   margin-bottom: 12rpx;
-  text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
+/* Standard settings item (row) */
 .settings-item {
   display: flex;
   align-items: center;
@@ -48,6 +48,15 @@
 
 .settings-item:active {
   border-color: #9B864430;
+}
+
+/* Column layout settings item */
+.settings-item-col {
+  background: #FDFCF8;
+  border: 2rpx solid #E8E3D8;
+  border-radius: 24rpx;
+  padding: 24rpx 28rpx;
+  margin-bottom: 12rpx;
 }
 
 .item-left {
@@ -73,6 +82,76 @@
   font-size: 32rpx;
   flex-shrink: 0;
   margin-left: 16rpx;
+}
+
+/* Toggle button group */
+.item-toggle {
+  display: flex;
+  background: #F2EFE4;
+  border-radius: 16rpx;
+  overflow: hidden;
+  border: 2rpx solid #E8E3D8;
+  flex-shrink: 0;
+}
+
+.toggle-btn {
+  font-size: 22rpx;
+  color: #A09A8C;
+  padding: 10rpx 24rpx;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.toggle-btn.active {
+  background: #9B8644;
+  color: #FDFCF8;
+}
+
+/* Checkbox grid */
+.checkbox-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  width: calc(50% - 8rpx);
+  padding: 8rpx 0;
+}
+
+.checkbox-box {
+  width: 36rpx;
+  height: 36rpx;
+  border: 2rpx solid #D6D0C2;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  background: #FDFCF8;
+}
+
+.checkbox-box.checked {
+  background: #9B8644;
+  border-color: #9B8644;
+}
+
+.checkbox-tick {
+  width: 14rpx;
+  height: 8rpx;
+  border-left: 3rpx solid #FDFCF8;
+  border-bottom: 3rpx solid #FDFCF8;
+  transform: rotate(-45deg);
+  margin-top: -4rpx;
+}
+
+.checkbox-label {
+  font-size: 24rpx;
+  color: #4A4636;
 }
 
 /* Footer */
