@@ -24,7 +24,8 @@
     <!-- Card placeholder -->
     <view class="detail-card-placeholder" style="background: linear-gradient(145deg, #EDE9DC, #E4DFCF)">
       <text class="dcp-name font-heading">{{card.name}}</text>
-      <text class="dcp-meta">{{card.setCode}} · {{card.rarity}}</text>
+      <text class="dcp-name-cn" wx:if="{{card.nameCN}}">{{card.nameCN}}</text>
+      <text class="dcp-meta">{{card.setCode}} · {{card.rarityCN || card.rarity}}</text>
     </view>
   </view>
 
@@ -37,9 +38,10 @@
     <view class="detail-header">
       <view class="dh-left">
         <text class="dh-name font-heading">{{card.name}}</text>
+        <text class="dh-name-cn" wx:if="{{card.nameCN}}">{{card.nameCN}}</text>
         <view class="dh-type">
-          <text>{{card.class}} · {{card.type}}{{card.subtype ? ' — ' + card.subtype : ''}} · </text>
-          <text class="dh-rarity">{{card.rarity}}</text>
+          <text>{{card.classCN || card.class}} · {{card.typeCN || card.type}}{{card.subtype ? ' — ' + card.subtype : ''}} · </text>
+          <text class="dh-rarity">{{card.rarityCN || card.rarity}}</text>
         </view>
       </view>
       <view class="dh-right">
@@ -53,19 +55,19 @@
     <!-- Stat chips -->
     <view class="stat-row">
       <view class="stat-chip">
-        <text class="stat-label">COST</text>
+        <text class="stat-label">费用</text>
         <text class="stat-value">{{card.cost !== null ? card.cost : '—'}}</text>
       </view>
       <view class="stat-chip">
-        <text class="stat-label">{{card.type === 'Attack Action' ? 'POWER' : 'DEFENSE'}}</text>
+        <text class="stat-label">{{card.type === 'Attack Action' ? '力量' : '防御'}}</text>
         <text class="stat-value stat-blue">{{card.type === 'Attack Action' ? (card.power !== null ? card.power : '—') : (card.defense !== null ? card.defense : '—')}}</text>
       </view>
       <view class="stat-chip">
-        <text class="stat-label">INTELLECT</text>
+        <text class="stat-label">智力</text>
         <text class="stat-value">{{card.intellect !== null ? card.intellect : '—'}}</text>
       </view>
       <view class="stat-chip">
-        <text class="stat-label">LIFE</text>
+        <text class="stat-label">生命</text>
         <text class="stat-value">{{card.life !== null ? card.life : '—'}}</text>
       </view>
     </view>
@@ -78,15 +80,15 @@
     <!-- Price row -->
     <view class="price-row">
       <view class="price-cell">
-        <text class="price-label">TCG Low</text>
+        <text class="price-label">TCG 最低</text>
         <text class="price-value font-mono">${{card.priceLow}}</text>
       </view>
       <view class="price-cell">
-        <text class="price-label">TCG Mid</text>
+        <text class="price-label">TCG 中位</text>
         <text class="price-value font-mono">${{card.priceMid}}</text>
       </view>
       <view class="price-cell">
-        <text class="price-label">TCG Market</text>
+        <text class="price-label">TCG 市场</text>
         <text class="price-value font-mono">${{card.priceMarket}}</text>
       </view>
     </view>

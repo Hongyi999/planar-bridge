@@ -30,7 +30,7 @@ Page({
   onSetTap(e) {
     var code = e.currentTarget.dataset.code;
     wx.showToast({
-      title: code + ' — Coming soon',
+      title: code + ' — 即将上线',
       icon: 'none',
       duration: 1500
     });

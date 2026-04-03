@@ -1,7 +1,7 @@
 <view class="series-page">
   <!-- Title -->
-  <text class="page-title font-heading">All Sets</text>
-  <text class="page-subtitle">Booster · Supplementary · History</text>
+  <text class="page-title font-heading">全部系列</text>
+  <text class="page-subtitle">补充包 · 扩展包 · 历史合集</text>
 
   <!-- Sort toggle -->
   <view class="sort-toggle">
@@ -33,7 +33,7 @@
         <!-- Info -->
         <view class="set-info">
           <text class="set-name font-heading">{{set.name}}</text>
-          <text class="set-tags">{{set.tags}} · {{set.cards}} cards</text>
+          <text class="set-tags">{{set.tags}} · {{set.cards}} 张卡</text>
         </view>
         <!-- Code -->
         <text class="set-code font-mono">{{set.code}}</text>

@@ -66,20 +66,20 @@ function getThinkingSteps(query, filters) {
 
   return [
     {
-      label: 'Understanding query intent...',
-      meta: filterDesc.length > 0 ? filterDesc.join(' · ') : 'analyzing keywords',
+      label: '理解搜索意图...',
+      meta: filterDesc.length > 0 ? filterDesc.join(' · ') : '分析关键词',
       color: 'purple',
       icon: 'clock'
     },
     {
-      label: 'Searching FAB database...',
-      meta: '4,200+ cards · filtering by ' + (filterDesc.length > 0 ? filterDesc.join(' + ') : 'keywords'),
+      label: '检索 FAB 卡牌数据库...',
+      meta: '4,200+ 张卡牌 · 筛选 ' + (filterDesc.length > 0 ? filterDesc.join(' + ') : '关键词'),
       color: 'gold',
       icon: 'search'
     },
     {
-      label: 'Fetching TCGPlayer market prices...',
-      meta: 'pulling live pricing data',
+      label: '获取 TCGPlayer 实时价格...',
+      meta: '拉取最新价格数据',
       color: 'green',
       icon: 'dollar'
     }

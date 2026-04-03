@@ -22,7 +22,7 @@
     </view>
 
     <!-- Heading -->
-    <view class="hero-heading font-heading">What cards are\nyou looking for?</view>
+    <view class="hero-heading font-heading">你在找什么卡牌？</view>
 
     <!-- Subtitle -->
     <view class="hero-sub">用自然语言搜索 Flesh and Blood 卡牌</view>
@@ -30,7 +30,7 @@
 
     <!-- Search bar -->
     <view class="hero-search">
-      <search-bar placeholder="Legendary equipment for Ninja..." bind:search="onSearch" />
+      <search-bar placeholder="搜索 Ninja 的传奇装备..." bind:search="onSearch" />
     </view>
 
     <!-- Suggestion chips -->

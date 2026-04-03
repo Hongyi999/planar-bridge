@@ -1,7 +1,7 @@
 <view class="lists-page">
   <!-- Title -->
-  <text class="page-title font-heading">My Collections</text>
-  <text class="page-subtitle">{{lists.length}} lists · {{totalCards}} cards · est. ${{totalValue}}</text>
+  <text class="page-title font-heading">我的收藏</text>
+  <text class="page-subtitle">{{lists.length}} 个列表 · {{totalCards}} 张卡 · 约 ${{totalValue}}</text>
 
   <!-- Horizontal scroll list cards -->
   <scroll-view scroll-x class="list-cards-scroll" enhanced show-scrollbar="{{false}}">
@@ -14,7 +14,7 @@
         bindtap="onSelectList"
       >
         <text class="lc-name">{{item.name}}</text>
-        <text class="lc-count">{{item.cardCount}} cards</text>
+        <text class="lc-count">{{item.cardCount}} 张卡</text>
         <text class="lc-value font-mono">${{item.value}}</text>
       </view>
     </view>
@@ -39,7 +39,7 @@
       <!-- Info -->
       <view class="ci-info">
         <text class="ci-name font-heading">{{item.name}}</text>
-        <text class="ci-meta">{{item.rarity}} · {{item.class}} {{item.type}} · {{item.setCode}}</text>
+        <text class="ci-meta">{{item.rarityCN || item.rarity}} · {{item.classCN || item.class}} {{item.typeCN || item.type}} · {{item.setCode}}</text>
       </view>
       <!-- Price -->
       <view class="ci-price">

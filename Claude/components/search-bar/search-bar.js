@@ -1,7 +1,7 @@
 Component({
   properties: {
     value: { type: String, value: '' },
-    placeholder: { type: String, value: 'Legendary equipment for Ninja...' },
+    placeholder: { type: String, value: '搜索 Ninja 的传奇装备...' },
     compact: { type: Boolean, value: false }
   },
   methods: {

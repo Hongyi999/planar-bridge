@@ -31,15 +31,15 @@
     <!-- AI Summary -->
     <view class="summary-card {{showResults ? 'show' : ''}}" wx:if="{{summary}}">
       <view class="summary-header">
-        <text class="summary-label font-heading">AGENT SUMMARY</text>
-        <text class="summary-count font-mono">{{resultCount}} results</text>
+        <text class="summary-label font-heading">AI 搜索摘要</text>
+        <text class="summary-count font-mono">{{resultCount}} 个结果</text>
       </view>
       <text class="summary-text">{{summary}}</text>
     </view>
 
     <!-- Results meta -->
     <view class="results-meta {{showResults ? 'show' : ''}}">
-      <text class="meta-left">{{resultCount}} results · by price desc</text>
+      <text class="meta-left">{{resultCount}} 个结果 · 按价格降序</text>
       <text class="meta-right" bindtap="onFollowUp">继续追问...</text>
     </view>
 
@@ -51,7 +51,7 @@
     <!-- Empty state -->
     <view class="empty-state {{showResults && resultCount === 0 ? 'show' : ''}}" wx:if="{{resultCount === 0}}">
       <text class="empty-text">未找到匹配卡牌</text>
-      <text class="empty-hint">尝试其他关键词，如 "legendary equipment" 或 "majestic attack"</text>
+      <text class="empty-hint">尝试其他关键词，如「传奇装备」或「威严攻击」</text>
     </view>
 
     <view class="bottom-spacer"></view>

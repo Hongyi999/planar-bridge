@@ -14,7 +14,8 @@
   <!-- Card info -->
   <view class="card-info">
     <view class="card-name font-heading">{{card.name}}</view>
-    <view class="card-meta">{{card.class}} · {{card.type}}{{card.subtype ? ' — ' + card.subtype : ''}} · {{card.setCode}}</view>
+    <view class="card-name-cn" wx:if="{{card.nameCN}}">{{card.nameCN}}</view>
+    <view class="card-meta">{{card.classCN || card.class}} · {{card.typeCN || card.type}}{{card.subtype ? ' — ' + card.subtype : ''}} · {{card.setCode}}</view>
     <view class="card-price-row">
       <text class="card-price font-mono {{card.priceTrend > 0 ? 'price-up' : card.priceTrend < 0 ? 'price-down' : 'price-flat'}}">${{card.priceMid}}</text>
       <text class="card-trend {{card.priceTrend > 0 ? 'price-up' : card.priceTrend < 0 ? 'price-down' : 'price-flat'}}">{{card.priceTrend > 0 ? '▲ ' + card.priceTrend + '%' : card.priceTrend < 0 ? '▼ ' + (-card.priceTrend) + '%' : '— 0%'}}</text>

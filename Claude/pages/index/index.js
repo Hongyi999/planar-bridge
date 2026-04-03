@@ -2,10 +2,10 @@ Page({
   data: {
     statusBarHeight: 20,
     chips: [
-      { text: 'Legendary 装备', type: 'gold', query: 'legendary equipment' },
-      { text: 'Majestic 攻击', type: 'purple', query: 'majestic attack action' },
+      { text: '传奇装备', type: 'gold', query: 'legendary equipment' },
+      { text: '威严攻击', type: 'purple', query: 'majestic attack action' },
       { text: '$5 以下好牌', type: 'green', query: 'under $5' },
-      { text: 'Uprising 热卡', type: 'gold', query: 'uprising' }
+      { text: 'Uprising 热门卡', type: 'gold', query: 'uprising' }
     ]
   },
   onLoad() {
