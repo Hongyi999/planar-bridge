@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "7WfwLnOUtsxu5Sl952cqn"
+uri = "file://planar-bridge-weapp.zip"
+type = "unspecified"
+title = "PlanarBridge WeChat Mini Program (weapp build)"
