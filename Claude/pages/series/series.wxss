@@ -1,0 +1,140 @@
+.series-page {
+  min-height: 100vh;
+  background: #F2EFE4;
+  padding: 24rpx 32rpx 160rpx;
+}
+
+.page-title {
+  display: block;
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #2C2A22;
+  letter-spacing: -0.01em;
+  margin-bottom: 6rpx;
+}
+
+.page-subtitle {
+  display: block;
+  font-size: 24rpx;
+  color: #A09A8C;
+  margin-bottom: 28rpx;
+}
+
+/* Sort toggle */
+.sort-toggle {
+  display: flex;
+  margin-bottom: 32rpx;
+}
+
+.sort-btn {
+  padding: 16rpx 32rpx;
+  font-size: 24rpx;
+  border: 3rpx solid #D6D0C2;
+  background: #FDFCF8;
+  color: #A09A8C;
+  font-family: -apple-system, "Helvetica Neue", "PingFang SC", sans-serif;
+  transition: all 0.2s;
+}
+
+.sort-btn-left {
+  border-radius: 20rpx 0 0 20rpx;
+}
+
+.sort-btn-right {
+  border-radius: 0 20rpx 20rpx 0;
+  border-left: none;
+}
+
+.sort-btn.active {
+  background: #9B8644;
+  color: #FDFCF8;
+  border-color: #9B8644;
+  font-weight: 600;
+}
+
+/* Series list */
+.series-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.year-divider {
+  padding: 20rpx 0 8rpx;
+  border-bottom: 3rpx solid #9B864418;
+  margin-bottom: 4rpx;
+}
+
+.year-text {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #9B8644;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.set-item {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 26rpx 8rpx;
+  border-bottom: 2rpx solid #E8E3D8;
+  transition: background 0.15s;
+}
+
+.set-item:active {
+  background: #9B864406;
+}
+
+.set-icon {
+  width: 76rpx;
+  height: 76rpx;
+  border-radius: 20rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #9B86440A;
+  border: 3rpx solid #9B864418;
+}
+
+.set-abbr {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #8B7A3E;
+}
+
+.set-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.set-name {
+  display: block;
+  font-size: 25rpx;
+  font-weight: 600;
+  color: #2C2A22;
+  letter-spacing: 0.01em;
+}
+
+.set-tags {
+  display: block;
+  font-size: 20rpx;
+  color: #A09A8C;
+  margin-top: 2rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.set-code {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #A09A8C;
+  flex-shrink: 0;
+}
+
+.set-arrow {
+  color: #C8C2B4;
+  font-size: 32rpx;
+  margin-left: 8rpx;
+}

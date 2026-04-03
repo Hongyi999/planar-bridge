@@ -1,0 +1,133 @@
+.tab-bar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 100rpx;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: #F2EFE4;
+  border-top: 1rpx solid #E8E3D8;
+  position: relative;
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4rpx;
+  flex: 1;
+  padding: 8rpx 0;
+  opacity: 0.45;
+  transition: opacity 0.2s;
+}
+
+.tab-item.active {
+  opacity: 1;
+}
+
+.tab-icon {
+  width: 44rpx;
+  height: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-text {
+  font-size: 20rpx;
+  font-weight: 500;
+  font-family: -apple-system, "Helvetica Neue", "PingFang SC", sans-serif;
+}
+
+/* Search icon */
+.i-search {
+  position: relative;
+  width: 36rpx;
+  height: 36rpx;
+}
+
+.i-search-circle {
+  width: 24rpx;
+  height: 24rpx;
+  border: 3rpx solid #A09A8C;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.i-search-handle {
+  position: absolute;
+  bottom: 2rpx;
+  right: 2rpx;
+  width: 12rpx;
+  height: 3rpx;
+  background: #A09A8C;
+  transform: rotate(45deg);
+  border-radius: 2rpx;
+}
+
+/* Grid icon */
+.i-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rpx;
+  width: 28rpx;
+  height: 28rpx;
+}
+
+.i-grid-cell {
+  border-radius: 3rpx;
+  background: #A09A8C;
+}
+
+/* Bookmark icon */
+.i-bookmark {
+  width: 22rpx;
+  height: 30rpx;
+  border: 3rpx solid #A09A8C;
+  border-bottom: none;
+  border-radius: 4rpx 4rpx 0 0;
+  position: relative;
+}
+
+.i-bookmark::after {
+  content: '';
+  position: absolute;
+  bottom: -10rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10rpx solid transparent;
+  border-right: 10rpx solid transparent;
+  border-top: 10rpx solid #F2EFE4;
+}
+
+/* Settings icon */
+.i-settings {
+  position: relative;
+  width: 32rpx;
+  height: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-settings-circle {
+  width: 24rpx;
+  height: 24rpx;
+  border: 3rpx solid #A09A8C;
+  border-radius: 50%;
+}
+
+.i-settings-dot {
+  position: absolute;
+  width: 8rpx;
+  height: 8rpx;
+  background: #A09A8C;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

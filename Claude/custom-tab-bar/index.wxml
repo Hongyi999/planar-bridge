@@ -1,0 +1,34 @@
+<view class="tab-bar">
+  <block wx:for="{{list}}" wx:key="index">
+    <view class="tab-item {{selected === index ? 'active' : ''}}" data-index="{{index}}" bindtap="switchTab">
+      <!-- Search icon -->
+      <view wx:if="{{item.icon === 'search'}}" class="tab-icon">
+        <view class="i-search">
+          <view class="i-search-circle" style="border-color: {{selected === index ? '#9B8644' : '#A09A8C'}}"></view>
+          <view class="i-search-handle" style="background: {{selected === index ? '#9B8644' : '#A09A8C'}}"></view>
+        </view>
+      </view>
+      <!-- Grid icon -->
+      <view wx:elif="{{item.icon === 'grid'}}" class="tab-icon">
+        <view class="i-grid">
+          <view class="i-grid-cell" style="background: {{selected === index ? '#9B8644' : '#A09A8C'}}"></view>
+          <view class="i-grid-cell" style="background: {{selected === index ? '#9B8644' : '#A09A8C'}}"></view>
+          <view class="i-grid-cell" style="background: {{selected === index ? '#9B8644' : '#A09A8C'}}"></view>
+          <view class="i-grid-cell" style="background: {{selected === index ? '#9B8644' : '#A09A8C'}}"></view>
+        </view>
+      </view>
+      <!-- Bookmark icon -->
+      <view wx:elif="{{item.icon === 'bookmark'}}" class="tab-icon">
+        <view class="i-bookmark" style="border-color: {{selected === index ? '#9B8644' : '#A09A8C'}}"></view>
+      </view>
+      <!-- Settings icon -->
+      <view wx:elif="{{item.icon === 'settings'}}" class="tab-icon">
+        <view class="i-settings">
+          <view class="i-settings-circle" style="border-color: {{selected === index ? '#9B8644' : '#A09A8C'}}"></view>
+          <view class="i-settings-dot" style="background: {{selected === index ? '#9B8644' : '#A09A8C'}}"></view>
+        </view>
+      </view>
+      <text class="tab-text" style="color: {{selected === index ? '#9B8644' : '#A09A8C'}}">{{item.text}}</text>
+    </view>
+  </block>
+</view>

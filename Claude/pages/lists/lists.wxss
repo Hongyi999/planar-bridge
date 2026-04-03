@@ -1,0 +1,216 @@
+.lists-page {
+  min-height: 100vh;
+  background: #F2EFE4;
+  padding: 24rpx 32rpx 160rpx;
+}
+
+.page-title {
+  display: block;
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #2C2A22;
+  letter-spacing: -0.01em;
+  margin-bottom: 6rpx;
+}
+
+.page-subtitle {
+  display: block;
+  font-size: 24rpx;
+  color: #A09A8C;
+  margin-bottom: 32rpx;
+}
+
+/* List cards scroll */
+.list-cards-scroll {
+  white-space: nowrap;
+  margin-bottom: 36rpx;
+  margin-left: -32rpx;
+  margin-right: -32rpx;
+  padding-left: 32rpx;
+}
+
+.list-cards-row {
+  display: inline-flex;
+  gap: 20rpx;
+  padding-right: 32rpx;
+}
+
+.list-card {
+  min-width: 256rpx;
+  border-radius: 28rpx;
+  padding: 28rpx;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.list-card:active {
+  transform: translateY(-4rpx);
+}
+
+.list-card.selected {
+  transform: translateY(-4rpx);
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.06);
+}
+
+.list-card-gold {
+  background: #9B86440A;
+  border: 3rpx solid #9B864420;
+}
+.list-card-gold .lc-name { color: #8B7A3E; }
+
+.list-card-purple {
+  background: #6B4C8A08;
+  border: 3rpx solid #6B4C8A18;
+}
+.list-card-purple .lc-name { color: #6B4C8A; }
+
+.list-card-green {
+  background: #3D7A5E08;
+  border: 3rpx solid #3D7A5E18;
+}
+.list-card-green .lc-name { color: #3D7A5E; }
+
+.lc-name {
+  display: block;
+  font-size: 24rpx;
+  font-weight: 600;
+  margin-bottom: 6rpx;
+}
+
+.lc-count {
+  display: block;
+  font-size: 20rpx;
+  color: #A09A8C;
+  margin-bottom: 16rpx;
+}
+
+.lc-value {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #2C2A22;
+}
+
+/* Selected title */
+.selected-title {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #2C2A22;
+  letter-spacing: 0.02em;
+  margin-bottom: 20rpx;
+}
+
+/* Card items */
+.cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.card-item {
+  display: flex;
+  align-items: center;
+  gap: 22rpx;
+  background: #FDFCF8;
+  border-radius: 24rpx;
+  padding: 18rpx 22rpx;
+  border: 2rpx solid #E8E3D8;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.card-item:active {
+  border-color: #9B864430;
+  box-shadow: 0 4rpx 24rpx #9B864408;
+}
+
+.ci-thumb {
+  width: 80rpx;
+  height: 112rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+  border: 2rpx solid #9B864420;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rpx;
+  overflow: hidden;
+}
+
+.ci-thumb-text {
+  font-size: 12rpx;
+  color: #9B8644;
+  text-align: center;
+  font-weight: 600;
+  line-height: 1.2;
+  word-break: break-all;
+  overflow: hidden;
+  max-height: 100rpx;
+}
+
+.ci-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ci-name {
+  display: block;
+  font-size: 23rpx;
+  font-weight: 600;
+  color: #2C2A22;
+  letter-spacing: 0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ci-meta {
+  display: block;
+  font-size: 20rpx;
+  color: #A09A8C;
+  margin-top: 2rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ci-price {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.ci-price-value {
+  display: block;
+  font-weight: 600;
+  font-size: 26rpx;
+  color: #2C2A22;
+}
+
+.ci-trend {
+  display: block;
+  font-size: 18rpx;
+  margin-top: 2rpx;
+}
+
+.price-up { color: #3D7A5E; }
+.price-down { color: #C4544A; }
+.price-flat { color: #A09A8C; }
+
+/* Empty */
+.empty-list {
+  text-align: center;
+  padding: 60rpx 40rpx;
+}
+
+.empty-text {
+  display: block;
+  font-size: 28rpx;
+  color: #6B6355;
+  margin-bottom: 8rpx;
+}
+
+.empty-hint {
+  display: block;
+  font-size: 24rpx;
+  color: #A09A8C;
+}

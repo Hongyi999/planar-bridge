@@ -1,0 +1,47 @@
+<view class="hero-page">
+  <!-- Background grid lines -->
+  <view class="bg-lines"></view>
+  <!-- Background glow -->
+  <view class="bg-glow"></view>
+  <!-- Floating orbs -->
+  <view class="orb orb-1"></view>
+  <view class="orb orb-2"></view>
+  <view class="orb orb-3"></view>
+
+  <!-- Center content -->
+  <view class="hero-content">
+    <!-- Logo -->
+    <view class="logo-row">
+      <!-- Bridge icon using CSS -->
+      <view class="logo-icon">
+        <view class="bridge-top"></view>
+        <view class="bridge-left"></view>
+        <view class="bridge-right"></view>
+      </view>
+      <text class="logo-text font-heading">PLANAR BRIDGE</text>
+    </view>
+
+    <!-- Heading -->
+    <view class="hero-heading font-heading">What cards are\nyou looking for?</view>
+
+    <!-- Subtitle -->
+    <view class="hero-sub">用自然语言搜索 Flesh and Blood 卡牌</view>
+    <view class="hero-sub-detail">实时价格 · 系列浏览 · 个人收藏</view>
+
+    <!-- Search bar -->
+    <view class="hero-search">
+      <search-bar placeholder="Legendary equipment for Ninja..." bind:search="onSearch" />
+    </view>
+
+    <!-- Suggestion chips -->
+    <view class="chips-row">
+      <view
+        wx:for="{{chips}}"
+        wx:key="index"
+        class="chip chip-{{item.type}}"
+        data-query="{{item.query}}"
+        bindtap="onChipTap"
+      >{{item.text}}</view>
+    </view>
+  </view>
+</view>

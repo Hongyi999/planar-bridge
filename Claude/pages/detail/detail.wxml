@@ -1,0 +1,107 @@
+<view class="detail-page" wx:if="{{card}}">
+  <!-- Hero area -->
+  <view class="detail-hero">
+    <!-- Decorative circles -->
+    <view class="deco-circle deco-1"></view>
+    <view class="deco-circle deco-2"></view>
+
+    <!-- Navigation -->
+    <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+      <view class="nav-btn-group">
+        <view class="nav-btn" bindtap="goBack">
+          <view class="nav-arrow-back"></view>
+        </view>
+        <view class="nav-divider"></view>
+        <view class="nav-btn" bindtap="goHome">
+          <view class="nav-home-icon">
+            <view class="home-roof"></view>
+            <view class="home-body"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Card placeholder -->
+    <view class="detail-card-placeholder" style="background: linear-gradient(145deg, #EDE9DC, #E4DFCF)">
+      <text class="dcp-name font-heading">{{card.name}}</text>
+      <text class="dcp-meta">{{card.setCode}} · {{card.rarity}}</text>
+    </view>
+  </view>
+
+  <!-- Pull-up sheet -->
+  <scroll-view scroll-y class="detail-sheet">
+    <!-- Drag handle -->
+    <view class="sheet-handle"></view>
+
+    <!-- Header: name + price -->
+    <view class="detail-header">
+      <view class="dh-left">
+        <text class="dh-name font-heading">{{card.name}}</text>
+        <view class="dh-type">
+          <text>{{card.class}} · {{card.type}}{{card.subtype ? ' — ' + card.subtype : ''}} · </text>
+          <text class="dh-rarity">{{card.rarity}}</text>
+        </view>
+      </view>
+      <view class="dh-right">
+        <text class="dh-price font-mono {{card.priceTrend > 0 ? 'price-up' : card.priceTrend < 0 ? 'price-down' : 'price-flat'}}">${{card.priceMid}}</text>
+        <text class="dh-trend {{card.priceTrend > 0 ? 'price-up' : card.priceTrend < 0 ? 'price-down' : 'price-flat'}}">
+          {{card.priceTrend > 0 ? '▲ ' + card.priceTrend + '% this week' : card.priceTrend < 0 ? '▼ ' + (-card.priceTrend) + '% this week' : '— stable'}}
+        </text>
+      </view>
+    </view>
+
+    <!-- Stat chips -->
+    <view class="stat-row">
+      <view class="stat-chip">
+        <text class="stat-label">COST</text>
+        <text class="stat-value">{{card.cost !== null ? card.cost : '—'}}</text>
+      </view>
+      <view class="stat-chip">
+        <text class="stat-label">{{card.type === 'Attack Action' ? 'POWER' : 'DEFENSE'}}</text>
+        <text class="stat-value stat-blue">{{card.type === 'Attack Action' ? (card.power !== null ? card.power : '—') : (card.defense !== null ? card.defense : '—')}}</text>
+      </view>
+      <view class="stat-chip">
+        <text class="stat-label">INTELLECT</text>
+        <text class="stat-value">{{card.intellect !== null ? card.intellect : '—'}}</text>
+      </view>
+      <view class="stat-chip">
+        <text class="stat-label">LIFE</text>
+        <text class="stat-value">{{card.life !== null ? card.life : '—'}}</text>
+      </view>
+    </view>
+
+    <!-- Card text -->
+    <view class="card-text-box">
+      <text class="card-text-content">{{card.text}}</text>
+    </view>
+
+    <!-- Price row -->
+    <view class="price-row">
+      <view class="price-cell">
+        <text class="price-label">TCG Low</text>
+        <text class="price-value font-mono">${{card.priceLow}}</text>
+      </view>
+      <view class="price-cell">
+        <text class="price-label">TCG Mid</text>
+        <text class="price-value font-mono">${{card.priceMid}}</text>
+      </view>
+      <view class="price-cell">
+        <text class="price-label">TCG Market</text>
+        <text class="price-value font-mono">${{card.priceMarket}}</text>
+      </view>
+    </view>
+
+    <!-- Action row -->
+    <view class="action-row">
+      <view class="btn-primary action-btn-main" bindtap="onAddToList">加入收藏列表</view>
+      <view class="action-btn-link" bindtap="onCopyLink">
+        <view class="link-icon">
+          <view class="link-arrow"></view>
+          <view class="link-box"></view>
+        </view>
+      </view>
+    </view>
+
+    <view class="bottom-spacer"></view>
+  </scroll-view>
+</view>

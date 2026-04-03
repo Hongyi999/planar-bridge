@@ -1,0 +1,59 @@
+<view class="results-page">
+  <!-- Custom navigation bar -->
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-btn-group">
+      <view class="nav-btn" bindtap="goBack">
+        <view class="nav-arrow-back"></view>
+      </view>
+      <view class="nav-divider"></view>
+      <view class="nav-btn" bindtap="goHome">
+        <view class="nav-home-icon">
+          <view class="home-roof"></view>
+          <view class="home-body"></view>
+        </view>
+      </view>
+    </view>
+    <text class="nav-title font-heading">搜索结果</text>
+  </view>
+
+  <!-- Scrollable content -->
+  <scroll-view scroll-y class="results-scroll" style="padding-top: {{statusBarHeight + 44}}px;">
+    <!-- Search bar compact -->
+    <view class="search-compact">
+      <search-bar value="{{query}}" compact="{{true}}" bind:search="onSearch" />
+    </view>
+
+    <!-- Thinking strip -->
+    <view class="thinking-section">
+      <thinking-strip steps="{{thinkingSteps}}" bind:complete="onThinkingComplete" />
+    </view>
+
+    <!-- AI Summary -->
+    <view class="summary-card {{showResults ? 'show' : ''}}" wx:if="{{summary}}">
+      <view class="summary-header">
+        <text class="summary-label font-heading">AGENT SUMMARY</text>
+        <text class="summary-count font-mono">{{resultCount}} results</text>
+      </view>
+      <text class="summary-text">{{summary}}</text>
+    </view>
+
+    <!-- Results meta -->
+    <view class="results-meta {{showResults ? 'show' : ''}}">
+      <text class="meta-left">{{resultCount}} results · by price desc</text>
+      <text class="meta-right" bindtap="onFollowUp">继续追问...</text>
+    </view>
+
+    <!-- Card grid -->
+    <view class="card-grid {{showResults ? 'show' : ''}}">
+      <card-tile wx:for="{{results}}" wx:key="id" card="{{item}}" index="{{index}}" />
+    </view>
+
+    <!-- Empty state -->
+    <view class="empty-state {{showResults && resultCount === 0 ? 'show' : ''}}" wx:if="{{resultCount === 0}}">
+      <text class="empty-text">未找到匹配卡牌</text>
+      <text class="empty-hint">尝试其他关键词，如 "legendary equipment" 或 "majestic attack"</text>
+    </view>
+
+    <view class="bottom-spacer"></view>
+  </scroll-view>
+</view>

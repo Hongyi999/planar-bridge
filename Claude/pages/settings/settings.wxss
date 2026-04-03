@@ -1,0 +1,130 @@
+.settings-page {
+  min-height: 100vh;
+  background: #F2EFE4;
+  padding: 24rpx 32rpx 160rpx;
+}
+
+.page-title {
+  display: block;
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #2C2A22;
+  letter-spacing: -0.01em;
+  margin-bottom: 6rpx;
+}
+
+.page-subtitle {
+  display: block;
+  font-size: 24rpx;
+  color: #A09A8C;
+  margin-bottom: 40rpx;
+}
+
+.settings-group {
+  margin-bottom: 32rpx;
+}
+
+.group-title {
+  font-size: 22rpx;
+  color: #A09A8C;
+  font-weight: 500;
+  padding: 0 8rpx;
+  margin-bottom: 12rpx;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FDFCF8;
+  border: 2rpx solid #E8E3D8;
+  border-radius: 24rpx;
+  padding: 24rpx 28rpx;
+  margin-bottom: 12rpx;
+  transition: border-color 0.2s;
+}
+
+.settings-item:active {
+  border-color: #9B864430;
+}
+
+.item-left {
+  flex: 1;
+}
+
+.item-label {
+  display: block;
+  font-size: 28rpx;
+  color: #2C2A22;
+  font-weight: 500;
+}
+
+.item-desc {
+  display: block;
+  font-size: 22rpx;
+  color: #A09A8C;
+  margin-top: 4rpx;
+}
+
+.item-arrow {
+  color: #C8C2B4;
+  font-size: 32rpx;
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+
+/* Footer */
+.settings-footer {
+  text-align: center;
+  padding-top: 80rpx;
+}
+
+.footer-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16rpx;
+}
+
+.footer-bridge {
+  position: relative;
+  width: 48rpx;
+  height: 32rpx;
+}
+
+.fb-left {
+  position: absolute;
+  bottom: 0;
+  left: 4rpx;
+  width: 16rpx;
+  height: 24rpx;
+  border: 2rpx solid #9B864440;
+  border-right: none;
+  border-radius: 16rpx 0 0 0;
+}
+
+.fb-right {
+  position: absolute;
+  bottom: 0;
+  right: 4rpx;
+  width: 16rpx;
+  height: 24rpx;
+  border: 2rpx solid #9B864440;
+  border-left: none;
+  border-radius: 0 16rpx 0 0;
+}
+
+.footer-name {
+  display: block;
+  font-size: 22rpx;
+  color: #9B864460;
+  letter-spacing: 0.15em;
+  margin-bottom: 4rpx;
+}
+
+.footer-tagline {
+  display: block;
+  font-size: 20rpx;
+  color: #C8C2B4;
+}
