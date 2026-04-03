@@ -96,7 +96,7 @@ export default function Lists() {
           </Text>
           <View
             className='lists-page__empty-cta'
-            onClick={() => Taro.switchTab({ url: '/pages/search/index' })}
+            onClick={() => Taro.reLaunch({ url: '/pages/search/index' })}
           >
             <Text className='lists-page__empty-cta-text'>Go to Search</Text>
           </View>

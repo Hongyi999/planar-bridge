@@ -41,7 +41,7 @@ interface BottomNavProps {
 export default function BottomNav({ active }: BottomNavProps) {
   const handleTabPress = (tab: Tab) => {
     if (tab.key === active) return;
-    Taro.switchTab({ url: tab.path });
+    Taro.reLaunch({ url: tab.path });
   };
 
   return (
