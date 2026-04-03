@@ -9,6 +9,7 @@ interface AppState {
   lastQuery: string;
   selectedCard: FabCard | null;
   isDetailOpen: boolean;
+  hydrated: boolean;
 }
 
 type Action =
@@ -21,7 +22,8 @@ type Action =
   | { type: 'DELETE_LIST'; payload: string }
   | { type: 'ADD_CARD_TO_LIST'; payload: { listId: string; card: FabListCard } }
   | { type: 'REMOVE_CARD_FROM_LIST'; payload: { listId: string; cardId: string } }
-  | { type: 'LOAD_LISTS'; payload: FabList[] };
+  | { type: 'LOAD_LISTS'; payload: FabList[] }
+  | { type: 'SET_HYDRATED' };
 
 const initialState: AppState = {
   user: null,
@@ -30,6 +32,7 @@ const initialState: AppState = {
   lastQuery: '',
   selectedCard: null,
   isDetailOpen: false,
+  hydrated: false,
 };
 
 function reducer(state: AppState, action: Action): AppState {
@@ -55,6 +58,9 @@ function reducer(state: AppState, action: Action): AppState {
 
     case 'LOAD_LISTS':
       return { ...state, lists: action.payload };
+
+    case 'SET_HYDRATED':
+      return { ...state, hydrated: true };
 
     case 'ADD_LIST': {
       const newLists = [...state.lists, action.payload];
@@ -156,6 +162,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (savedUser) {
       dispatch({ type: 'SET_USER', payload: savedUser });
     }
+    dispatch({ type: 'SET_HYDRATED' });
   }, []);
 
   useEffect(() => {

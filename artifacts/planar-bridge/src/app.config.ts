@@ -13,5 +13,25 @@ export default defineAppConfig({
     backgroundColor: '#0A0A0C',
     enablePullDownRefresh: false,
   },
+  tabBar: {
+    color: '#8E8E93',
+    selectedColor: '#E8A838',
+    backgroundColor: '#141418',
+    borderStyle: 'black',
+    list: [
+      {
+        pagePath: 'pages/search/index',
+        text: 'Search',
+      },
+      {
+        pagePath: 'pages/lists/index',
+        text: 'Lists',
+      },
+      {
+        pagePath: 'pages/settings/index',
+        text: 'Settings',
+      },
+    ],
+  },
   animation: true,
 });

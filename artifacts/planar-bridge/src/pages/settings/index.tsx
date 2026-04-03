@@ -1,6 +1,5 @@
 import { View, Text, Image } from '@tarojs/components';
 import Taro, { useLoad } from '@tarojs/taro';
-import BottomNav from '../../components/BottomNav';
 import { useApp } from '../../store/AppContext';
 import './index.scss';
 
@@ -21,7 +20,7 @@ export default function Settings() {
   const { user } = state;
 
   useLoad(() => {
-    if (!state.user?.authenticated) {
+    if (state.hydrated && !state.user?.authenticated) {
       Taro.redirectTo({ url: '/pages/welcome/index' });
     }
   });
@@ -207,7 +206,6 @@ export default function Settings() {
         </Text>
       </View>
 
-      <BottomNav active='settings' />
     </View>
   );
 }

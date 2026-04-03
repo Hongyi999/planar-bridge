@@ -2,8 +2,7 @@ import { View, Text, ScrollView, Image, Input } from '@tarojs/components';
 import type { ITouchEvent } from '@tarojs/components';
 import type { BaseEventOrig, InputProps } from '@tarojs/components/types/Input';
 import Taro, { useLoad } from '@tarojs/taro';
-import { useState } from 'react';
-import BottomNav from '../../components/BottomNav';
+import { useState, useRef } from 'react';
 import { useApp } from '../../store/AppContext';
 import type { FabList } from '../../types';
 import { RarityColors } from '../../constants/colors';
@@ -15,9 +14,10 @@ export default function Lists() {
   const [showNewListModal, setShowNewListModal] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [swipedCardId, setSwipedCardId] = useState<string | null>(null);
+  const touchStartXRef = useRef<number | null>(null);
 
   useLoad(() => {
-    if (!state.user?.authenticated) {
+    if (state.hydrated && !state.user?.authenticated) {
       Taro.redirectTo({ url: '/pages/welcome/index' });
     }
   });
@@ -63,6 +63,21 @@ export default function Lists() {
     setSwipedCardId(null);
   };
 
+  const handleCardTouchStart = (e: ITouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
+  };
+
+  const handleCardTouchEnd = (cardId: string, e: ITouchEvent) => {
+    if (touchStartXRef.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartXRef.current;
+    touchStartXRef.current = null;
+    if (deltaX < -50) {
+      setSwipedCardId(cardId);
+    } else if (deltaX > 20 && swipedCardId === cardId) {
+      setSwipedCardId(null);
+    }
+  };
+
   const exportList = (list: FabList) => {
     const text = [
       `List: ${list.name}`,
@@ -96,7 +111,7 @@ export default function Lists() {
           </Text>
           <View
             className='lists-page__empty-cta'
-            onClick={() => Taro.reLaunch({ url: '/pages/search/index' })}
+            onClick={() => Taro.switchTab({ url: '/pages/search/index' })}
           >
             <Text className='lists-page__empty-cta-text'>Go to Search</Text>
           </View>
@@ -162,10 +177,11 @@ export default function Lists() {
                       <View
                         key={card.cardId}
                         className={`lists-page__card-item ${swipedCardId === card.cardId ? 'lists-page__card-item--swiped' : ''}`}
+                        onTouchStart={handleCardTouchStart}
+                        onTouchEnd={(e: ITouchEvent) => handleCardTouchEnd(card.cardId, e)}
                       >
                         <View
                           className='lists-page__card-item-inner'
-                          onClick={() => setSwipedCardId(swipedCardId === card.cardId ? null : card.cardId)}
                         >
                           {card.cardImage ? (
                             <Image
@@ -251,7 +267,6 @@ export default function Lists() {
         </View>
       )}
 
-      <BottomNav active='lists' />
     </View>
   );
 }

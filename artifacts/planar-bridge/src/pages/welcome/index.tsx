@@ -11,7 +11,7 @@ export default function Welcome() {
 
   useLoad(() => {
     if (state.user?.authenticated) {
-      Taro.reLaunch({ url: '/pages/search/index' });
+      Taro.switchTab({ url: '/pages/search/index' });
     }
   });
 
@@ -34,7 +34,7 @@ export default function Welcome() {
       };
 
       dispatch({ type: 'SET_USER', payload: user });
-      Taro.reLaunch({ url: '/pages/search/index' });
+      Taro.switchTab({ url: '/pages/search/index' });
     } catch (err) {
       setLoading(false);
       Taro.showToast({ title: 'Login failed, please try again', icon: 'error', duration: 2000 });
@@ -48,7 +48,7 @@ export default function Welcome() {
       authenticated: true,
     };
     dispatch({ type: 'SET_USER', payload: user });
-    Taro.reLaunch({ url: '/pages/search/index' });
+    Taro.switchTab({ url: '/pages/search/index' });
   };
 
   const isH5 = process.env.TARO_ENV === 'h5';

@@ -7,7 +7,6 @@ import CardTile from '../../components/CardTile';
 import SkeletonCard from '../../components/SkeletonCard';
 import SuggestionChips from '../../components/SuggestionChips';
 import CardDetailModal from '../../components/CardDetailModal';
-import BottomNav from '../../components/BottomNav';
 import { useApp } from '../../store/AppContext';
 import { searchCards, parseQueryToParams } from '../../api/fabdb';
 import type { FabCard, SearchState } from '../../types';
@@ -22,7 +21,7 @@ export default function Search() {
   const [favoritedCards, setFavoritedCards] = useState<Set<string>>(new Set());
 
   useLoad(() => {
-    if (!state.user?.authenticated) {
+    if (state.hydrated && !state.user?.authenticated) {
       Taro.redirectTo({ url: '/pages/welcome/index' });
     }
   });
@@ -201,7 +200,6 @@ export default function Search() {
         onCreateList={createList}
       />
 
-      <BottomNav active='search' />
     </View>
   );
 }
