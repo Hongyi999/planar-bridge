@@ -23,18 +23,26 @@ export default defineAppConfig({
       {
         pagePath: 'pages/search/index',
         text: '搜索',
+        iconPath: 'images/tab-search.png',
+        selectedIconPath: 'images/tab-search-sel.png',
       },
       {
         pagePath: 'pages/series/index',
         text: '系列',
+        iconPath: 'images/tab-series.png',
+        selectedIconPath: 'images/tab-series-sel.png',
       },
       {
         pagePath: 'pages/lists/index',
         text: '收藏',
+        iconPath: 'images/tab-lists.png',
+        selectedIconPath: 'images/tab-lists-sel.png',
       },
       {
         pagePath: 'pages/settings/index',
         text: '设置',
+        iconPath: 'images/tab-settings.png',
+        selectedIconPath: 'images/tab-settings-sel.png',
       },
     ],
   },

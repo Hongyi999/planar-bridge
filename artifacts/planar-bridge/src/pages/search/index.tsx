@@ -1,6 +1,7 @@
-import { View, Text, ScrollView } from '@tarojs/components';
+import { View, Text, ScrollView, Image, Input } from '@tarojs/components';
+import type { BaseEventOrig, InputProps } from '@tarojs/components/types/Input';
 import Taro from '@tarojs/taro';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import SearchBar from '../../components/SearchBar';
 import AgentThinkingStrip from '../../components/AgentThinkingStrip';
 import CardTile from '../../components/CardTile';
@@ -9,8 +10,17 @@ import SuggestionChips from '../../components/SuggestionChips';
 import CardDetailModal from '../../components/CardDetailModal';
 import { useApp } from '../../store/AppContext';
 import { searchCards, parseQueryToParams } from '../../api/fabdb';
-import type { FabCard, SearchState } from '../../types';
+import type { FabCard, SearchState, UserProfile } from '../../types';
 import './index.scss';
+
+const HERO_CHIPS = [
+  { label: 'Legendary 装备', variant: 'gold' },
+  { label: 'Majestic 攻击', variant: 'purple' },
+  { label: '$5 以下好牌', variant: 'green' },
+  { label: 'Uprising 热卡', variant: 'gold' },
+];
+
+const LOGO_ICON = require('../../images/logo-icon.png');
 
 export default function Search() {
   const { state, dispatch, openCardDetail, closeCardDetail, addCardToList, createList } = useApp();
@@ -19,12 +29,41 @@ export default function Search() {
   const [isThinking, setIsThinking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [favoritedCards, setFavoritedCards] = useState<Set<string>>(new Set());
+  const [heroInput, setHeroInput] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
 
-  useEffect(() => {
-    if (state.hydrated && !state.user?.authenticated) {
-      Taro.reLaunch({ url: '/pages/welcome/index' });
+  const isAuthenticated = state.hydrated && state.user?.authenticated;
+  const isH5 = process.env.TARO_ENV === 'h5';
+
+  const doLogin = useCallback(async (): Promise<boolean> => {
+    if (loginLoading) return false;
+    setLoginLoading(true);
+    try {
+      if (isH5) {
+        const user: UserProfile = { nickName: 'Guest Player', avatarUrl: '', authenticated: true };
+        dispatch({ type: 'SET_USER', payload: user });
+        setLoginLoading(false);
+        return true;
+      }
+      const loginRes = await Taro.login();
+      if (!loginRes.code) throw new Error('No code');
+      let nickName = 'Player';
+      let avatarUrl = '';
+      try {
+        const profileRes = await Taro.getUserProfile({ desc: '用于显示您的个人信息' });
+        nickName = profileRes.userInfo.nickName || 'Player';
+        avatarUrl = profileRes.userInfo.avatarUrl || '';
+      } catch (_) {}
+      const user: UserProfile = { openid: loginRes.code, nickName, avatarUrl, authenticated: true };
+      dispatch({ type: 'SET_USER', payload: user });
+      setLoginLoading(false);
+      return true;
+    } catch (err) {
+      setLoginLoading(false);
+      Taro.showToast({ title: '登录失败，请重试', icon: 'error', duration: 2000 });
+      return false;
     }
-  }, [state.hydrated, state.user?.authenticated]);
+  }, [loginLoading, isH5, dispatch]);
 
   const runSearch = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) return;
@@ -32,7 +71,6 @@ export default function Search() {
     setSearchState('thinking');
     setIsThinking(true);
     setError(null);
-
     try {
       const params = parseQueryToParams(searchQuery);
       const result = await searchCards(params);
@@ -42,12 +80,26 @@ export default function Search() {
       });
     } catch (err) {
       setError('Unable to search cards. Please check your connection.');
-      dispatch({
-        type: 'SET_SEARCH_RESULTS',
-        payload: { results: [], query: searchQuery },
-      });
+      dispatch({ type: 'SET_SEARCH_RESULTS', payload: { results: [], query: searchQuery } });
     }
   }, [dispatch]);
+
+  const handleHeroSearch = useCallback(async (q: string) => {
+    if (!q.trim()) return;
+    if (!state.user?.authenticated) {
+      const ok = await doLogin();
+      if (!ok) return;
+    }
+    runSearch(q);
+  }, [state.user, doLogin, runSearch]);
+
+  const handleHeroChip = useCallback(async (label: string) => {
+    if (!state.user?.authenticated) {
+      const ok = await doLogin();
+      if (!ok) return;
+    }
+    runSearch(label);
+  }, [state.user, doLogin, runSearch]);
 
   const handleThinkingComplete = useCallback(() => {
     setIsThinking(false);
@@ -77,6 +129,67 @@ export default function Search() {
       return next;
     });
   };
+
+  if (!isAuthenticated) {
+    return (
+      <View className='hero'>
+        <View className='hero__bg-lines' />
+        <View className='hero__bg-glow' />
+        <View className='hero__orb hero__orb--1' />
+        <View className='hero__orb hero__orb--2' />
+        <View className='hero__orb hero__orb--3' />
+
+        <View className='hero__content'>
+          <View className='hero__logo-row'>
+            <Image
+              className='hero__logo-img'
+              src={LOGO_ICON}
+              mode='aspectFit'
+            />
+            <Text className='hero__logo-text'>Planar Bridge</Text>
+          </View>
+
+          <Text className='hero__headline'>
+            What cards are{'\n'}you looking for?
+          </Text>
+          <Text className='hero__sub'>
+            用自然语言搜索 Flesh and Blood 卡牌{'\n'}实时价格 · 系列浏览 · 个人收藏
+          </Text>
+
+          <View className='hero__sbox'>
+            <View className='hero__sbox-icon'>
+              <View className='hero__search-outer'>
+                <View className='hero__search-handle' />
+              </View>
+            </View>
+            <Input
+              className='hero__sbox-input'
+              placeholderClass='hero__sbox-placeholder'
+              placeholder='Legendary equipment for Ninja...'
+              value={heroInput}
+              onInput={(e: BaseEventOrig<InputProps.inputEventDetail>) => setHeroInput(e.detail.value)}
+              confirmType='search'
+              onConfirm={() => handleHeroSearch(heroInput)}
+            />
+          </View>
+
+          <View className='hero__chips'>
+            {HERO_CHIPS.map((chip, i) => (
+              <View
+                key={i}
+                className={`hero__chip hero__chip--${chip.variant}`}
+                onClick={() => handleHeroChip(chip.label)}
+              >
+                <Text className='hero__chip-text'>{chip.label}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        <Text className='hero__legal'>Card data · fabdb.net community database</Text>
+      </View>
+    );
+  }
 
   const showResults = searchState === 'results' || searchState === 'thinking';
 
@@ -133,11 +246,7 @@ export default function Search() {
           {searchState === 'results' && (
             <>
               {state.searchResults.length > 0 ? (
-                <ScrollView
-                  className='search-page__scroll'
-                  scrollY
-                  enableFlex
-                >
+                <ScrollView className='search-page__scroll' scrollY enableFlex>
                   <View className='search-page__results-header'>
                     <Text className='search-page__results-count'>
                       {state.searchResults.length} result{state.searchResults.length !== 1 ? 's' : ''}
@@ -199,7 +308,6 @@ export default function Search() {
         onAddToList={addCardToList}
         onCreateList={createList}
       />
-
     </View>
   );
 }
