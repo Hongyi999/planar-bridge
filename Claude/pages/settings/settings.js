@@ -295,12 +295,15 @@ Page({
 
   // --- Internal ---
   _saveCurrentSettings() {
-    saveSettings({
+    var settings = {
       sortIndex: this.data.sortIndex,
       searchLangIndex: this.data.searchLangIndex,
       viewMode: this.data.viewMode,
       currency: this.data.currency,
       exportFields: this.data.exportFields
-    });
+    };
+    saveSettings(settings);
+    // Sync to cloud in background
+    storageUtil.syncSettingsToCloud(settings);
   }
 });

@@ -1,3 +1,8 @@
+/**
+ * AI Parser — handles search query parsing and AI cloud function calls.
+ * Retains local parseQuery as fallback, adds cloud AI search.
+ */
+
 function parseQuery(query) {
   const q = query.toLowerCase();
   const filters = {};
@@ -6,30 +11,34 @@ function parseQuery(query) {
   var classes = ['ninja','guardian','brute','warrior','wizard','mechanologist','ranger','runeblade','assassin','illusionist','generic'];
   classes.forEach(function(c) { if (q.includes(c)) filters.class = c.charAt(0).toUpperCase() + c.slice(1); });
 
+  // Chinese class mapping
+  var classCN = {'忍者':'Ninja','守护者':'Guardian','蛮兽':'Brute','战士':'Warrior','法师':'Wizard','机械师':'Mechanologist','游侠':'Ranger','符文之刃':'Runeblade','刺客':'Assassin','幻术师':'Illusionist','通用':'Generic'};
+  Object.keys(classCN).forEach(function(cn) { if (q.includes(cn)) filters.class = classCN[cn]; });
+
   // Rarity detection
   var rarities = ['legendary','majestic','rare','common','fabled'];
   rarities.forEach(function(r) { if (q.includes(r)) filters.rarity = r.charAt(0).toUpperCase() + r.slice(1); });
+  if (q.includes('传奇')) filters.rarity = 'Legendary';
+  if (q.includes('威严')) filters.rarity = 'Majestic';
+  if (q.includes('稀有')) filters.rarity = 'Rare';
+  if (q.includes('神话')) filters.rarity = 'Fabled';
 
   // Type detection
   var types = ['equipment','weapon','attack action','defense reaction','attack','action','instant'];
   types.forEach(function(t) {
     if (q.includes(t)) filters.type = t.split(' ').map(function(w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(' ');
   });
-
-  // Chinese type mapping
   if (q.includes('装备')) filters.type = 'Equipment';
   if (q.includes('武器')) filters.type = 'Weapon';
   if (q.includes('攻击')) filters.type = 'Attack Action';
-
-  // Chinese rarity mapping
-  if (q.includes('传奇')) filters.rarity = 'Legendary';
+  if (q.includes('防御')) filters.type = 'Defense Reaction';
 
   // Price detection
   var priceMatch = q.match(/under\s*\$?(\d+)/i) || q.match(/(\d+)\s*以下/) || q.match(/below\s*\$?(\d+)/i) || q.match(/\$(\d+)\s*以下/);
   if (priceMatch) filters.priceMax = parseFloat(priceMatch[1]);
 
   // Set detection
-  var sets = {wtr:'WTR',arc:'ARC',cru:'CRU',mon:'MON',ele:'ELE',eve:'EVE',upr:'UPR',uprising:'UPR',dyn:'DYN',out:'OUT',dtd:'DTD',bri:'BRI',hvy:'HVY',mst:'MST',ros:'ROS',hnt:'HNT'};
+  var sets = {wtr:'WTR',arc:'ARC',cru:'CRU',mon:'MON',ele:'ELE',eve:'EVE',upr:'UPR',uprising:'UPR',dyn:'DYN',out:'OUT',dtd:'DTD',bri:'BRI',hvy:'HVY',mst:'MST',ros:'ROS',hnt:'HNT',sea:'SEA'};
   Object.keys(sets).forEach(function(s) { if (q.includes(s)) filters.setCode = sets[s]; });
 
   // Keyword detection
@@ -46,23 +55,23 @@ function generateSummary(query, results) {
   var types = {};
   var sets = {};
   results.forEach(function(c) {
-    types[c.type] = (types[c.type] || 0) + 1;
-    sets[c.setCode] = (sets[c.setCode] || 0) + 1;
+    types[c.typeCN || c.type] = true;
+    sets[c.setCode] = true;
   });
 
-  var typeStr = Object.keys(types).join('、');
-  var setStr = Object.keys(sets).join('、');
+  var typeStr = Object.keys(types).slice(0, 3).join('、');
+  var setStr = Object.keys(sets).slice(0, 3).join('、');
 
   return '找到 ' + count + ' 张匹配卡牌，类型包括 ' + typeStr + '，来自 ' + setStr + ' 系列。已获取 TCGPlayer 最新市价。';
 }
 
 function getThinkingSteps(query, filters) {
   var filterDesc = [];
-  if (filters.class) filterDesc.push('class=' + filters.class);
-  if (filters.rarity) filterDesc.push('rarity=' + filters.rarity);
-  if (filters.type) filterDesc.push('type=' + filters.type);
-  if (filters.setCode) filterDesc.push('set=' + filters.setCode);
-  if (filters.priceMax) filterDesc.push('price<$' + filters.priceMax);
+  if (filters && filters.class) filterDesc.push('class=' + filters.class);
+  if (filters && filters.rarity) filterDesc.push('rarity=' + filters.rarity);
+  if (filters && filters.type) filterDesc.push('type=' + filters.type);
+  if (filters && filters.setCode) filterDesc.push('set=' + filters.setCode);
+  if (filters && filters.priceMax) filterDesc.push('price<$' + filters.priceMax);
 
   return [
     {
@@ -73,7 +82,7 @@ function getThinkingSteps(query, filters) {
     },
     {
       label: '检索 FAB 卡牌数据库...',
-      meta: '4,200+ 张卡牌 · 筛选 ' + (filterDesc.length > 0 ? filterDesc.join(' + ') : '关键词'),
+      meta: '云端数据库 · 筛选 ' + (filterDesc.length > 0 ? filterDesc.join(' + ') : '关键词'),
       color: 'gold',
       icon: 'search'
     },
@@ -86,8 +95,32 @@ function getThinkingSteps(query, filters) {
   ];
 }
 
+/**
+ * AI-powered search via cloud function.
+ * Returns { filters, results, resultCount, summary, aiUsed }
+ */
+function aiSearch(query, sortField, sortOrder) {
+  return new Promise(function(resolve, reject) {
+    wx.cloud.callFunction({
+      name: 'aiSearch',
+      data: {
+        query: query,
+        sortField: sortField || 'priceMid',
+        sortOrder: sortOrder || 'desc'
+      },
+      success: function(res) {
+        resolve(res.result);
+      },
+      fail: function(err) {
+        reject(err);
+      }
+    });
+  });
+}
+
 module.exports = {
-  parseQuery,
-  generateSummary,
-  getThinkingSteps
+  parseQuery: parseQuery,
+  generateSummary: generateSummary,
+  getThinkingSteps: getThinkingSteps,
+  aiSearch: aiSearch
 };

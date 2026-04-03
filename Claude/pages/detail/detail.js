@@ -1,4 +1,5 @@
 var cardData = require('../../utils/cardData.js');
+var cloudDB = require('../../utils/cloudDB.js');
 var storageUtil = require('../../utils/storage.js');
 
 Page({
@@ -9,23 +10,34 @@ Page({
     card: null,
     highlightedText: '',
     heroHeight: 560,
+    isLoading: true,
     _touchStartY: 0,
     _startHeroHeight: 560
   },
-  onLoad(options) {
+  onLoad: function(options) {
+    var that = this;
     var sysInfo = wx.getSystemInfoSync();
     var menuBtn = wx.getMenuButtonBoundingClientRect();
-    var card = cardData.getCardById(options.id);
-    if (card) {
-      var highlighted = this.highlightKeywords(card.text, card.keywords);
-      this.setData({
-        statusBarHeight: sysInfo.statusBarHeight || 20,
-        navTop: menuBtn.top,
-        navHeight: menuBtn.height,
-        card: card,
-        highlightedText: highlighted
-      });
-    }
+
+    that.setData({
+      statusBarHeight: sysInfo.statusBarHeight || 20,
+      navTop: menuBtn.top,
+      navHeight: menuBtn.height,
+      isLoading: true
+    });
+
+    // Try cloud first, fallback to local
+    cloudDB.getCardById(options.id).then(function(card) {
+      if (card) {
+        that.setData({
+          card: card,
+          highlightedText: card.text,
+          isLoading: false
+        });
+      } else {
+        that.setData({ isLoading: false });
+      }
+    });
   },
   highlightKeywords(text, keywords) {
     // For WXML we just return text as-is; keywords are handled in template

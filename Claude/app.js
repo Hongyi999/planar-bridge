@@ -1,6 +1,18 @@
 App({
   onLaunch() {
-    // Initialize default collections if not exist
+    // Initialize cloud development
+    if (wx.cloud) {
+      wx.cloud.init({
+        env: 'dev-7gpmka26fbecea2a',
+        traceUser: true
+      });
+
+      // Sync collections from cloud in background
+      var storageUtil = require('./utils/storage.js');
+      storageUtil.syncFromCloud();
+    }
+
+    // Initialize default collections if not exist (offline fallback)
     const lists = wx.getStorageSync('lists');
     if (!lists || !lists.length) {
       wx.setStorageSync('lists', [
@@ -11,6 +23,7 @@ App({
     }
   },
   globalData: {
-    appName: 'Planar Bridge'
+    appName: 'Planar Bridge',
+    cloudEnv: 'dev-7gpmka26fbecea2a'
   }
 });

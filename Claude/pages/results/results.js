@@ -1,6 +1,34 @@
 var cardData = require('../../utils/cardData.js');
 var aiParser = require('../../utils/aiParser.js');
 
+// Sort options mapping
+var SORT_MAP = [
+  { field: 'priceMid', order: 'desc' },   // 0: 价格从高到低
+  { field: 'priceMid', order: 'asc' },    // 1: 价格从低到高
+  { field: 'name', order: 'asc' },         // 2: 名称 A-Z
+  { field: 'name', order: 'desc' },        // 3: 名称 Z-A
+  { field: 'setCode', order: 'asc' }       // 4: 系列
+];
+
+function getSortPreference() {
+  var settings = wx.getStorageSync('appSettings');
+  var idx = (settings && settings.sortIndex) || 0;
+  return SORT_MAP[idx] || SORT_MAP[0];
+}
+
+function sortResults(results, sortPref) {
+  return results.slice().sort(function(a, b) {
+    var field = sortPref.field;
+    var asc = sortPref.order === 'asc' ? 1 : -1;
+    var aVal = a[field];
+    var bVal = b[field];
+    if (aVal == null) return 1;
+    if (bVal == null) return -1;
+    if (typeof aVal === 'string') return aVal.localeCompare(bVal) * asc;
+    return (aVal - bVal) * asc;
+  });
+}
+
 Page({
   data: {
     statusBarHeight: 20,
@@ -13,38 +41,63 @@ Page({
     summary: '',
     resultCount: 0,
     results: [],
-    showResults: false
+    showResults: false,
+    isLoading: false
   },
-  onLoad(options) {
+
+  onLoad: function(options) {
+    var that = this;
     var sysInfo = wx.getSystemInfoSync();
     var menuBtn = wx.getMenuButtonBoundingClientRect();
     var query = decodeURIComponent(options.query || '');
-    var filters = aiParser.parseQuery(query);
-    var results = cardData.searchCards(filters);
+    var sortPref = getSortPreference();
 
-    // Sort by price descending
-    results.sort(function(a, b) { return b.priceMid - a.priceMid; });
+    // Show thinking steps immediately
+    var localFilters = aiParser.parseQuery(query);
+    var steps = aiParser.getThinkingSteps(query, localFilters);
 
-    var steps = aiParser.getThinkingSteps(query, filters);
-    var summary = aiParser.generateSummary(query, results);
-
-    this.setData({
+    that.setData({
       statusBarHeight: sysInfo.statusBarHeight || 20,
       navTop: menuBtn.top,
       navHeight: menuBtn.height,
       navFullHeight: menuBtn.bottom + 8,
       query: query,
-      filters: filters,
       thinkingSteps: steps,
-      summary: summary,
-      resultCount: results.length,
-      results: results
+      isLoading: true
+    });
+
+    // Try cloud AI search first, fallback to local
+    aiParser.aiSearch(query, sortPref.field, sortPref.order).then(function(result) {
+      var results = sortResults(result.results || [], sortPref);
+      that.setData({
+        filters: result.filters || {},
+        summary: result.summary || '',
+        resultCount: result.resultCount || results.length,
+        results: results,
+        isLoading: false
+      });
+    }).catch(function() {
+      // Fallback to local search
+      var filters = aiParser.parseQuery(query);
+      var results = cardData.searchCards(filters);
+      results = sortResults(results, sortPref);
+      var summary = aiParser.generateSummary(query, results);
+
+      that.setData({
+        filters: filters,
+        summary: summary,
+        resultCount: results.length,
+        results: results,
+        isLoading: false
+      });
     });
   },
-  onThinkingComplete() {
+
+  onThinkingComplete: function() {
     this.setData({ showResults: true });
   },
-  onSearch(e) {
+
+  onSearch: function(e) {
     var query = e.detail.value;
     if (query && query.trim()) {
       wx.redirectTo({
@@ -52,14 +105,16 @@ Page({
       });
     }
   },
-  goBack() {
+
+  goBack: function() {
     wx.navigateBack();
   },
-  goHome() {
+
+  goHome: function() {
     wx.switchTab({ url: '/pages/index/index' });
   },
-  onFollowUp() {
-    // Could navigate to a new search with context
+
+  onFollowUp: function() {
     wx.showToast({ title: '继续追问功能开发中', icon: 'none' });
   }
 });
