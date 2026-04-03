@@ -14,7 +14,12 @@ const config = {
   plugins: [],
   defineConstants: {},
   copy: {
-    patterns: [],
+    patterns: [
+      {
+        from: 'src/images',
+        to: `dist/${process.env.TARO_ENV || 'h5'}/images`,
+      },
+    ],
     options: {},
   },
   framework: 'react',
