@@ -45,7 +45,7 @@
       <view class="dh-right">
         <text class="dh-price font-mono {{card.priceTrend > 0 ? 'price-up' : card.priceTrend < 0 ? 'price-down' : 'price-flat'}}">${{card.priceMid}}</text>
         <text class="dh-trend {{card.priceTrend > 0 ? 'price-up' : card.priceTrend < 0 ? 'price-down' : 'price-flat'}}">
-          {{card.priceTrend > 0 ? '▲ ' + card.priceTrend + '% this week' : card.priceTrend < 0 ? '▼ ' + (-card.priceTrend) + '% this week' : '— stable'}}
+          {{card.priceTrend > 0 ? '▲ ' + card.priceTrend + '%' : card.priceTrend < 0 ? '▼ ' + (-card.priceTrend) + '%' : '— 0%'}}
         </text>
       </view>
     </view>

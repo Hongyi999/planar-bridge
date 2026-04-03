@@ -171,11 +171,13 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 28rpx;
+  overflow: hidden;
 }
 
 .dh-left {
   flex: 1;
   min-width: 0;
+  margin-right: 16rpx;
 }
 
 .dh-name {
@@ -185,6 +187,7 @@
   letter-spacing: -0.01em;
   display: block;
   margin-bottom: 4rpx;
+  word-break: break-word;
 }
 
 .dh-type {
@@ -200,11 +203,11 @@
 .dh-right {
   text-align: right;
   flex-shrink: 0;
-  margin-left: 20rpx;
+  max-width: 260rpx;
 }
 
 .dh-price {
-  font-size: 38rpx;
+  font-size: 34rpx;
   font-weight: 600;
   display: block;
 }
@@ -213,6 +216,10 @@
   font-size: 20rpx;
   display: block;
   margin-top: 2rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260rpx;
 }
 
 .price-up { color: #3D7A5E; }
