@@ -1,8 +1,16 @@
+.detail-page,
+.detail-page view,
+.detail-page scroll-view {
+  box-sizing: border-box;
+}
+
 .detail-page {
   min-height: 100vh;
   background: #F2EFE4;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 /* Hero */
@@ -162,6 +170,9 @@
   border: 2rpx solid #E8E3D8;
   border-bottom: none;
   height: calc(100vh - 524rpx);
+  box-sizing: border-box;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .sheet-handle {
@@ -290,6 +301,8 @@
   line-height: 1.65;
   color: #4A4636;
   white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Price row */
