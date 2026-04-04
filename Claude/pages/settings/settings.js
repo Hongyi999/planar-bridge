@@ -295,31 +295,98 @@ Page({
   _runImageImport(round) {
     if (this._imageImportPaused) return;
     var that = this;
-    var batchSize = 10;
-    that.setData({ imageImportProgress: '第' + (round + 1) + '批... 已完成 ' + that._imageImportTotal + ' 张' });
-    wx.cloud.callFunction({
-      name: 'importImages',
-      data: { action: 'processDefault', offset: 0, limit: batchSize }
-    }).then(function(res) {
-      var r = res.result;
-      if (r.processed > 0) {
-        that._imageImportTotal += r.processed;
-        that._imageImportErrors += (r.errors || []).length;
-        that.setData({ imageImportProgress: '已完成 ' + that._imageImportTotal + ' 张' + (that._imageImportErrors > 0 ? '（' + that._imageImportErrors + ' 个错误）' : '') });
-        // Auto-continue next batch
-        that._runImageImport(round + 1);
-      } else {
-        that.setData({ imageImportRunning: false, imageImportProgress: '全部完成！共 ' + that._imageImportTotal + ' 张' });
-        wx.showToast({ title: '图片下载完成！', icon: 'success' });
-        that.onRefreshDbStats();
+    var batchSize = 5;
+    var db = wx.cloud.database();
+    var _ = db.command;
+
+    that.setData({ imageImportProgress: '第' + (round + 1) + '批 查询中... 已完成 ' + that._imageImportTotal + ' 张' });
+
+    // Step 1: Query cards that need images (client-side DB query)
+    db.collection('cards')
+      .where({ imageUrl: _.neq(''), cloudImageId: _.eq('') })
+      .limit(batchSize)
+      .field({ _id: true, name: true, imageUrl: true, setCode: true })
+      .get()
+      .then(function(res) {
+        var cards = res.data;
+        if (cards.length === 0) {
+          that.setData({ imageImportRunning: false, imageImportProgress: '全部完成！共 ' + that._imageImportTotal + ' 张' });
+          wx.showToast({ title: '图片下载完成！', icon: 'success' });
+          that.onRefreshDbStats();
+          return;
+        }
+
+        that.setData({ imageImportProgress: '第' + (round + 1) + '批 下载中(' + cards.length + '张)... 已完成 ' + that._imageImportTotal + ' 张' });
+
+        // Step 2: Process each card sequentially
+        that._processImageQueue(cards, 0, round);
+      })
+      .catch(function(err) {
+        that._imageImportErrors++;
+        that.setData({ imageImportProgress: '查询出错: ' + (err.message || '未知错误') + '，3秒后重试...' });
+        setTimeout(function() {
+          if (!that._imageImportPaused) that._runImageImport(round);
+        }, 3000);
+      });
+  },
+
+  _processImageQueue(cards, index, round) {
+    if (this._imageImportPaused) return;
+    if (index >= cards.length) {
+      // Batch done, continue next batch
+      this._runImageImport(round + 1);
+      return;
+    }
+
+    var that = this;
+    var card = cards[index];
+    var ext = '.png';
+    var match = (card.imageUrl || '').match(/\.(\w+)(?:\?|$)/);
+    if (match) ext = '.' + match[1];
+    var cloudPath = 'cards/' + (card.setCode || 'unknown') + '/' + card._id + ext;
+
+    // Download image to temp file
+    wx.downloadFile({
+      url: card.imageUrl,
+      timeout: 20000,
+      success: function(dlRes) {
+        if (dlRes.statusCode !== 200) {
+          console.error('Download failed for ' + card.name + ': HTTP ' + dlRes.statusCode);
+          that._imageImportErrors++;
+          that._processImageQueue(cards, index + 1, round);
+          return;
+        }
+        // Upload to cloud storage
+        wx.cloud.uploadFile({
+          cloudPath: cloudPath,
+          filePath: dlRes.tempFilePath,
+          success: function(upRes) {
+            // Update DB record with cloud file ID
+            var db = wx.cloud.database();
+            db.collection('cards').doc(card._id).update({
+              data: { cloudImageId: upRes.fileID, updatedAt: new Date() }
+            }).then(function() {
+              that._imageImportTotal++;
+              that.setData({ imageImportProgress: '第' + (round + 1) + '批 ' + (index + 1) + '/' + cards.length + ' ' + card.name + ' ✓ 共 ' + that._imageImportTotal + ' 张' });
+              that._processImageQueue(cards, index + 1, round);
+            }).catch(function(err) {
+              console.error('DB update failed for ' + card.name + ': ' + err.message);
+              that._imageImportErrors++;
+              that._processImageQueue(cards, index + 1, round);
+            });
+          },
+          fail: function(err) {
+            console.error('Upload failed for ' + card.name + ': ' + (err.errMsg || err.message));
+            that._imageImportErrors++;
+            that._processImageQueue(cards, index + 1, round);
+          }
+        });
+      },
+      fail: function(err) {
+        console.error('Download failed for ' + card.name + ': ' + (err.errMsg || err.message));
+        that._imageImportErrors++;
+        that._processImageQueue(cards, index + 1, round);
       }
-    }).catch(function(err) {
-      that._imageImportErrors++;
-      that.setData({ imageImportProgress: '第' + (round + 1) + '批出错: ' + (err.message || '未知错误') + '，3秒后重试...' });
-      // Auto-retry after 3 seconds
-      setTimeout(function() {
-        if (!that._imageImportPaused) that._runImageImport(round);
-      }, 3000);
     });
   },
 
