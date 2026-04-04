@@ -173,10 +173,19 @@ Page({
     }).then(function(res) {
       wx.hideLoading();
       var r = res.result;
+      var errCount = (r.errors && r.errors.length) || 0;
       var nextOffset = offset + batchSize;
+      // Show errors if any
+      if (errCount > 0) {
+        console.error('Batch errors:', r.errors.slice(0, 3));
+      }
       if (nextOffset < allCards.length) {
-        // Auto-continue without asking
-        that._writeCardBatch(nextOffset, batchSize);
+        // Update progress with error info
+        wx.showLoading({ title: '写入 ' + nextOffset + '/' + allCards.length + (errCount > 0 ? ' (错误:' + errCount + ')' : '') });
+        // Small delay to avoid overwhelming cloud function
+        setTimeout(function() {
+          that._writeCardBatch(nextOffset, batchSize);
+        }, 200);
       } else {
         that._allCardsCache = null;
         wx.showToast({ title: '全部 ' + allCards.length + ' 张卡牌导入完成！', icon: 'success' });
