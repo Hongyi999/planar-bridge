@@ -1,12 +1,6 @@
 <view class="hero-page">
   <!-- Background grid lines -->
   <view class="bg-lines"></view>
-  <!-- Background glow -->
-  <view class="bg-glow"></view>
-  <!-- Floating orbs -->
-  <view class="orb orb-1"></view>
-  <view class="orb orb-2"></view>
-  <view class="orb orb-3"></view>
 
   <!-- Center content -->
   <view class="hero-content">
