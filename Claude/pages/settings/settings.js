@@ -83,6 +83,12 @@ Page({
   },
 
   // --- Card Database Import ---
+  // Data URLs (client-side fetch, works from user's phone)
+  _DATA_URLS: {
+    cards: 'https://cdn.jsdelivr.net/gh/the-fab-cube/flesh-and-blood-cards@develop/json/english/card.json',
+    sets: 'https://cdn.jsdelivr.net/gh/the-fab-cube/flesh-and-blood-cards@develop/json/english/set.json'
+  },
+
   onRefreshDbStats() {
     var that = this;
     wx.cloud.callFunction({ name: 'importCards', data: { action: 'stats' } }).then(function(res) {
@@ -102,52 +108,93 @@ Page({
     var that = this;
     wx.showModal({
       title: '导入卡牌数据',
-      content: '将从 GitHub 拉取全部 FAB 卡牌数据并写入云数据库。每批导入 50 张，可能需要多次执行。是否开始？',
-      confirmText: '开始导入',
+      content: '将下载全部 FAB 卡牌数据并写入云数据库。数据较大（约10MB），请确保网络通畅。',
+      confirmText: '开始',
       success: function(res) {
         if (res.confirm) {
-          that._runCardImport(0);
+          that._fetchAndImportCards();
         }
       }
     });
   },
 
-  _runCardImport(offset) {
+  _fetchAndImportCards() {
     var that = this;
-    wx.showLoading({ title: '导入中... ' + offset });
-    wx.cloud.callFunction({
-      name: 'importCards',
-      data: { action: 'importBatch', offset: offset, limit: 50 }
-    }).then(function(res) {
-      wx.hideLoading();
-      var r = res.result;
-      if (r.hasMore) {
+    wx.showLoading({ title: '下载卡牌数据...' });
+    wx.request({
+      url: that._DATA_URLS.cards,
+      method: 'GET',
+      dataType: 'json',
+      timeout: 60000,
+      success: function(res) {
+        if (res.statusCode !== 200 || !Array.isArray(res.data)) {
+          wx.hideLoading();
+          wx.showToast({ title: '下载失败: HTTP ' + res.statusCode, icon: 'none' });
+          return;
+        }
+        var allCards = res.data;
+        wx.hideLoading();
         wx.showModal({
-          title: '进度: ' + (r.offset + r.imported) + '/' + r.totalSource,
-          content: '已导入 ' + r.imported + ' 张卡牌（含 ' + r.printingsInBatch + ' 个版本）。继续下一批？',
-          confirmText: '继续',
-          cancelText: '暂停',
+          title: '下载成功',
+          content: '共 ' + allCards.length + ' 张卡牌。将分批写入数据库，每批 20 张。',
+          confirmText: '开始写入',
           success: function(modal) {
             if (modal.confirm) {
-              that._runCardImport(r.nextOffset);
-            } else {
-              that.onRefreshDbStats();
+              that._allCardsCache = allCards;
+              that._writeCardBatch(0, 20);
             }
           }
         });
+      },
+      fail: function(err) {
+        wx.hideLoading();
+        wx.showToast({ title: '网络错误: ' + (err.errMsg || ''), icon: 'none' });
+      }
+    });
+  },
+
+  _writeCardBatch(offset, batchSize) {
+    var that = this;
+    var allCards = that._allCardsCache;
+    if (!allCards) return;
+
+    var batch = allCards.slice(offset, offset + batchSize);
+    if (batch.length === 0) {
+      that._allCardsCache = null;
+      wx.showToast({ title: '全部导入完成！', icon: 'success' });
+      that.onRefreshDbStats();
+      return;
+    }
+
+    wx.showLoading({ title: '写入 ' + offset + '/' + allCards.length + '...' });
+    wx.cloud.callFunction({
+      name: 'importCards',
+      data: { action: 'writeCards', cards: batch }
+    }).then(function(res) {
+      wx.hideLoading();
+      var r = res.result;
+      var nextOffset = offset + batchSize;
+      if (nextOffset < allCards.length) {
+        // Auto-continue without asking
+        that._writeCardBatch(nextOffset, batchSize);
       } else {
-        wx.showToast({ title: '全部导入完成！', icon: 'success' });
+        that._allCardsCache = null;
+        wx.showToast({ title: '全部 ' + allCards.length + ' 张卡牌导入完成！', icon: 'success' });
         that.onRefreshDbStats();
       }
     }).catch(function(err) {
       wx.hideLoading();
       wx.showModal({
-        title: '导入出错',
-        content: err.message || '未知错误，请重试。当前 offset: ' + offset,
+        title: '写入出错 (offset: ' + offset + ')',
+        content: (err.message || err.errMsg || '未知错误') + '\n是否重试？',
         confirmText: '重试',
         cancelText: '取消',
         success: function(modal) {
-          if (modal.confirm) that._runCardImport(offset);
+          if (modal.confirm) that._writeCardBatch(offset, batchSize);
+          else {
+            that._allCardsCache = null;
+            that.onRefreshDbStats();
+          }
         }
       });
     });
@@ -209,17 +256,36 @@ Page({
   },
 
   onImportSets() {
-    wx.showLoading({ title: '导入系列数据...' });
-    wx.cloud.callFunction({
-      name: 'importCards',
-      data: { action: 'importSets' }
-    }).then(function(res) {
-      wx.hideLoading();
-      var r = res.result;
-      wx.showToast({ title: '已导入 ' + r.imported + ' 个系列', icon: 'success' });
-    }).catch(function(err) {
-      wx.hideLoading();
-      wx.showToast({ title: '导入失败: ' + (err.message || '未知错误'), icon: 'none' });
+    var that = this;
+    wx.showLoading({ title: '下载系列数据...' });
+    wx.request({
+      url: that._DATA_URLS.sets,
+      method: 'GET',
+      dataType: 'json',
+      timeout: 30000,
+      success: function(res) {
+        if (res.statusCode !== 200 || !Array.isArray(res.data)) {
+          wx.hideLoading();
+          wx.showToast({ title: '下载失败', icon: 'none' });
+          return;
+        }
+        wx.showLoading({ title: '写入 ' + res.data.length + ' 个系列...' });
+        wx.cloud.callFunction({
+          name: 'importCards',
+          data: { action: 'writeSets', sets: res.data }
+        }).then(function(cfRes) {
+          wx.hideLoading();
+          wx.showToast({ title: '已导入 ' + cfRes.result.imported + ' 个系列', icon: 'success' });
+          that.onRefreshDbStats();
+        }).catch(function(err) {
+          wx.hideLoading();
+          wx.showToast({ title: '写入失败: ' + (err.message || err.errMsg || ''), icon: 'none' });
+        });
+      },
+      fail: function(err) {
+        wx.hideLoading();
+        wx.showToast({ title: '网络错误', icon: 'none' });
+      }
     });
   },
 

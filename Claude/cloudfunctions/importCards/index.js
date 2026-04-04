@@ -360,10 +360,10 @@ async function importSets(sets) {
  * Main cloud function entry
  *
  * Actions:
- *   'count'       - Fetch card.json and return total count (for planning batches)
- *   'importBatch' - Fetch card.json, transform and import cards[offset:offset+limit]
- *   'importSets'  - Fetch and import all sets
- *   'stats'       - Return current DB card/set counts
+ *   'stats'         - Return current DB card/set counts
+ *   'writeSets'     - Write sets data (passed from client). event.sets = array
+ *   'writeCards'    - Write card data (passed from client, already raw). event.cards = array
+ *                     Transforms and upserts to DB
  */
 exports.main = async function(event) {
   var action = event.action || 'stats';
@@ -378,10 +378,10 @@ exports.main = async function(event) {
     };
   }
 
-  if (action === 'importSets') {
-    console.log('Fetching sets data...');
-    var sets = await fetchJSONWithFallback(SET_JSON_URLS);
-    console.log('Fetched ' + sets.length + ' sets');
+  if (action === 'writeSets') {
+    var sets = event.sets || [];
+    if (sets.length === 0) return { success: false, error: 'No sets data provided' };
+    console.log('Writing ' + sets.length + ' sets to DB...');
     var result = await importSets(sets);
     return {
       success: true,
@@ -391,40 +391,20 @@ exports.main = async function(event) {
     };
   }
 
-  if (action === 'count') {
-    console.log('Fetching card data from GitHub...');
-    var cards = await fetchJSONWithFallback(CARD_JSON_URLS);
-    return {
-      success: true,
-      total: cards.length
-    };
-  }
+  if (action === 'writeCards') {
+    var rawCards = event.cards || [];
+    if (rawCards.length === 0) return { success: false, error: 'No cards data provided' };
+    console.log('Transforming and writing ' + rawCards.length + ' cards...');
 
-  if (action === 'importBatch') {
-    var offset = event.offset || 0;
-    var limit = event.limit || 50;
-
-    console.log('Fetching card data from GitHub...');
-    var allCards = await fetchJSONWithFallback(CARD_JSON_URLS);
-    console.log('Total cards from source: ' + allCards.length);
-
-    var batch = allCards.slice(offset, offset + limit);
-    console.log('Processing batch: offset=' + offset + ', count=' + batch.length);
-
-    var transformed = batch.map(transformCard);
+    var transformed = rawCards.map(transformCard);
     var errors = await upsertBatch(transformed);
 
-    var hasMore = (offset + limit) < allCards.length;
     var totalPrintings = 0;
     transformed.forEach(function(c) { totalPrintings += c.printingCount; });
 
     return {
       success: true,
-      imported: batch.length,
-      totalSource: allCards.length,
-      offset: offset,
-      nextOffset: hasMore ? offset + limit : null,
-      hasMore: hasMore,
+      imported: rawCards.length,
       printingsInBatch: totalPrintings,
       errors: errors
     };
