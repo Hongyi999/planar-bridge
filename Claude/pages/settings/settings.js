@@ -364,13 +364,18 @@ Page({
           cloudPath: cloudPath,
           filePath: dlRes.tempFilePath,
           success: function(upRes) {
-            // Update DB record with cloud file ID
-            var db = wx.cloud.database();
-            db.collection('cards').doc(card._id).update({
-              data: { cloudImageId: upRes.fileID, updatedAt: new Date() }
-            }).then(function() {
-              that._imageImportTotal++;
-              that.setData({ imageImportProgress: '第' + (round + 1) + '批 ' + (index + 1) + '/' + cards.length + ' ' + card.name + ' ✓ 共 ' + that._imageImportTotal + ' 张' });
+            // Update DB record via cloud function (client has no write permission)
+            wx.cloud.callFunction({
+              name: 'importCards',
+              data: { action: 'updateCardImage', cardId: card._id, cloudImageId: upRes.fileID }
+            }).then(function(cfRes) {
+              if (cfRes.result && cfRes.result.success) {
+                that._imageImportTotal++;
+                that.setData({ imageImportProgress: '第' + (round + 1) + '批 ' + (index + 1) + '/' + cards.length + ' ' + card.name + ' ✓ 共 ' + that._imageImportTotal + ' 张' });
+              } else {
+                console.error('DB update failed for ' + card.name + ': ' + (cfRes.result && cfRes.result.error || 'unknown'));
+                that._imageImportErrors++;
+              }
               that._processImageQueue(cards, index + 1, round);
             }).catch(function(err) {
               console.error('DB update failed for ' + card.name + ': ' + err.message);

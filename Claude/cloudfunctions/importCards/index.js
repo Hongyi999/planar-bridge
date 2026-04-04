@@ -410,5 +410,19 @@ exports.main = async function(event) {
     };
   }
 
+  if (action === 'updateCardImage') {
+    var cardId = event.cardId;
+    var cloudImageId = event.cloudImageId;
+    if (!cardId || !cloudImageId) return { success: false, error: 'Missing cardId or cloudImageId' };
+    try {
+      await db.collection('cards').doc(cardId).update({
+        data: { cloudImageId: cloudImageId, updatedAt: new Date() }
+      });
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: e.message };
+    }
+  }
+
   return { success: false, error: 'Unknown action: ' + action };
 };
