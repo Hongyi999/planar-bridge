@@ -20,6 +20,14 @@ Component({
       }, that.properties.index * 100);
     }
   },
+  pageLifetimes: {
+    show() {
+      var cardId = this.properties.card.id || this.properties.card._id;
+      if (cardId) {
+        this.setData({ isFav: storage.isCardFavorited(cardId) });
+      }
+    }
+  },
   methods: {
     onTap() {
       wx.navigateTo({

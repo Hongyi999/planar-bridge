@@ -101,18 +101,48 @@ function getThinkingSteps(query, filters) {
 }
 
 /**
+ * Merge two filter objects. Scalar fields: new overrides old.
+ * Array fields (keywords): concatenate and deduplicate.
+ */
+function mergeFilters(base, added) {
+  var result = {};
+  // Copy base
+  Object.keys(base).forEach(function(k) { result[k] = base[k]; });
+  // Merge added
+  Object.keys(added).forEach(function(k) {
+    if (k === 'keywords') {
+      var baseKw = result.keywords || [];
+      var addedKw = added.keywords || [];
+      var merged = baseKw.slice();
+      addedKw.forEach(function(kw) {
+        if (merged.indexOf(kw) === -1) merged.push(kw);
+      });
+      if (merged.length > 0) result.keywords = merged;
+    } else {
+      result[k] = added[k];
+    }
+  });
+  return result;
+}
+
+/**
  * AI-powered search via cloud function.
  * Returns { filters, results, resultCount, summary, aiUsed }
+ * If preFilters is provided, sends structured filters directly (skip AI re-parsing).
  */
-function aiSearch(query, sortField, sortOrder) {
+function aiSearch(query, sortField, sortOrder, preFilters) {
+  var data = {
+    query: query,
+    sortField: sortField || 'priceMid',
+    sortOrder: sortOrder || 'desc'
+  };
+  if (preFilters) {
+    data.filters = preFilters;
+  }
   return new Promise(function(resolve, reject) {
     wx.cloud.callFunction({
       name: 'aiSearch',
-      data: {
-        query: query,
-        sortField: sortField || 'priceMid',
-        sortOrder: sortOrder || 'desc'
-      },
+      data: data,
       success: function(res) {
         resolve(res.result);
       },
@@ -125,6 +155,7 @@ function aiSearch(query, sortField, sortOrder) {
 
 module.exports = {
   parseQuery: parseQuery,
+  mergeFilters: mergeFilters,
   generateSummary: generateSummary,
   getThinkingSteps: getThinkingSteps,
   aiSearch: aiSearch

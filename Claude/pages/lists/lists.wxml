@@ -1,6 +1,6 @@
 <view class="lists-page">
   <!-- Title -->
-  <text class="page-title font-heading">我的收藏</text>
+  <text class="page-title font-heading">收藏列表</text>
   <text class="page-subtitle" wx:if="{{isLoaded}}">{{lists.length}} 个列表 · {{totalCards}} 张卡 · 约 ${{totalValue}}</text>
 
   <!-- Loading -->
@@ -23,11 +23,15 @@
       <view
         wx:for="{{lists}}"
         wx:key="id"
-        class="list-card list-card-{{item.color}} {{selectedIndex === index ? 'selected' : ''}}"
+        class="list-card list-card-{{item.color}} {{selectedIndex === index ? 'selected' : ''}} {{showHint ? 'wobble' : ''}}"
         data-index="{{index}}"
-        bindtap="onSelectList"
+        bindtap="{{isEditMode ? '' : 'onSelectList'}}"
         bindlongpress="onListLongPress"
       >
+        <view class="lc-arrows" wx:if="{{isEditMode}}">
+          <view class="lc-arrow {{index === 0 ? 'lc-arrow-disabled' : ''}}" data-index="{{index}}" catchtap="onMoveLeft">←</view>
+          <view class="lc-arrow {{index === lists.length - 1 ? 'lc-arrow-disabled' : ''}}" data-index="{{index}}" catchtap="onMoveRight">→</view>
+        </view>
         <text class="lc-name">{{item.name}}</text>
         <text class="lc-count">{{item.cardCount}} 张卡</text>
         <text class="lc-value font-mono">${{item.value}}</text>
@@ -38,7 +42,7 @@
   <!-- Selected list title + edit -->
   <view class="selected-title-row" wx:if="{{isLoaded && lists.length > 0}}">
     <text class="selected-title font-heading">{{lists[selectedIndex].name}}</text>
-    <text class="selected-edit" data-index="{{selectedIndex}}" bindtap="onListLongPress">编辑</text>
+    <text class="selected-edit" bindtap="onToggleEditMode">{{isEditMode ? '完成' : '编辑'}}</text>
   </view>
 
   <!-- Cards list -->

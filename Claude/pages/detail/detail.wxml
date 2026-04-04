@@ -115,7 +115,7 @@
 
     <!-- Action row -->
     <view class="action-row">
-      <view class="btn-primary action-btn-main" bindtap="onAddToList">加入收藏列表</view>
+      <view class="{{isInCollection ? 'btn-collected' : 'btn-primary'}} action-btn-main" bindtap="onAddToList">{{isInCollection ? '已收藏 · 管理列表' : '加入收藏列表'}}</view>
       <view class="action-btn-link" bindtap="onCopyLink">
         <view class="link-icon">
           <view class="link-arrow"></view>
@@ -126,4 +126,29 @@
 
     <view class="bottom-spacer"></view>
   </scroll-view>
+
+  <!-- Multi-select list modal -->
+  <view class="modal-mask" wx:if="{{showListModal}}" bindtap="onModalCancel">
+    <view class="modal-content" catchtap="">
+      <text class="modal-title font-heading">选择收藏列表</text>
+      <view class="modal-list">
+        <view
+          wx:for="{{modalLists}}"
+          wx:key="id"
+          class="modal-list-item"
+          data-index="{{index}}"
+          bindtap="onToggleModalList"
+        >
+          <view class="modal-checkbox {{item.checked ? 'modal-checkbox-checked' : ''}}">
+            <text wx:if="{{item.checked}}">✓</text>
+          </view>
+          <text class="modal-list-name">{{item.name}}</text>
+        </view>
+      </view>
+      <view class="modal-actions">
+        <view class="modal-btn-cancel" bindtap="onModalCancel">取消</view>
+        <view class="modal-btn-confirm" bindtap="onModalConfirm">确定</view>
+      </view>
+    </view>
+  </view>
 </view>

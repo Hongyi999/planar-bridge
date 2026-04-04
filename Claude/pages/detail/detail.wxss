@@ -423,3 +423,114 @@
 .bottom-spacer {
   height: 60rpx;
 }
+
+/* Collected button style */
+.btn-collected {
+  background: transparent;
+  border: 3rpx solid #9B8644;
+  color: #9B8644;
+  border-radius: 26rpx;
+  padding: 20rpx 0;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.btn-collected:active {
+  background: #9B86440A;
+}
+
+/* Multi-select modal */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  width: 580rpx;
+  background: #FDFCF8;
+  border-radius: 32rpx;
+  padding: 40rpx 36rpx 32rpx;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.modal-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #2C2A22;
+  display: block;
+  margin-bottom: 28rpx;
+}
+.modal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  margin-bottom: 32rpx;
+}
+.modal-list-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 20rpx 16rpx;
+  border-radius: 16rpx;
+}
+.modal-list-item:active {
+  background: #F2EFE4;
+}
+.modal-checkbox {
+  width: 44rpx;
+  height: 44rpx;
+  border: 3rpx solid #C8C2B4;
+  border-radius: 10rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  color: #FDFCF8;
+  flex-shrink: 0;
+}
+.modal-checkbox-checked {
+  background: #9B8644;
+  border-color: #9B8644;
+}
+.modal-list-name {
+  font-size: 28rpx;
+  color: #2C2A22;
+  font-weight: 500;
+}
+.modal-actions {
+  display: flex;
+  gap: 16rpx;
+}
+.modal-btn-cancel {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 0;
+  border-radius: 22rpx;
+  font-size: 28rpx;
+  color: #6B6355;
+  background: #F2EFE4;
+  font-weight: 500;
+}
+.modal-btn-cancel:active {
+  background: #E8E3D8;
+}
+.modal-btn-confirm {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 0;
+  border-radius: 22rpx;
+  font-size: 28rpx;
+  color: #FDFCF8;
+  background: #9B8644;
+  font-weight: 600;
+}
+.modal-btn-confirm:active {
+  background: #8B7A3E;
+}

@@ -76,6 +76,7 @@ function syncFromCloud() {
       if (result && result.success && result.data) {
         var cloudLists = result.data.lists;
         var cloudSettings = result.data.settings;
+        var changed = false;
 
         if (cloudLists && cloudLists.length > 0) {
           var localLists = getLists();
@@ -84,7 +85,12 @@ function syncFromCloud() {
 
           // Cloud is newer — use cloud data
           if (cloudTime > localTime) {
-            wx.setStorageSync('lists', cloudLists);
+            var localJSON = JSON.stringify(localLists);
+            var cloudJSON = JSON.stringify(cloudLists);
+            if (localJSON !== cloudJSON) {
+              wx.setStorageSync('lists', cloudLists);
+              changed = true;
+            }
             wx.setStorageSync('lists_updated', cloudTime);
           }
         }
@@ -96,7 +102,7 @@ function syncFromCloud() {
           }
         }
 
-        resolve(true);
+        resolve(changed);
       } else {
         resolve(false);
       }

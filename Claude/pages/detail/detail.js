@@ -12,7 +12,11 @@ Page({
     heroHeight: 560,
     isLoading: true,
     _touchStartY: 0,
-    _startHeroHeight: 560
+    _startHeroHeight: 560,
+    isInCollection: false,
+    collectionListNames: [],
+    showListModal: false,
+    modalLists: []
   },
   onLoad: function(options) {
     var that = this;
@@ -36,11 +40,31 @@ Page({
           highlightedText: card.text,
           isLoading: false
         });
+        that._refreshCollectionState();
       } else {
         that.setData({ isLoading: false });
       }
     }).catch(function() {
       that.setData({ isLoading: false });
+    });
+  },
+  onShow: function() {
+    if (this.data.card) {
+      this._refreshCollectionState();
+    }
+  },
+  _refreshCollectionState: function() {
+    var cardId = this.data.card.id || this.data.card._id;
+    var lists = storageUtil.getLists();
+    var inLists = [];
+    lists.forEach(function(list) {
+      if (list.cards.indexOf(cardId) !== -1) {
+        inLists.push(list.name);
+      }
+    });
+    this.setData({
+      isInCollection: inLists.length > 0,
+      collectionListNames: inLists
     });
   },
   highlightKeywords(text, keywords) {
@@ -71,22 +95,55 @@ Page({
     this.setData({ heroHeight: 560 });
   },
   onAddToList() {
-    var that = this;
+    var cardId = this.data.card.id || this.data.card._id;
     var lists = storageUtil.getLists();
-    var names = lists.map(function(l) { return l.name; });
+    if (!lists.length) {
+      wx.showToast({ title: '请先创建收藏列表', icon: 'none' });
+      return;
+    }
+    var modalLists = lists.map(function(list) {
+      return {
+        id: list.id,
+        name: list.name,
+        checked: list.cards.indexOf(cardId) !== -1
+      };
+    });
+    this.setData({ showListModal: true, modalLists: modalLists });
+  },
+  onToggleModalList: function(e) {
+    var idx = e.currentTarget.dataset.index;
+    var key = 'modalLists[' + idx + '].checked';
+    this.setData({ [key]: !this.data.modalLists[idx].checked });
+  },
+  onModalConfirm: function() {
+    var that = this;
+    var cardId = this.data.card.id || this.data.card._id;
+    var lists = storageUtil.getLists();
+    var addedNames = [];
 
-    wx.showActionSheet({
-      itemList: names,
-      success: function(res) {
-        var list = lists[res.tapIndex];
-        storageUtil.addCardToList(list.id, that.data.card.id || that.data.card._id);
-        wx.showToast({
-          title: '已加入 ' + list.name,
-          icon: 'none',
-          duration: 1500
-        });
+    this.data.modalLists.forEach(function(ml) {
+      var list = lists.find(function(l) { return l.id === ml.id; });
+      if (!list) return;
+      var isIn = list.cards.indexOf(cardId) !== -1;
+      if (ml.checked && !isIn) {
+        storageUtil.addCardToList(ml.id, cardId);
+        addedNames.push(ml.name);
+      } else if (!ml.checked && isIn) {
+        storageUtil.removeCardFromList(ml.id, cardId);
       }
     });
+
+    this.setData({ showListModal: false });
+    this._refreshCollectionState();
+
+    if (addedNames.length > 0) {
+      wx.showToast({ title: '已更新收藏', icon: 'none', duration: 1500 });
+    } else {
+      wx.showToast({ title: '已更新', icon: 'none', duration: 1000 });
+    }
+  },
+  onModalCancel: function() {
+    this.setData({ showListModal: false });
   },
   onCopyLink() {
     if (this.data.card && this.data.card.tcgplayerUrl) {

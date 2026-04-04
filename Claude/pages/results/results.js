@@ -55,8 +55,14 @@ Page({
     var query = decodeURIComponent(options.query || '');
     var sortPref = getSortPreference();
 
+    // Check if pre-parsed filters were passed (from follow-up search)
+    var preFilters = null;
+    if (options.filters) {
+      try { preFilters = JSON.parse(decodeURIComponent(options.filters)); } catch(e) {}
+    }
+
     // Show thinking steps immediately
-    var localFilters = aiParser.parseQuery(query);
+    var localFilters = preFilters || aiParser.parseQuery(query);
     var steps = aiParser.getThinkingSteps(query, localFilters);
 
     that.setData({
@@ -70,20 +76,20 @@ Page({
     });
 
     // Try cloud AI search first, fallback to local
-    aiParser.aiSearch(query, sortPref.field, sortPref.order).then(function(result) {
+    aiParser.aiSearch(query, sortPref.field, sortPref.order, preFilters).then(function(result) {
       var results = result.results || [];
-      // Apply local price filters as safety net (cloud may not have latest parser)
-      var localFilters = aiParser.parseQuery(query);
-      if (localFilters.priceMin || localFilters.priceMax) {
+      // Apply local price filters as safety net
+      var effectiveFilters = preFilters || aiParser.parseQuery(query);
+      if (effectiveFilters.priceMin || effectiveFilters.priceMax) {
         results = results.filter(function(card) {
-          if (localFilters.priceMin && card.priceMid < localFilters.priceMin) return false;
-          if (localFilters.priceMax && card.priceMid > localFilters.priceMax) return false;
+          if (effectiveFilters.priceMin && card.priceMid < effectiveFilters.priceMin) return false;
+          if (effectiveFilters.priceMax && card.priceMid > effectiveFilters.priceMax) return false;
           return true;
         });
       }
       results = sortResults(results, sortPref);
       that.setData({
-        filters: result.filters || localFilters,
+        filters: result.filters || effectiveFilters,
         summary: result.summary || '',
         resultCount: results.length,
         results: results,
@@ -91,7 +97,7 @@ Page({
       });
     }).catch(function() {
       // Fallback to local search
-      var filters = aiParser.parseQuery(query);
+      var filters = preFilters || aiParser.parseQuery(query);
       var results = cardData.searchCards(filters);
       results = sortResults(results, sortPref);
       var summary = aiParser.generateSummary(query, results);
@@ -138,9 +144,13 @@ Page({
   onFollowUpConfirm: function(e) {
     var refinement = this.data.followUpValue || (e && e.detail && e.detail.value) || '';
     if (refinement.trim()) {
+      // Parse the incremental query and merge with existing filters
+      var incrementalFilters = aiParser.parseQuery(refinement.trim());
+      var mergedFilters = aiParser.mergeFilters(this.data.filters, incrementalFilters);
       var combined = this.data.query + ' ' + refinement.trim();
       wx.redirectTo({
-        url: '/pages/results/results?query=' + encodeURIComponent(combined)
+        url: '/pages/results/results?query=' + encodeURIComponent(combined) +
+          '&filters=' + encodeURIComponent(JSON.stringify(mergedFilters))
       });
     }
   },

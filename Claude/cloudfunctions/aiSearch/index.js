@@ -80,24 +80,30 @@ exports.main = async (event) => {
   let summary = '';
   let aiUsed = false;
 
-  // Step 1: Try AI parsing
-  try {
-    const ai = cloud.extend.AI;
-    const parseResult = await ai.bot.sendMessage({
-      botId: BOT_ID,
-      msg: '你是 Flesh and Blood TCG 卡牌搜索助手。将以下用户查询解析为 JSON 过滤条件。\n' +
-        '可用字段: class, type, subtype, rarity, setCode, keywords(数组), priceMax, priceMin, name(模糊匹配)\n' +
-        '可用 class: Ninja, Guardian, Brute, Warrior, Wizard, Mechanologist, Ranger, Runeblade, Assassin, Illusionist, Generic\n' +
-        '可用 type: Equipment, Weapon, Attack Action, Defense Reaction, Action, Instant\n' +
-        '可用 rarity: Common, Rare, Majestic, Legendary, Fabled\n' +
-        '仅返回 JSON 对象，不要其他文字。只包含用户明确提到的条件。\n\n' +
-        '用户查询: "' + query + '"'
-    });
-    filters = JSON.parse(parseResult.content);
-    aiUsed = true;
-  } catch (e) {
-    // Fallback to keyword parsing
-    filters = fallbackParse(query);
+  // If pre-parsed filters provided (from follow-up merge), use directly
+  if (event.filters && Object.keys(event.filters).length > 0) {
+    filters = event.filters;
+    aiUsed = false;
+  } else {
+    // Step 1: Try AI parsing
+    try {
+      const ai = cloud.extend.AI;
+      const parseResult = await ai.bot.sendMessage({
+        botId: BOT_ID,
+        msg: '你是 Flesh and Blood TCG 卡牌搜索助手。将以下用户查询解析为 JSON 过滤条件。\n' +
+          '可用字段: class, type, subtype, rarity, setCode, keywords(数组), priceMax, priceMin, name(模糊匹配)\n' +
+          '可用 class: Ninja, Guardian, Brute, Warrior, Wizard, Mechanologist, Ranger, Runeblade, Assassin, Illusionist, Generic\n' +
+          '可用 type: Equipment, Weapon, Attack Action, Defense Reaction, Action, Instant\n' +
+          '可用 rarity: Common, Rare, Majestic, Legendary, Fabled\n' +
+          '仅返回 JSON 对象，不要其他文字。只包含用户明确提到的条件。\n\n' +
+          '用户查询: "' + query + '"'
+      });
+      filters = JSON.parse(parseResult.content);
+      aiUsed = true;
+    } catch (e) {
+      // Fallback to keyword parsing
+      filters = fallbackParse(query);
+    }
   }
 
   // Step 2: Build database query

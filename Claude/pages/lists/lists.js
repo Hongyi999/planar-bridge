@@ -10,77 +10,67 @@ Page({
     selectedCards: [],
     totalCards: 0,
     totalValue: '0.00',
-    isLoaded: false
+    isLoaded: true,
+    isEditMode: false,
+    showHint: false
   },
   onShow: function() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 2 });
     }
 
-    // Sync from cloud in background, then reload
+    // Immediate: render from local storage (synchronous)
+    this.loadData();
+
+    // Background: sync cloud, only refresh if data changed
     var that = this;
-    storageUtil.syncFromCloud().then(function() {
-      that.loadData();
-    }).catch(function() {
-      that.loadData();
-    });
+    storageUtil.syncFromCloud().then(function(changed) {
+      if (changed) that.loadData();
+    }).catch(function() {});
+
+    // First-visit wobble hint
+    if (!wx.getStorageSync('lists_hint_shown')) {
+      this.setData({ showHint: true });
+      setTimeout(function() {
+        that.setData({ showHint: false });
+        wx.setStorageSync('lists_hint_shown', true);
+      }, 2500);
+    }
   },
   loadData: function() {
-    var that = this;
     var lists = storageUtil.getLists();
     var totalCards = 0;
     var totalValue = 0;
 
-    // Collect all unique card IDs
-    var allCardIds = [];
-    lists.forEach(function(list) {
-      list.cards.forEach(function(id) {
-        if (allCardIds.indexOf(id) === -1) allCardIds.push(id);
-      });
+    var enrichedLists = lists.map(function(list) {
+      var cards = list.cards.map(function(id) {
+        // Use local cardData (synchronous) for instant rendering
+        return cardData.getCardById(id);
+      }).filter(Boolean);
+      var listValue = cards.reduce(function(sum, c) { return sum + (c.priceMid || 0); }, 0);
+      totalCards += cards.length;
+      totalValue += listValue;
+      return {
+        id: list.id,
+        name: list.name,
+        color: list.color,
+        cardCount: cards.length,
+        value: listValue.toFixed(2),
+        cards: cards,
+        colorStyle: theme.listColors[list.color] || theme.listColors.gold
+      };
     });
 
-    // Resolve all cards (try cloud, fallback to local)
-    var cardPromises = allCardIds.map(function(id) {
-      return cloudDB.getCardById(id).then(function(card) {
-        return card;
-      });
-    });
+    var selectedCards = enrichedLists.length > 0
+      ? enrichedLists[Math.min(this.data.selectedIndex, enrichedLists.length - 1)].cards
+      : [];
 
-    Promise.all(cardPromises).then(function(resolvedCards) {
-      var cardMap = {};
-      resolvedCards.forEach(function(card) {
-        if (card) cardMap[card._id || card.id] = card;
-      });
-
-      var enrichedLists = lists.map(function(list) {
-        var cards = list.cards.map(function(id) {
-          return cardMap[id] || null;
-        }).filter(Boolean);
-        var listValue = cards.reduce(function(sum, c) { return sum + (c.priceMid || 0); }, 0);
-        totalCards += cards.length;
-        totalValue += listValue;
-        return {
-          id: list.id,
-          name: list.name,
-          color: list.color,
-          cardCount: cards.length,
-          value: listValue.toFixed(2),
-          cards: cards,
-          colorStyle: theme.listColors[list.color] || theme.listColors.gold
-        };
-      });
-
-      var selectedCards = enrichedLists.length > 0
-        ? enrichedLists[Math.min(that.data.selectedIndex, enrichedLists.length - 1)].cards
-        : [];
-
-      that.setData({
-        lists: enrichedLists,
-        selectedCards: selectedCards,
-        totalCards: totalCards,
-        totalValue: totalValue.toFixed(2),
-        isLoaded: true
-      });
+    this.setData({
+      lists: enrichedLists,
+      selectedCards: selectedCards,
+      totalCards: totalCards,
+      totalValue: totalValue.toFixed(2),
+      isLoaded: true
     });
   },
   onSelectList: function(e) {
@@ -129,6 +119,38 @@ Page({
         }
       }
     });
+  },
+  onToggleEditMode: function() {
+    this.setData({ isEditMode: !this.data.isEditMode });
+  },
+  onMoveLeft: function(e) {
+    var idx = e.currentTarget.dataset.index;
+    if (idx <= 0) return;
+    var lists = storageUtil.getLists();
+    var temp = lists[idx];
+    lists[idx] = lists[idx - 1];
+    lists[idx - 1] = temp;
+    storageUtil.saveLists(lists);
+    // Adjust selectedIndex if affected
+    var sel = this.data.selectedIndex;
+    if (sel === idx) sel = idx - 1;
+    else if (sel === idx - 1) sel = idx;
+    this.setData({ selectedIndex: sel });
+    this.loadData();
+  },
+  onMoveRight: function(e) {
+    var idx = e.currentTarget.dataset.index;
+    var lists = storageUtil.getLists();
+    if (idx >= lists.length - 1) return;
+    var temp = lists[idx];
+    lists[idx] = lists[idx + 1];
+    lists[idx + 1] = temp;
+    storageUtil.saveLists(lists);
+    var sel = this.data.selectedIndex;
+    if (sel === idx) sel = idx + 1;
+    else if (sel === idx + 1) sel = idx;
+    this.setData({ selectedIndex: sel });
+    this.loadData();
   },
   onListLongPress: function(e) {
     var that = this;
