@@ -1,53 +1,102 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 180" fill="none" stroke="#9B8644" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-  <!-- Central arch -->
-  <path d="M100 95 Q100 55 70 45 Q55 40 50 55 Q45 70 60 80 L100 95 L140 80 Q155 70 150 55 Q145 40 130 45 Q100 55 100 95Z" fill="none"/>
-  <!-- Left tower -->
-  <path d="M35 130 L35 50 Q35 30 50 25 L60 22 L60 45" fill="none"/>
-  <path d="M50 130 L50 55" fill="none"/>
-  <path d="M35 70 L50 65" fill="none"/>
-  <path d="M35 90 L50 85" fill="none"/>
-  <path d="M35 110 L50 105" fill="none"/>
-  <!-- Right tower -->
-  <path d="M165 130 L165 50 Q165 30 150 25 L140 22 L140 45" fill="none"/>
-  <path d="M150 130 L150 55" fill="none"/>
-  <path d="M165 70 L150 65" fill="none"/>
-  <path d="M165 90 L150 85" fill="none"/>
-  <path d="M165 110 L150 105" fill="none"/>
-  <!-- Left wing top -->
-  <path d="M60 45 L35 50" fill="none"/>
-  <path d="M50 25 L75 20 Q90 18 100 30" fill="none"/>
-  <!-- Right wing top -->
-  <path d="M140 45 L165 50" fill="none"/>
-  <path d="M150 25 L125 20 Q110 18 100 30" fill="none"/>
-  <!-- Cross beams -->
-  <path d="M60 80 L50 130" fill="none"/>
-  <path d="M140 80 L150 130" fill="none"/>
-  <!-- Diamond decorations left -->
-  <path d="M42 58 L47 53 L52 58 L47 63Z" fill="none"/>
-  <!-- Diamond decorations right -->
-  <path d="M148 58 L153 53 L158 58 L153 63Z" fill="none"/>
-  <!-- Trefoil left -->
-  <circle cx="43" cy="80" r="4" fill="none"/>
-  <circle cx="38" cy="86" r="4" fill="none"/>
-  <circle cx="48" cy="86" r="4" fill="none"/>
-  <!-- Trefoil right -->
-  <circle cx="157" cy="80" r="4" fill="none"/>
-  <circle cx="152" cy="86" r="4" fill="none"/>
-  <circle cx="162" cy="86" r="4" fill="none"/>
-  <!-- Inner arch detail -->
-  <path d="M75 95 Q100 70 125 95" fill="none" stroke-width="2"/>
-  <!-- Base line -->
-  <path d="M30 130 L170 130" fill="none" stroke-width="2"/>
-  <!-- Center keystone -->
-  <path d="M95 30 L100 22 L105 30" fill="none" stroke-width="2"/>
-  <!-- Lattice left panel -->
-  <path d="M38 95 L48 100" fill="none" stroke-width="1.5"/>
-  <path d="M48 95 L38 100" fill="none" stroke-width="1.5"/>
-  <path d="M38 105 L48 110" fill="none" stroke-width="1.5"/>
-  <path d="M48 105 L38 110" fill="none" stroke-width="1.5"/>
-  <!-- Lattice right panel -->
-  <path d="M152 95 L162 100" fill="none" stroke-width="1.5"/>
-  <path d="M162 95 L152 100" fill="none" stroke-width="1.5"/>
-  <path d="M152 105 L162 110" fill="none" stroke-width="1.5"/>
-  <path d="M162 105 L152 110" fill="none" stroke-width="1.5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 175" fill="none" stroke="#9B8644" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+
+  <!-- ===== LEFT TOWER ===== -->
+  <!-- Outer left edge -->
+  <line x1="18" y1="155" x2="18" y2="40"/>
+  <!-- Inner right edge -->
+  <line x1="52" y1="155" x2="52" y2="30"/>
+  <!-- Tower top stepped profile -->
+  <path d="M18 40 L18 28 L28 18 L28 8 L42 2 L52 8 L52 18 L58 26"/>
+  <!-- Top cap inner -->
+  <line x1="35" y1="8" x2="35" y2="18"/>
+  <!-- Tower horizontal divisions -->
+  <line x1="18" y1="52" x2="52" y2="52"/>
+  <line x1="18" y1="75" x2="52" y2="75"/>
+  <line x1="18" y1="98" x2="52" y2="98"/>
+  <line x1="18" y1="122" x2="52" y2="122"/>
+
+  <!-- ===== RIGHT TOWER (mirror) ===== -->
+  <line x1="202" y1="155" x2="202" y2="40"/>
+  <line x1="168" y1="155" x2="168" y2="30"/>
+  <path d="M202 40 L202 28 L192 18 L192 8 L178 2 L168 8 L168 18 L162 26"/>
+  <line x1="185" y1="8" x2="185" y2="18"/>
+  <line x1="168" y1="52" x2="202" y2="52"/>
+  <line x1="168" y1="75" x2="202" y2="75"/>
+  <line x1="168" y1="98" x2="202" y2="98"/>
+  <line x1="168" y1="122" x2="202" y2="122"/>
+
+  <!-- ===== CROSSING DIAGONAL BEAMS ===== -->
+  <!-- Beam A: left tower → right base (two edges = band) -->
+  <line x1="52" y1="38" x2="182" y2="155"/>
+  <line x1="52" y1="55" x2="168" y2="155"/>
+  <!-- Beam B: right tower → left base (two edges = band) -->
+  <line x1="168" y1="38" x2="38" y2="155"/>
+  <line x1="168" y1="55" x2="52" y2="155"/>
+
+  <!-- Beam cross-dividers (perpendicular to beam, creating compartments) -->
+  <!-- Beam A divisions -->
+  <line x1="88" y1="66" x2="78" y2="82"/>
+  <line x1="122" y1="95" x2="112" y2="111"/>
+  <!-- Beam B divisions -->
+  <line x1="132" y1="66" x2="142" y2="82"/>
+  <line x1="98" y1="95" x2="108" y2="111"/>
+
+  <!-- ===== GOTHIC POINTED ARCH ===== -->
+  <path d="M80 155 Q110 108 140 155"/>
+  <!-- Inner arch line -->
+  <path d="M88 155 Q110 118 132 155" stroke-width="1.8"/>
+
+  <!-- ===== BASE LINE ===== -->
+  <line x1="12" y1="155" x2="208" y2="155" stroke-width="2.8"/>
+
+  <!-- ===== TOP CENTER TREFOIL ===== -->
+  <circle cx="110" cy="22" r="6" stroke-width="1.8"/>
+  <circle cx="103" cy="30" r="5.5" stroke-width="1.8"/>
+  <circle cx="117" cy="30" r="5.5" stroke-width="1.8"/>
+  <!-- Trefoil stem -->
+  <line x1="110" y1="36" x2="110" y2="42" stroke-width="1.8"/>
+
+  <!-- ===== LEFT TOWER DECORATIONS ===== -->
+  <!-- Upper compartment: trefoil/clover -->
+  <circle cx="35" cy="59" r="3.5" stroke-width="1.5"/>
+  <circle cx="29" cy="65" r="3.5" stroke-width="1.5"/>
+  <circle cx="41" cy="65" r="3.5" stroke-width="1.5"/>
+  <!-- Middle compartment: diamond -->
+  <path d="M35 80 L40 85 L35 90 L30 85Z" stroke-width="1.5"/>
+  <!-- Lower compartments: X lattice -->
+  <line x1="22" y1="102" x2="48" y2="118" stroke-width="1.5"/>
+  <line x1="48" y1="102" x2="22" y2="118" stroke-width="1.5"/>
+  <!-- Bottom: vertical bars -->
+  <line x1="28" y1="126" x2="28" y2="150" stroke-width="1.2"/>
+  <line x1="35" y1="126" x2="35" y2="150" stroke-width="1.2"/>
+  <line x1="42" y1="126" x2="42" y2="150" stroke-width="1.2"/>
+
+  <!-- ===== RIGHT TOWER DECORATIONS ===== -->
+  <!-- Upper compartment: hexagon -->
+  <path d="M185 59 L190 63 L190 69 L185 73 L180 69 L180 63Z" stroke-width="1.5"/>
+  <!-- Middle compartment: diamond -->
+  <path d="M185 80 L190 85 L185 90 L180 85Z" stroke-width="1.5"/>
+  <!-- Lower compartments: X lattice -->
+  <line x1="172" y1="102" x2="198" y2="118" stroke-width="1.5"/>
+  <line x1="198" y1="102" x2="172" y2="118" stroke-width="1.5"/>
+  <!-- Bottom: vertical bars -->
+  <line x1="178" y1="126" x2="178" y2="150" stroke-width="1.2"/>
+  <line x1="185" y1="126" x2="185" y2="150" stroke-width="1.2"/>
+  <line x1="192" y1="126" x2="192" y2="150" stroke-width="1.2"/>
+
+  <!-- ===== CENTER CROSSING ORNAMENT ===== -->
+  <!-- Diamond at crossing point -->
+  <path d="M105 97 L110 90 L115 97 L110 104Z" stroke-width="2"/>
+  <!-- Small dots at beam intersections -->
+  <circle cx="82" cy="74" r="2" fill="#9B8644" stroke="none"/>
+  <circle cx="138" cy="74" r="2" fill="#9B8644" stroke="none"/>
+
+  <!-- ===== SMALL DECORATIVE ELEMENTS ON BEAMS ===== -->
+  <!-- Trefoil on beam A upper section -->
+  <circle cx="72" cy="56" r="2.5" stroke-width="1.2"/>
+  <circle cx="68" cy="61" r="2.5" stroke-width="1.2"/>
+  <circle cx="76" cy="61" r="2.5" stroke-width="1.2"/>
+  <!-- Hexagon on beam B upper section -->
+  <path d="M148 56 L151 58 L151 62 L148 64 L145 62 L145 58Z" stroke-width="1.2"/>
+
 </svg>

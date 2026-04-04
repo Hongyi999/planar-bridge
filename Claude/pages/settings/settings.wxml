@@ -176,12 +176,7 @@
 
   <!-- Footer -->
   <view class="settings-footer">
-    <view class="footer-logo">
-      <view class="footer-bridge">
-        <view class="fb-left"></view>
-        <view class="fb-right"></view>
-      </view>
-    </view>
+    <image class="footer-logo-img" src="/assets/icons/logo-bridge.svg" mode="aspectFit" />
     <text class="footer-name font-heading">PLANAR BRIDGE</text>
     <text class="footer-tagline">AI-powered FAB Card Search</text>
   </view>
