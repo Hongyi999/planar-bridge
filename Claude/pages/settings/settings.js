@@ -49,7 +49,10 @@ Page({
     searchLangOptions: ['中英双语', '仅中文', '仅英文'],
     viewMode: 'grid',
     currency: 'USD',
-    exportFields: DEFAULT_SETTINGS.exportFields
+    exportFields: DEFAULT_SETTINGS.exportFields,
+    showExportModal: false,
+    exportLists: [],
+    exportFormat: 'csv'
   },
 
   onLoad() {
@@ -136,20 +139,66 @@ Page({
     this._saveCurrentSettings();
   },
 
-  onExportCollection() {
+  onExportStart() {
     var lists = storageUtil.getLists();
-    var fields = this.data.exportFields.filter(function(f) { return f.checked; });
-    var currency = this.data.currency;
-
     if (!lists.length) {
       wx.showToast({ title: '暂无收藏列表', icon: 'none' });
       return;
     }
+    var exportLists = lists.map(function(list) {
+      return {
+        id: list.id,
+        name: list.name,
+        cardCount: list.cards ? list.cards.length : 0,
+        selected: true
+      };
+    });
+    this.setData({ showExportModal: true, exportLists: exportLists, exportFormat: 'csv' });
+  },
 
+  onToggleExportList(e) {
+    var idx = e.currentTarget.dataset.index;
+    var key = 'exportLists[' + idx + '].selected';
+    this.setData({ [key]: !this.data.exportLists[idx].selected });
+  },
+
+  onSetExportFormat(e) {
+    this.setData({ exportFormat: e.currentTarget.dataset.format });
+  },
+
+  onExportCancel() {
+    this.setData({ showExportModal: false });
+  },
+
+  onExportConfirm() {
+    var that = this;
+    var selectedIds = this.data.exportLists.filter(function(l) { return l.selected; }).map(function(l) { return l.id; });
+    if (!selectedIds.length) {
+      wx.showToast({ title: '请选择至少一个列表', icon: 'none' });
+      return;
+    }
+
+    var allLists = storageUtil.getLists();
+    var lists = allLists.filter(function(l) { return selectedIds.indexOf(l.id) >= 0; });
+    var fields = this.data.exportFields.filter(function(f) { return f.checked; });
+    var currency = this.data.currency;
+
+    if (this.data.exportFormat === 'text') {
+      this._exportAsText(lists, fields, currency);
+    } else {
+      this._exportAsCSVFile(lists, fields, currency);
+    }
+    this.setData({ showExportModal: false });
+  },
+
+  _exportAsText(lists, fields, currency) {
     var output = '';
     lists.forEach(function(list) {
-      if (!list.cards || !list.cards.length) return;
       output += '【' + list.name + '】\n';
+      if (!list.cards || !list.cards.length) {
+        output += '（空列表）\n\n';
+        return;
+      }
       list.cards.forEach(function(cardId) {
         var card = cardData.getCardById(cardId);
         if (!card) return;
@@ -167,11 +216,6 @@ Page({
       output += '\n';
     });
 
-    if (!output.trim()) {
-      wx.showToast({ title: '收藏列表为空', icon: 'none' });
-      return;
-    }
-
     wx.setClipboardData({
       data: output.trim(),
       success: function() {
@@ -180,16 +224,7 @@ Page({
     });
   },
 
-  onExportCSV() {
-    var lists = storageUtil.getLists();
-    var fields = this.data.exportFields.filter(function(f) { return f.checked; });
-    var currency = this.data.currency;
-
-    if (!lists.length) {
-      wx.showToast({ title: '暂无收藏列表', icon: 'none' });
-      return;
-    }
-
+  _exportAsCSVFile(lists, fields, currency) {
     // CSV header
     var header = ['列表名称'];
     fields.forEach(function(f) { header.push(f.label); });
@@ -217,12 +252,49 @@ Page({
       });
     });
 
-    var csv = rows.join('\n');
+    var csv = '\uFEFF' + rows.join('\n'); // BOM for Excel compatibility
 
-    wx.setClipboardData({
+    // Save as file for download
+    var fs = wx.getFileSystemManager();
+    var filePath = wx.env.USER_DATA_PATH + '/planar_bridge_export.csv';
+    fs.writeFile({
+      filePath: filePath,
       data: csv,
+      encoding: 'utf8',
       success: function() {
-        wx.showToast({ title: 'CSV 已复制到剪贴板', icon: 'success' });
+        wx.shareFileMessage({
+          filePath: filePath,
+          fileName: 'PlanarBridge收藏导出.csv',
+          success: function() {
+            wx.showToast({ title: '导出成功', icon: 'success' });
+          },
+          fail: function() {
+            // Fallback: open file
+            wx.openDocument({
+              filePath: filePath,
+              showMenu: true,
+              success: function() {},
+              fail: function() {
+                // Last fallback: copy to clipboard
+                wx.setClipboardData({
+                  data: csv,
+                  success: function() {
+                    wx.showToast({ title: 'CSV 已复制到剪贴板', icon: 'success' });
+                  }
+                });
+              }
+            });
+          }
+        });
+      },
+      fail: function() {
+        // Fallback: copy
+        wx.setClipboardData({
+          data: csv,
+          success: function() {
+            wx.showToast({ title: 'CSV 已复制到剪贴板', icon: 'success' });
+          }
+        });
       }
     });
   },

@@ -48,10 +48,9 @@
 
   <!-- Export settings -->
   <view class="settings-group">
-    <view class="group-title">导出设置</view>
+    <view class="group-title">导出字段</view>
     <view class="settings-item-col">
-      <text class="item-label">导出字段选择</text>
-      <text class="item-desc" style="margin-bottom: 20rpx;">导出收藏时包含以下信息</text>
+      <text class="item-desc" style="margin-bottom: 16rpx;">选择导出时包含的信息</text>
       <view class="checkbox-grid">
         <view class="checkbox-item" wx:for="{{exportFields}}" wx:key="key" data-key="{{item.key}}" bindtap="onToggleExportField">
           <view class="checkbox-box {{item.checked ? 'checked' : ''}}">
@@ -61,19 +60,55 @@
         </view>
       </view>
     </view>
-    <view class="settings-item" bindtap="onExportCollection">
+  </view>
+
+  <!-- Export actions -->
+  <view class="settings-group">
+    <view class="group-title">导出收藏</view>
+    <view class="settings-item" bindtap="onExportStart">
       <view class="item-left">
-        <text class="item-label">导出收藏列表</text>
-        <text class="item-desc">复制为文本，可粘贴到备忘录或分享</text>
+        <text class="item-label">选择列表并导出</text>
+        <text class="item-desc">选择需要导出的列表，支持文本和 CSV 格式</text>
       </view>
       <text class="item-arrow">›</text>
     </view>
-    <view class="settings-item" bindtap="onExportCSV">
-      <view class="item-left">
-        <text class="item-label">导出为 CSV</text>
-        <text class="item-desc">生成表格格式，可用于电子表格</text>
+  </view>
+
+  <!-- Export modal -->
+  <view class="export-modal-mask" wx:if="{{showExportModal}}" bindtap="onExportCancel">
+    <view class="export-modal" catchtap="">
+      <text class="export-modal-title font-heading">导出收藏列表</text>
+
+      <!-- Step 1: Select lists -->
+      <text class="export-step-label">选择要导出的列表</text>
+      <view class="export-list-select">
+        <view class="export-list-item" wx:for="{{exportLists}}" wx:key="id" data-index="{{index}}" bindtap="onToggleExportList">
+          <view class="checkbox-box {{item.selected ? 'checked' : ''}}">
+            <view wx:if="{{item.selected}}" class="checkbox-tick"></view>
+          </view>
+          <text class="export-list-name">{{item.name}}</text>
+          <text class="export-list-count">{{item.cardCount}} 张卡</text>
+        </view>
       </view>
-      <text class="item-arrow">›</text>
+
+      <!-- Step 2: Format selection -->
+      <text class="export-step-label" style="margin-top: 24rpx;">选择导出格式</text>
+      <view class="export-format-row">
+        <view class="export-format-btn {{exportFormat === 'text' ? 'active' : ''}}" data-format="text" bindtap="onSetExportFormat">
+          <text class="efb-label">文本</text>
+          <text class="efb-desc">复制到剪贴板</text>
+        </view>
+        <view class="export-format-btn {{exportFormat === 'csv' ? 'active' : ''}}" data-format="csv" bindtap="onSetExportFormat">
+          <text class="efb-label">CSV</text>
+          <text class="efb-desc">保存为文件</text>
+        </view>
+      </view>
+
+      <!-- Actions -->
+      <view class="export-actions">
+        <view class="export-btn-cancel" bindtap="onExportCancel">取消</view>
+        <view class="export-btn-confirm" bindtap="onExportConfirm">导出</view>
+      </view>
     </view>
   </view>
 

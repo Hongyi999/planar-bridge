@@ -244,6 +244,7 @@ function searchCards(filters) {
     if (filters.type && !card.type.toLowerCase().includes(filters.type.toLowerCase())) return false;
     if (filters.setCode && card.setCode.toLowerCase() !== filters.setCode.toLowerCase()) return false;
     if (filters.priceMax && card.priceMid > filters.priceMax) return false;
+    if (filters.priceMin && card.priceMid < filters.priceMin) return false;
     if (filters.keywords && filters.keywords.length > 0) {
       const cardKw = card.keywords.map(k => k.toLowerCase());
       const cardText = card.text.toLowerCase();

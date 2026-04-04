@@ -29,6 +29,9 @@ Page({
   },
   onChipTap(e) {
     var text = e.currentTarget.dataset.text;
-    this.setData({ searchValue: text, searchFocus: true });
+    this.setData({ searchValue: text });
+    wx.navigateTo({
+      url: '/pages/results/results?query=' + encodeURIComponent(text)
+    });
   }
 });

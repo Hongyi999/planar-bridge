@@ -26,8 +26,11 @@
     </view>
   </scroll-view>
 
-  <!-- Selected list title -->
-  <text class="selected-title font-heading" wx:if="{{lists.length > 0}}">{{lists[selectedIndex].name}}</text>
+  <!-- Selected list title + edit -->
+  <view class="selected-title-row" wx:if="{{lists.length > 0}}">
+    <text class="selected-title font-heading">{{lists[selectedIndex].name}}</text>
+    <text class="selected-edit" data-index="{{selectedIndex}}" bindtap="onListLongPress">编辑</text>
+  </view>
 
   <!-- Cards list -->
   <view class="cards-list">
