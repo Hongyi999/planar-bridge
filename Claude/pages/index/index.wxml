@@ -12,12 +12,7 @@
   <view class="hero-content">
     <!-- Logo -->
     <view class="logo-row">
-      <!-- Bridge icon using CSS -->
-      <view class="logo-icon">
-        <view class="bridge-top"></view>
-        <view class="bridge-left"></view>
-        <view class="bridge-right"></view>
-      </view>
+      <image class="logo-img" src="/assets/icons/logo-bridge.svg" mode="aspectFit" />
       <text class="logo-text font-heading">PLANAR BRIDGE</text>
     </view>
 
