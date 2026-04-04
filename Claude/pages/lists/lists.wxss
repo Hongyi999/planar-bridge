@@ -55,36 +55,29 @@
   padding: 6rpx 16rpx;
 }
 
-/* Card wrap — holds arrows + card */
-.list-card-wrap {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-/* Arrows above card */
-.lc-arrows-top {
+/* Arrows inside card, above text */
+.lc-arrows-inner {
   display: flex;
   gap: 12rpx;
+  justify-content: center;
   margin-bottom: 8rpx;
 }
-.lc-arrow-top {
-  width: 40rpx;
-  height: 32rpx;
+.lc-arrow-inner {
+  width: 44rpx;
+  height: 36rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22rpx;
+  font-size: 24rpx;
   color: #6B6355;
   background: #FDFCF8;
-  border-radius: 8rpx;
+  border-radius: 10rpx;
   border: 2rpx solid #E8E3D8;
 }
-.lc-arrow-top:active {
+.lc-arrow-inner:active {
   background: #E8E3D8;
 }
-.lc-arrow-top-disabled {
+.lc-arrow-inner-disabled {
   opacity: 0.3;
 }
 
