@@ -12,7 +12,10 @@ Page({
     totalValue: '0.00',
     isLoaded: true,
     isEditMode: false,
-    showHint: false
+    showHint: false,
+    showEditPanel: false,
+    editName: '',
+    editColor: 'gold'
   },
   onShow: function() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
@@ -105,16 +108,15 @@ Page({
       success: function(res) {
         if (res.confirm && res.content && res.content.trim()) {
           var lists = storageUtil.getLists();
-          lists.push({
+          lists.unshift({
             id: 'list-' + Date.now(),
             name: res.content.trim(),
             color: nextColor,
             cards: []
           });
           storageUtil.saveLists(lists);
+          that.setData({ selectedIndex: 0 });
           that.loadData();
-          // Select the newly created list
-          that.setData({ selectedIndex: lists.length - 1 });
           wx.showToast({ title: '已创建', icon: 'none' });
         }
       }
@@ -153,59 +155,60 @@ Page({
     this.loadData();
   },
   onListLongPress: function(e) {
-    var that = this;
     var idx = e.currentTarget.dataset.index;
-
-    wx.showActionSheet({
-      itemList: ['重命名', '更换颜色', '删除列表'],
-      success: function(res) {
-        if (res.tapIndex === 0) {
-          that._renameList(idx);
-        } else if (res.tapIndex === 1) {
-          that._changeColor(idx);
-        } else if (res.tapIndex === 2) {
-          that._deleteList(idx);
-        }
-      }
-    });
+    this._openEditPanel(idx);
   },
-  _renameList: function(idx) {
-    var that = this;
+  onOpenEditPanel: function() {
+    this._openEditPanel(this.data.selectedIndex);
+  },
+  _openEditPanel: function(idx) {
     var lists = storageUtil.getLists();
     var list = lists[idx];
-
-    wx.showModal({
-      title: '重命名列表',
-      placeholderText: list.name,
-      editable: true,
-      success: function(res) {
-        if (res.confirm && res.content && res.content.trim()) {
-          lists[idx].name = res.content.trim();
-          storageUtil.saveLists(lists);
-          that.loadData();
-          wx.showToast({ title: '已重命名', icon: 'none' });
-        }
-      }
+    if (!list) return;
+    this.setData({
+      showEditPanel: true,
+      editName: list.name,
+      editColor: list.color || 'gold',
+      _editIndex: idx
     });
   },
-  _changeColor: function(idx) {
-    var that = this;
-    var colorNames = ['金色', '紫色', '绿色'];
-    var colorValues = ['gold', 'purple', 'green'];
-
-    wx.showActionSheet({
-      itemList: colorNames,
-      success: function(res) {
-        var lists = storageUtil.getLists();
-        lists[idx].color = colorValues[res.tapIndex];
-        storageUtil.saveLists(lists);
-        that.loadData();
-        wx.showToast({ title: '已更换颜色', icon: 'none' });
-      }
-    });
+  onCloseEditPanel: function() {
+    this.setData({ showEditPanel: false });
   },
-  _deleteList: function(idx) {
+  onEditNameInput: function(e) {
+    this.setData({ editName: e.detail.value });
+  },
+  onEditColorTap: function(e) {
+    this.setData({ editColor: e.currentTarget.dataset.color });
+  },
+  onEditSave: function() {
+    var idx = this.data._editIndex;
+    var lists = storageUtil.getLists();
+    if (!lists[idx]) return;
+
+    var nameChanged = false;
+    var colorChanged = false;
+
+    if (this.data.editName.trim() && this.data.editName.trim() !== lists[idx].name) {
+      lists[idx].name = this.data.editName.trim();
+      nameChanged = true;
+    }
+    if (this.data.editColor !== lists[idx].color) {
+      lists[idx].color = this.data.editColor;
+      colorChanged = true;
+    }
+
+    if (nameChanged || colorChanged) {
+      storageUtil.saveLists(lists);
+      this.loadData();
+    }
+
+    this.setData({ showEditPanel: false });
+    wx.showToast({ title: '已保存', icon: 'none' });
+  },
+  onEditDelete: function() {
     var that = this;
+    var idx = this.data._editIndex;
     var lists = storageUtil.getLists();
     var listName = lists[idx].name;
 
@@ -218,9 +221,8 @@ Page({
         if (res.confirm) {
           lists.splice(idx, 1);
           storageUtil.saveLists(lists);
-          // Adjust selected index
           var newIdx = Math.min(that.data.selectedIndex, Math.max(0, lists.length - 1));
-          that.setData({ selectedIndex: newIdx });
+          that.setData({ selectedIndex: newIdx, showEditPanel: false });
           that.loadData();
           wx.showToast({ title: '已删除', icon: 'none' });
         }

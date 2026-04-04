@@ -37,6 +37,7 @@ Page({
     navFullHeight: 64,
     query: '',
     filters: {},
+    filterChips: [],
     thinkingSteps: [],
     summary: '',
     resultCount: 0,
@@ -88,8 +89,10 @@ Page({
         });
       }
       results = sortResults(results, sortPref);
+      var finalFilters = result.filters || effectiveFilters;
       that.setData({
-        filters: result.filters || effectiveFilters,
+        filters: finalFilters,
+        filterChips: that._buildFilterChips(finalFilters),
         summary: result.summary || '',
         resultCount: results.length,
         results: results,
@@ -104,6 +107,7 @@ Page({
 
       that.setData({
         filters: filters,
+        filterChips: that._buildFilterChips(filters),
         summary: summary,
         resultCount: results.length,
         results: results,
@@ -112,6 +116,46 @@ Page({
     });
   },
 
+  _buildFilterChips: function(filters) {
+    var chips = [];
+    var labelMap = {
+      class: '职业', type: '类型', rarity: '稀有度', setCode: '系列',
+      subtype: '子类型', name: '名称'
+    };
+    Object.keys(filters).forEach(function(key) {
+      if (key === 'keywords' && filters.keywords && filters.keywords.length > 0) {
+        filters.keywords.forEach(function(kw) {
+          chips.push({ key: 'keyword:' + kw, label: '关键词', value: kw });
+        });
+      } else if (key === 'priceMin') {
+        chips.push({ key: 'priceMin', label: '价格', value: '≥$' + filters.priceMin });
+      } else if (key === 'priceMax') {
+        chips.push({ key: 'priceMax', label: '价格', value: '≤$' + filters.priceMax });
+      } else if (labelMap[key] && filters[key]) {
+        chips.push({ key: key, label: labelMap[key], value: filters[key] });
+      }
+    });
+    return chips;
+  },
+  onRemoveChip: function(e) {
+    var chipKey = e.currentTarget.dataset.key;
+    var filters = JSON.parse(JSON.stringify(this.data.filters));
+
+    if (chipKey.indexOf('keyword:') === 0) {
+      var kw = chipKey.substring(8);
+      filters.keywords = (filters.keywords || []).filter(function(k) { return k !== kw; });
+      if (filters.keywords.length === 0) delete filters.keywords;
+    } else {
+      delete filters[chipKey];
+    }
+
+    // Re-search with updated filters
+    var query = this.data.query;
+    wx.redirectTo({
+      url: '/pages/results/results?query=' + encodeURIComponent(query) +
+        '&filters=' + encodeURIComponent(JSON.stringify(filters))
+    });
+  },
   onThinkingComplete: function() {
     this.setData({ showResults: true });
   },

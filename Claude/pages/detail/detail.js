@@ -113,7 +113,9 @@ Page({
   onToggleModalList: function(e) {
     var idx = e.currentTarget.dataset.index;
     var key = 'modalLists[' + idx + '].checked';
-    this.setData({ [key]: !this.data.modalLists[idx].checked });
+    var update = {};
+    update[key] = !this.data.modalLists[idx].checked;
+    this.setData(update);
   },
   onModalConfirm: function() {
     var that = this;
@@ -141,6 +143,9 @@ Page({
     } else {
       wx.showToast({ title: '已更新', icon: 'none', duration: 1000 });
     }
+  },
+  onModalNoop: function() {
+    // Prevent tap from bubbling to mask
   },
   onModalCancel: function() {
     this.setData({ showListModal: false });

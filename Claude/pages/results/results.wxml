@@ -34,6 +34,15 @@
       <text class="summary-text">{{summary}}</text>
     </view>
 
+    <!-- Active filter chips -->
+    <view class="filter-chips {{showResults ? 'show' : ''}}" wx:if="{{filterChips.length > 0}}">
+      <view class="filter-chip" wx:for="{{filterChips}}" wx:key="key" data-key="{{item.key}}" bindtap="onRemoveChip">
+        <text class="fc-label">{{item.label}}:</text>
+        <text class="fc-value">{{item.value}}</text>
+        <text class="fc-remove">×</text>
+      </view>
+    </view>
+
     <!-- Results meta -->
     <view class="results-meta {{showResults ? 'show' : ''}}">
       <text class="meta-left">{{resultCount}} 个结果 · 按价格降序</text>

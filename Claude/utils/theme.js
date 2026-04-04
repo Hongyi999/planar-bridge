@@ -30,6 +30,9 @@ module.exports = {
   listColors: {
     gold: { bg: '#9B86440A', border: '#9B864420', text: '#8B7A3E' },
     purple: { bg: '#6B4C8A08', border: '#6B4C8A18', text: '#6B4C8A' },
-    green: { bg: '#3D7A5E08', border: '#3D7A5E18', text: '#3D7A5E' }
+    green: { bg: '#3D7A5E08', border: '#3D7A5E18', text: '#3D7A5E' },
+    blue: { bg: '#4A82B508', border: '#4A82B518', text: '#4A82B5' },
+    red: { bg: '#C4544A08', border: '#C4544A18', text: '#C4544A' },
+    orange: { bg: '#D4882008', border: '#D4882018', text: '#D48820' }
   }
 };

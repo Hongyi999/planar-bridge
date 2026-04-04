@@ -12,6 +12,14 @@
     </view>
   </view>
 
+  <!-- List header with reorder icon -->
+  <view class="list-header-row" wx:if="{{isLoaded}}">
+    <view class="list-header-spacer"></view>
+    <view class="reorder-btn {{isEditMode ? 'reorder-btn-active' : ''}}" bindtap="onToggleEditMode">
+      <image class="reorder-icon" src="/assets/icons/reorder.svg" mode="aspectFit" />
+    </view>
+  </view>
+
   <!-- Horizontal scroll list cards -->
   <scroll-view scroll-x class="list-cards-scroll" enhanced show-scrollbar="{{false}}" wx:if="{{isLoaded}}">
     <view class="list-cards-row">
@@ -42,7 +50,7 @@
   <!-- Selected list title + edit -->
   <view class="selected-title-row" wx:if="{{isLoaded && lists.length > 0}}">
     <text class="selected-title font-heading">{{lists[selectedIndex].name}}</text>
-    <text class="selected-edit" bindtap="onToggleEditMode">{{isEditMode ? '完成' : '编辑'}}</text>
+    <text class="selected-edit" bindtap="onOpenEditPanel">编辑</text>
   </view>
 
   <!-- Cards list -->
@@ -78,6 +86,38 @@
     <view class="empty-list" wx:if="{{selectedCards.length === 0}}">
       <text class="empty-text">此列表暂无卡牌</text>
       <text class="empty-hint">搜索并收藏卡牌，它们会出现在这里</text>
+    </view>
+  </view>
+
+  <!-- Edit panel modal -->
+  <view class="edit-mask" wx:if="{{showEditPanel}}" bindtap="onCloseEditPanel">
+    <view class="edit-panel" catchtap="">
+      <text class="edit-panel-title font-heading">编辑列表</text>
+
+      <!-- Rename section -->
+      <view class="edit-section">
+        <text class="edit-section-label">重命名</text>
+        <input class="edit-rename-input" value="{{editName}}" bindinput="onEditNameInput" placeholder="输入新名称" />
+      </view>
+
+      <!-- Color section -->
+      <view class="edit-section">
+        <text class="edit-section-label">更换颜色</text>
+        <view class="edit-color-palette">
+          <view class="edit-color-dot edit-color-gold {{editColor === 'gold' ? 'edit-color-selected' : ''}}" data-color="gold" bindtap="onEditColorTap"></view>
+          <view class="edit-color-dot edit-color-purple {{editColor === 'purple' ? 'edit-color-selected' : ''}}" data-color="purple" bindtap="onEditColorTap"></view>
+          <view class="edit-color-dot edit-color-green {{editColor === 'green' ? 'edit-color-selected' : ''}}" data-color="green" bindtap="onEditColorTap"></view>
+          <view class="edit-color-dot edit-color-blue {{editColor === 'blue' ? 'edit-color-selected' : ''}}" data-color="blue" bindtap="onEditColorTap"></view>
+          <view class="edit-color-dot edit-color-red {{editColor === 'red' ? 'edit-color-selected' : ''}}" data-color="red" bindtap="onEditColorTap"></view>
+          <view class="edit-color-dot edit-color-orange {{editColor === 'orange' ? 'edit-color-selected' : ''}}" data-color="orange" bindtap="onEditColorTap"></view>
+        </view>
+      </view>
+
+      <!-- Save button -->
+      <view class="edit-save-btn" bindtap="onEditSave">保存</view>
+
+      <!-- Delete section -->
+      <view class="edit-delete-btn" bindtap="onEditDelete">删除列表</view>
     </view>
   </view>
 </view>
