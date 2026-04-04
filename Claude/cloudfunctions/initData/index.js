@@ -148,7 +148,8 @@ exports.main = async (event) => {
     if (action === 'all' || action === 'cards') {
       for (const card of SEED_CARDS) {
         try {
-          await db.collection('cards').doc(card._id).set({ data: card });
+          const { _id, ...cardData } = card;
+          await db.collection('cards').doc(_id).set({ data: cardData });
           results.cards++;
         } catch (e) {
           results.errors.push('card ' + card._id + ': ' + e.message);
@@ -159,7 +160,8 @@ exports.main = async (event) => {
     if (action === 'all' || action === 'sets') {
       for (const set of SEED_SETS) {
         try {
-          await db.collection('sets').doc(set._id).set({ data: set });
+          const { _id, ...setData } = set;
+          await db.collection('sets').doc(_id).set({ data: setData });
           results.sets++;
         } catch (e) {
           results.errors.push('set ' + set._id + ': ' + e.message);
