@@ -12,6 +12,12 @@
     </view>
   </view>
 
+  <!-- List section header -->
+  <view class="list-section-header" wx:if="{{isLoaded}}">
+    <text class="list-section-title font-heading">全部列表</text>
+    <text class="list-section-action" bindtap="onToggleEditMode">{{isEditMode ? '完成' : '排序'}}</text>
+  </view>
+
   <!-- Horizontal scroll list cards -->
   <scroll-view scroll-x class="list-cards-scroll" enhanced show-scrollbar="{{false}}" wx:if="{{isLoaded}}">
     <view class="list-cards-row">
@@ -23,25 +29,25 @@
       <view
         wx:for="{{lists}}"
         wx:key="id"
-        class="list-card {{selectedIndex === index ? 'selected' : ''}} {{showHint ? 'wobble' : ''}}"
-        style="background: {{item.hexColor}}0A; border: 3rpx solid {{item.hexColor}}20; {{selectedIndex === index ? 'border-bottom: 6rpx solid ' + item.hexColor + ';' : ''}}"
+        class="list-card-wrap"
         data-index="{{index}}"
-        bindtap="onSelectList"
-        bindlongpress="onListLongPress"
       >
-        <text class="lc-name" style="color: {{item.hexColor}};">{{item.name}}</text>
-        <text class="lc-count">{{item.cardCount}} 张卡</text>
-        <view class="lc-bottom-row">
-          <text class="lc-value font-mono">${{item.value}}</text>
-          <view class="lc-move-btns" wx:if="{{isEditMode}}">
-            <view class="lc-move {{index === 0 ? 'lc-move-disabled' : ''}}" data-index="{{index}}" catchtap="onMoveLeft">←</view>
-            <view class="lc-move {{index === lists.length - 1 ? 'lc-move-disabled' : ''}}" data-index="{{index}}" catchtap="onMoveRight">→</view>
-          </view>
+        <!-- Move arrows above card -->
+        <view class="lc-arrows-top" wx:if="{{isEditMode}}">
+          <view class="lc-arrow-top {{index === 0 ? 'lc-arrow-top-disabled' : ''}}" data-index="{{index}}" catchtap="onMoveLeft">←</view>
+          <view class="lc-arrow-top {{index === lists.length - 1 ? 'lc-arrow-top-disabled' : ''}}" data-index="{{index}}" catchtap="onMoveRight">→</view>
         </view>
-      </view>
-      <!-- Reorder toggle at end -->
-      <view class="list-card-reorder" bindtap="onToggleEditMode">
-        <text class="lc-reorder-text">{{isEditMode ? '完成' : '排序'}}</text>
+        <view
+          class="list-card {{selectedIndex === index ? 'selected' : ''}} {{showHint ? 'wobble' : ''}}"
+          style="background: {{item.hexColor}}0A; border: 3rpx solid {{item.hexColor}}20; {{selectedIndex === index ? 'border-bottom: 6rpx solid ' + item.hexColor + ';' : ''}}"
+          data-index="{{index}}"
+          bindtap="onSelectList"
+          bindlongpress="onListLongPress"
+        >
+          <text class="lc-name" style="color: {{item.hexColor}};">{{item.name}}</text>
+          <text class="lc-count">{{item.cardCount}} 张卡</text>
+          <text class="lc-value font-mono">${{item.value}}</text>
+        </view>
       </view>
     </view>
   </scroll-view>

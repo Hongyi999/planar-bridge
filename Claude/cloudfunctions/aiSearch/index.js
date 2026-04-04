@@ -52,13 +52,17 @@ function fallbackParse(query) {
     if (q.includes(tcn)) { filters.type = TYPE_MAP[tcn]; break; }
   }
 
-  // Price detection — max
-  var priceMaxMatch = q.match(/(?:under|below)\s*\$?(\d+)/) || q.match(/(\d+)\s*(?:刀|美元|块|元)?\s*以下/) || q.match(/低于\s*\$?(\d+)/) || q.match(/小于\s*\$?(\d+)/);
-  if (priceMaxMatch) filters.priceMax = parseFloat(priceMaxMatch[1]);
+  // Price detection — min (multiple "大于X" → take largest)
+  var minPatterns = [/(?:over|above)\s*\$?(\d+)/g, /(\d+)\s*(?:刀|美元|块|元)?\s*以上/g, /大于\s*\$?(\d+)/g, /超过\s*\$?(\d+)/g, /金额大于\s*\$?(\d+)/g, /(?:高于|贵于)\s*\$?(\d+)/g];
+  var allMins = [];
+  for (var mp of minPatterns) { var m; while ((m = mp.exec(q)) !== null) allMins.push(parseFloat(m[1])); }
+  if (allMins.length > 0) filters.priceMin = Math.max(...allMins);
 
-  // Price detection — min
-  var priceMinMatch = q.match(/(?:over|above)\s*\$?(\d+)/) || q.match(/(\d+)\s*(?:刀|美元|块|元)?\s*以上/) || q.match(/大于\s*\$?(\d+)/) || q.match(/超过\s*\$?(\d+)/) || q.match(/金额大于\s*\$?(\d+)/);
-  if (priceMinMatch) filters.priceMin = parseFloat(priceMinMatch[1]);
+  // Price detection — max (multiple "小于X" → take smallest)
+  var maxPatterns = [/(?:under|below)\s*\$?(\d+)/g, /(\d+)\s*(?:刀|美元|块|元)?\s*以下/g, /低于\s*\$?(\d+)/g, /小于\s*\$?(\d+)/g];
+  var allMaxes = [];
+  for (var xp of maxPatterns) { var m2; while ((m2 = xp.exec(q)) !== null) allMaxes.push(parseFloat(m2[1])); }
+  if (allMaxes.length > 0) filters.priceMax = Math.min(...allMaxes);
 
   // Set code detection
   var setCodes = ['WTR', 'ARC', 'CRU', 'MON', 'ELE', 'EVE', 'UPR', 'DYN', 'OUT', 'DTD', 'BRI', 'HVY', 'MST', 'ROS', 'HNT', 'SEA', 'SSM', 'HIS'];

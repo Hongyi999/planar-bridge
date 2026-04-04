@@ -33,13 +33,43 @@ function parseQuery(query) {
   if (q.includes('攻击')) filters.type = 'Attack Action';
   if (q.includes('防御')) filters.type = 'Defense Reaction';
 
-  // Price detection — max (under/below/以下)
-  var priceMaxMatch = q.match(/under\s*\$?(\d+)/i) || q.match(/below\s*\$?(\d+)/i) || q.match(/(\d+)\s*(?:刀|美元|块|元)?\s*以下/) || q.match(/\$(\d+)\s*以下/) || q.match(/低于\s*\$?(\d+)/) || q.match(/小于\s*\$?(\d+)/);
-  if (priceMaxMatch) filters.priceMax = parseFloat(priceMaxMatch[1]);
-
   // Price detection — min (over/above/以上/大于/超过)
-  var priceMinMatch = q.match(/over\s*\$?(\d+)/i) || q.match(/above\s*\$?(\d+)/i) || q.match(/(\d+)\s*(?:刀|美元|块|元)?\s*以上/) || q.match(/\$(\d+)\s*以上/) || q.match(/大于\s*\$?(\d+)/) || q.match(/超过\s*\$?(\d+)/) || q.match(/金额大于\s*\$?(\d+)/) || q.match(/(?:价格|金额)\s*[>＞]\s*\$?(\d+)/);
-  if (priceMinMatch) filters.priceMin = parseFloat(priceMinMatch[1]);
+  // When multiple "大于X" appear, take the largest value (user is refining upward)
+  var priceMinPatterns = [
+    /over\s*\$?(\d+)/gi, /above\s*\$?(\d+)/gi,
+    /(\d+)\s*(?:刀|美元|块|元)?\s*以上/g, /\$(\d+)\s*以上/g,
+    /大于\s*\$?(\d+)/g, /超过\s*\$?(\d+)/g,
+    /金额大于\s*\$?(\d+)/g, /(?:价格|金额)\s*[>＞]\s*\$?(\d+)/g,
+    /(?:高于|贵于)\s*\$?(\d+)/g
+  ];
+  var allMins = [];
+  priceMinPatterns.forEach(function(pattern) {
+    var m;
+    while ((m = pattern.exec(q)) !== null) {
+      allMins.push(parseFloat(m[1]));
+    }
+  });
+  if (allMins.length > 0) {
+    filters.priceMin = Math.max.apply(null, allMins);
+  }
+
+  // Price detection — max (under/below/以下)
+  // When multiple appear, take the smallest value (user is refining downward)
+  var priceMaxPatterns = [
+    /under\s*\$?(\d+)/gi, /below\s*\$?(\d+)/gi,
+    /(\d+)\s*(?:刀|美元|块|元)?\s*以下/g, /\$(\d+)\s*以下/g,
+    /低于\s*\$?(\d+)/g, /小于\s*\$?(\d+)/g
+  ];
+  var allMaxes = [];
+  priceMaxPatterns.forEach(function(pattern) {
+    var m;
+    while ((m = pattern.exec(q)) !== null) {
+      allMaxes.push(parseFloat(m[1]));
+    }
+  });
+  if (allMaxes.length > 0) {
+    filters.priceMax = Math.min.apply(null, allMaxes);
+  }
 
   // Set detection
   var sets = {wtr:'WTR',arc:'ARC',cru:'CRU',mon:'MON',ele:'ELE',eve:'EVE',upr:'UPR',uprising:'UPR',dyn:'DYN',out:'OUT',dtd:'DTD',bri:'BRI',hvy:'HVY',mst:'MST',ros:'ROS',hnt:'HNT',sea:'SEA'};
