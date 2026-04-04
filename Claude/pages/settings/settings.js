@@ -136,12 +136,12 @@ Page({
         wx.hideLoading();
         wx.showModal({
           title: '下载成功',
-          content: '共 ' + allCards.length + ' 张卡牌。将分批写入数据库，每批 20 张。',
+          content: '共 ' + allCards.length + ' 张卡牌。将分批写入数据库。',
           confirmText: '开始写入',
           success: function(modal) {
             if (modal.confirm) {
               that._allCardsCache = allCards;
-              that._writeCardBatch(0, 20);
+              that._writeCardBatch(0, 5);
             }
           }
         });
@@ -151,6 +151,46 @@ Page({
         wx.showToast({ title: '网络错误: ' + (err.errMsg || ''), icon: 'none' });
       }
     });
+  },
+
+  // Strip raw card to essential fields only (reduce payload size)
+  _slimCard(card) {
+    var printings = (card.printings || []).map(function(p) {
+      return {
+        unique_id: p.unique_id || '',
+        id: p.id || '',
+        set_id: p.set_id || '',
+        edition: p.edition || '',
+        rarity: p.rarity || '',
+        foiling: p.foiling || '',
+        image_url: p.image_url || '',
+        tcgplayer_product_id: p.tcgplayer_product_id || '',
+        tcgplayer_url: p.tcgplayer_url || '',
+        artists: p.artists || []
+      };
+    });
+    return {
+      unique_id: card.unique_id,
+      name: card.name,
+      color: card.color || '',
+      pitch: card.pitch || '',
+      cost: card.cost || '',
+      power: card.power || '',
+      defense: card.defense || '',
+      health: card.health || '',
+      intelligence: card.intelligence || '',
+      types: card.types || [],
+      card_keywords: card.card_keywords || [],
+      functional_text_plain: card.functional_text_plain || '',
+      functional_text: card.functional_text || '',
+      type_text: card.type_text || '',
+      played_horizontally: card.played_horizontally || false,
+      blitz_legal: card.blitz_legal || false,
+      cc_legal: card.cc_legal || false,
+      commoner_legal: card.commoner_legal || false,
+      traits: card.traits || [],
+      printings: printings
+    };
   },
 
   _writeCardBatch(offset, batchSize) {
@@ -166,10 +206,13 @@ Page({
       return;
     }
 
+    // Slim down data to fit cloud function payload limit (~100KB)
+    var slimBatch = batch.map(function(c) { return that._slimCard(c); });
+
     wx.showLoading({ title: '写入 ' + offset + '/' + allCards.length + '...' });
     wx.cloud.callFunction({
       name: 'importCards',
-      data: { action: 'writeCards', cards: batch }
+      data: { action: 'writeCards', cards: slimBatch }
     }).then(function(res) {
       wx.hideLoading();
       var r = res.result;
