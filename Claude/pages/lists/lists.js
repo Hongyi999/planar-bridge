@@ -3,6 +3,17 @@ var cardData = require('../../utils/cardData.js');
 var cloudDB = require('../../utils/cloudDB.js');
 var theme = require('../../utils/theme.js');
 
+// Convert legacy named colors to hex
+var NAMED_TO_HEX = {
+  gold: '#9B8644', purple: '#6B4C8A', green: '#3D7A5E',
+  blue: '#4A82B5', red: '#C4544A', orange: '#D48820'
+};
+function colorToHex(color) {
+  if (!color) return '#9B8644';
+  if (color.charAt(0) === '#') return color;
+  return NAMED_TO_HEX[color] || '#9B8644';
+}
+
 Page({
   data: {
     lists: [],
@@ -15,7 +26,16 @@ Page({
     showHint: false,
     showEditPanel: false,
     editName: '',
-    editColor: 'gold'
+    editColor: '#9B8644',
+    colorPalette: [
+      '#9B8644', '#D4A017', '#E8C94A', '#F5DEB3',
+      '#C4544A', '#E07B6C', '#D4546A', '#F4A6B0',
+      '#D48820', '#E8A040', '#F0C060', '#FDE68A',
+      '#3D7A5E', '#5AA87A', '#80C49E', '#A8E6CF',
+      '#4A82B5', '#6BA3D6', '#89CFF0', '#B0D4F1',
+      '#6B4C8A', '#9370DB', '#B39DDB', '#D1C4E9',
+      '#2C2A22', '#6B6355', '#A09A8C', '#D6D0C2'
+    ]
   },
   onShow: function() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
@@ -57,10 +77,10 @@ Page({
         id: list.id,
         name: list.name,
         color: list.color,
+        hexColor: colorToHex(list.color),
         cardCount: cards.length,
         value: listValue.toFixed(2),
-        cards: cards,
-        colorStyle: theme.listColors[list.color] || theme.listColors.gold
+        cards: cards
       };
     });
 
@@ -168,9 +188,12 @@ Page({
     this.setData({
       showEditPanel: true,
       editName: list.name,
-      editColor: list.color || 'gold',
+      editColor: colorToHex(list.color),
       _editIndex: idx
     });
+  },
+  onEditPanelNoop: function() {
+    // Prevent tap from bubbling to mask
   },
   onCloseEditPanel: function() {
     this.setData({ showEditPanel: false });
@@ -193,7 +216,7 @@ Page({
       lists[idx].name = this.data.editName.trim();
       nameChanged = true;
     }
-    if (this.data.editColor !== lists[idx].color) {
+    if (this.data.editColor !== colorToHex(lists[idx].color)) {
       lists[idx].color = this.data.editColor;
       colorChanged = true;
     }
@@ -214,7 +237,7 @@ Page({
 
     wx.showModal({
       title: '删除列表',
-      content: '确定要删除「' + listName + '」吗？列表中的卡牌不会被删除。',
+      content: '确定要删除「' + listName + '」吗？',
       confirmText: '删除',
       confirmColor: '#C4544A',
       success: function(res) {

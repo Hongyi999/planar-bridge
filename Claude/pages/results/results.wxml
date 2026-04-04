@@ -34,15 +34,6 @@
       <text class="summary-text">{{summary}}</text>
     </view>
 
-    <!-- Active filter chips -->
-    <view class="filter-chips {{showResults ? 'show' : ''}}" wx:if="{{filterChips.length > 0}}">
-      <view class="filter-chip" wx:for="{{filterChips}}" wx:key="key" data-key="{{item.key}}" bindtap="onRemoveChip">
-        <text class="fc-label">{{item.label}}:</text>
-        <text class="fc-value">{{item.value}}</text>
-        <text class="fc-remove">×</text>
-      </view>
-    </view>
-
     <!-- Results meta -->
     <view class="results-meta {{showResults ? 'show' : ''}}">
       <text class="meta-left">{{resultCount}} 个结果 · 按价格降序</text>
@@ -50,20 +41,7 @@
         <view class="view-toggle" bindtap="onToggleView">
           <image class="view-toggle-icon" src="/assets/icons/{{viewMode === 'grid' ? 'view-list' : 'view-grid'}}.svg" mode="aspectFit" />
         </view>
-        <text class="meta-right" bindtap="onFollowUp">继续追问...</text>
       </view>
-    </view>
-
-    <!-- Follow-up bar -->
-    <view class="followup-bar {{showFollowUp ? 'show' : ''}}" wx:if="{{showFollowUp}}">
-      <input class="followup-input" value="{{followUpValue}}"
-        placeholder="基于「{{query}}」继续搜索..."
-        placeholder-class="followup-placeholder"
-        focus="{{showFollowUp}}"
-        confirm-type="search"
-        bindinput="onFollowUpInput"
-        bindconfirm="onFollowUpConfirm" />
-      <text class="followup-cancel" bindtap="onFollowUpCancel">取消</text>
     </view>
 
     <!-- Card grid -->

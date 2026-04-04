@@ -12,14 +12,6 @@
     </view>
   </view>
 
-  <!-- List header with reorder icon -->
-  <view class="list-header-row" wx:if="{{isLoaded}}">
-    <view class="list-header-spacer"></view>
-    <view class="reorder-btn {{isEditMode ? 'reorder-btn-active' : ''}}" bindtap="onToggleEditMode">
-      <image class="reorder-icon" src="/assets/icons/reorder.svg" mode="aspectFit" />
-    </view>
-  </view>
-
   <!-- Horizontal scroll list cards -->
   <scroll-view scroll-x class="list-cards-scroll" enhanced show-scrollbar="{{false}}" wx:if="{{isLoaded}}">
     <view class="list-cards-row">
@@ -31,18 +23,25 @@
       <view
         wx:for="{{lists}}"
         wx:key="id"
-        class="list-card list-card-{{item.color}} {{selectedIndex === index ? 'selected' : ''}} {{showHint ? 'wobble' : ''}}"
+        class="list-card {{selectedIndex === index ? 'selected' : ''}} {{showHint ? 'wobble' : ''}}"
+        style="background: {{item.hexColor}}0A; border: 3rpx solid {{item.hexColor}}20; {{selectedIndex === index ? 'border-bottom: 6rpx solid ' + item.hexColor + ';' : ''}}"
         data-index="{{index}}"
-        bindtap="{{isEditMode ? '' : 'onSelectList'}}"
+        bindtap="onSelectList"
         bindlongpress="onListLongPress"
       >
-        <view class="lc-arrows" wx:if="{{isEditMode}}">
-          <view class="lc-arrow {{index === 0 ? 'lc-arrow-disabled' : ''}}" data-index="{{index}}" catchtap="onMoveLeft">←</view>
-          <view class="lc-arrow {{index === lists.length - 1 ? 'lc-arrow-disabled' : ''}}" data-index="{{index}}" catchtap="onMoveRight">→</view>
-        </view>
-        <text class="lc-name">{{item.name}}</text>
+        <text class="lc-name" style="color: {{item.hexColor}};">{{item.name}}</text>
         <text class="lc-count">{{item.cardCount}} 张卡</text>
-        <text class="lc-value font-mono">${{item.value}}</text>
+        <view class="lc-bottom-row">
+          <text class="lc-value font-mono">${{item.value}}</text>
+          <view class="lc-move-btns" wx:if="{{isEditMode}}">
+            <view class="lc-move {{index === 0 ? 'lc-move-disabled' : ''}}" data-index="{{index}}" catchtap="onMoveLeft">←</view>
+            <view class="lc-move {{index === lists.length - 1 ? 'lc-move-disabled' : ''}}" data-index="{{index}}" catchtap="onMoveRight">→</view>
+          </view>
+        </view>
+      </view>
+      <!-- Reorder toggle at end -->
+      <view class="list-card-reorder" bindtap="onToggleEditMode">
+        <text class="lc-reorder-text">{{isEditMode ? '完成' : '排序'}}</text>
       </view>
     </view>
   </scroll-view>
@@ -91,7 +90,7 @@
 
   <!-- Edit panel modal -->
   <view class="edit-mask" wx:if="{{showEditPanel}}" bindtap="onCloseEditPanel">
-    <view class="edit-panel" catchtap="">
+    <view class="edit-panel" catchtap="onEditPanelNoop">
       <text class="edit-panel-title font-heading">编辑列表</text>
 
       <!-- Rename section -->
@@ -103,13 +102,15 @@
       <!-- Color section -->
       <view class="edit-section">
         <text class="edit-section-label">更换颜色</text>
-        <view class="edit-color-palette">
-          <view class="edit-color-dot edit-color-gold {{editColor === 'gold' ? 'edit-color-selected' : ''}}" data-color="gold" bindtap="onEditColorTap"></view>
-          <view class="edit-color-dot edit-color-purple {{editColor === 'purple' ? 'edit-color-selected' : ''}}" data-color="purple" bindtap="onEditColorTap"></view>
-          <view class="edit-color-dot edit-color-green {{editColor === 'green' ? 'edit-color-selected' : ''}}" data-color="green" bindtap="onEditColorTap"></view>
-          <view class="edit-color-dot edit-color-blue {{editColor === 'blue' ? 'edit-color-selected' : ''}}" data-color="blue" bindtap="onEditColorTap"></view>
-          <view class="edit-color-dot edit-color-red {{editColor === 'red' ? 'edit-color-selected' : ''}}" data-color="red" bindtap="onEditColorTap"></view>
-          <view class="edit-color-dot edit-color-orange {{editColor === 'orange' ? 'edit-color-selected' : ''}}" data-color="orange" bindtap="onEditColorTap"></view>
+        <view class="edit-color-grid">
+          <view wx:for="{{colorPalette}}" wx:key="*this"
+            class="edit-color-cell {{editColor === item ? 'edit-color-cell-selected' : ''}}"
+            style="background: {{item}};"
+            data-color="{{item}}"
+            bindtap="onEditColorTap"
+          >
+            <text wx:if="{{editColor === item}}" class="edit-color-check">✓</text>
+          </view>
         </view>
       </view>
 

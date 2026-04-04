@@ -37,15 +37,12 @@ Page({
     navFullHeight: 64,
     query: '',
     filters: {},
-    filterChips: [],
     thinkingSteps: [],
     summary: '',
     resultCount: 0,
     results: [],
     showResults: false,
     isLoading: false,
-    showFollowUp: false,
-    followUpValue: '',
     viewMode: 'grid'
   },
 
@@ -56,14 +53,8 @@ Page({
     var query = decodeURIComponent(options.query || '');
     var sortPref = getSortPreference();
 
-    // Check if pre-parsed filters were passed (from follow-up search)
-    var preFilters = null;
-    if (options.filters) {
-      try { preFilters = JSON.parse(decodeURIComponent(options.filters)); } catch(e) {}
-    }
-
     // Show thinking steps immediately
-    var localFilters = preFilters || aiParser.parseQuery(query);
+    var localFilters = aiParser.parseQuery(query);
     var steps = aiParser.getThinkingSteps(query, localFilters);
 
     that.setData({
@@ -77,22 +68,19 @@ Page({
     });
 
     // Try cloud AI search first, fallback to local
-    aiParser.aiSearch(query, sortPref.field, sortPref.order, preFilters).then(function(result) {
+    aiParser.aiSearch(query, sortPref.field, sortPref.order).then(function(result) {
       var results = result.results || [];
       // Apply local price filters as safety net
-      var effectiveFilters = preFilters || aiParser.parseQuery(query);
-      if (effectiveFilters.priceMin || effectiveFilters.priceMax) {
+      if (localFilters.priceMin || localFilters.priceMax) {
         results = results.filter(function(card) {
-          if (effectiveFilters.priceMin && card.priceMid < effectiveFilters.priceMin) return false;
-          if (effectiveFilters.priceMax && card.priceMid > effectiveFilters.priceMax) return false;
+          if (localFilters.priceMin && card.priceMid < localFilters.priceMin) return false;
+          if (localFilters.priceMax && card.priceMid > localFilters.priceMax) return false;
           return true;
         });
       }
       results = sortResults(results, sortPref);
-      var finalFilters = result.filters || effectiveFilters;
       that.setData({
-        filters: finalFilters,
-        filterChips: that._buildFilterChips(finalFilters),
+        filters: result.filters || localFilters,
         summary: result.summary || '',
         resultCount: results.length,
         results: results,
@@ -100,14 +88,13 @@ Page({
       });
     }).catch(function() {
       // Fallback to local search
-      var filters = preFilters || aiParser.parseQuery(query);
+      var filters = aiParser.parseQuery(query);
       var results = cardData.searchCards(filters);
       results = sortResults(results, sortPref);
       var summary = aiParser.generateSummary(query, results);
 
       that.setData({
         filters: filters,
-        filterChips: that._buildFilterChips(filters),
         summary: summary,
         resultCount: results.length,
         results: results,
@@ -116,46 +103,6 @@ Page({
     });
   },
 
-  _buildFilterChips: function(filters) {
-    var chips = [];
-    var labelMap = {
-      class: '职业', type: '类型', rarity: '稀有度', setCode: '系列',
-      subtype: '子类型', name: '名称'
-    };
-    Object.keys(filters).forEach(function(key) {
-      if (key === 'keywords' && filters.keywords && filters.keywords.length > 0) {
-        filters.keywords.forEach(function(kw) {
-          chips.push({ key: 'keyword:' + kw, label: '关键词', value: kw });
-        });
-      } else if (key === 'priceMin') {
-        chips.push({ key: 'priceMin', label: '价格', value: '≥$' + filters.priceMin });
-      } else if (key === 'priceMax') {
-        chips.push({ key: 'priceMax', label: '价格', value: '≤$' + filters.priceMax });
-      } else if (labelMap[key] && filters[key]) {
-        chips.push({ key: key, label: labelMap[key], value: filters[key] });
-      }
-    });
-    return chips;
-  },
-  onRemoveChip: function(e) {
-    var chipKey = e.currentTarget.dataset.key;
-    var filters = JSON.parse(JSON.stringify(this.data.filters));
-
-    if (chipKey.indexOf('keyword:') === 0) {
-      var kw = chipKey.substring(8);
-      filters.keywords = (filters.keywords || []).filter(function(k) { return k !== kw; });
-      if (filters.keywords.length === 0) delete filters.keywords;
-    } else {
-      delete filters[chipKey];
-    }
-
-    // Re-search with updated filters
-    var query = this.data.query;
-    wx.redirectTo({
-      url: '/pages/results/results?query=' + encodeURIComponent(query) +
-        '&filters=' + encodeURIComponent(JSON.stringify(filters))
-    });
-  },
   onThinkingComplete: function() {
     this.setData({ showResults: true });
   },
@@ -175,32 +122,6 @@ Page({
 
   goHome: function() {
     wx.switchTab({ url: '/pages/index/index' });
-  },
-
-  onFollowUp: function() {
-    this.setData({ showFollowUp: true });
-  },
-
-  onFollowUpInput: function(e) {
-    this.setData({ followUpValue: e.detail.value });
-  },
-
-  onFollowUpConfirm: function(e) {
-    var refinement = this.data.followUpValue || (e && e.detail && e.detail.value) || '';
-    if (refinement.trim()) {
-      // Parse the incremental query and merge with existing filters
-      var incrementalFilters = aiParser.parseQuery(refinement.trim());
-      var mergedFilters = aiParser.mergeFilters(this.data.filters, incrementalFilters);
-      var combined = this.data.query + ' ' + refinement.trim();
-      wx.redirectTo({
-        url: '/pages/results/results?query=' + encodeURIComponent(combined) +
-          '&filters=' + encodeURIComponent(JSON.stringify(mergedFilters))
-      });
-    }
-  },
-
-  onFollowUpCancel: function() {
-    this.setData({ showFollowUp: false, followUpValue: '' });
   },
 
   onToggleView: function() {

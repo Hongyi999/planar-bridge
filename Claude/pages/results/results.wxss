@@ -122,45 +122,6 @@
   line-height: 1.6;
 }
 
-/* Filter chips */
-.filter-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx;
-  margin-bottom: 16rpx;
-  padding: 0 8rpx;
-  opacity: 0;
-  transition: opacity 0.4s ease-out;
-}
-.filter-chips.show {
-  opacity: 1;
-}
-.filter-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6rpx;
-  background: #FDFCF8;
-  border: 2rpx solid #9B864430;
-  border-radius: 20rpx;
-  padding: 8rpx 16rpx;
-  font-size: 22rpx;
-}
-.filter-chip:active {
-  background: #F2EFE4;
-}
-.fc-label {
-  color: #A09A8C;
-}
-.fc-value {
-  color: #9B8644;
-  font-weight: 600;
-}
-.fc-remove {
-  color: #C8C2B4;
-  font-size: 26rpx;
-  margin-left: 4rpx;
-}
-
 /* Results meta */
 .results-meta {
   display: flex;
@@ -197,50 +158,6 @@
 .view-toggle-icon {
   width: 32rpx;
   height: 32rpx;
-}
-
-.meta-right {
-  font-size: 22rpx;
-  color: #6B4C8A;
-  font-weight: 500;
-}
-
-/* Follow-up bar */
-.followup-bar {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  background: #FDFCF8;
-  border: 2rpx solid #E8E3D8;
-  border-radius: 24rpx;
-  padding: 12rpx 20rpx;
-  margin-bottom: 20rpx;
-  animation: fadeSlideIn 0.3s ease-out;
-}
-
-@keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(-10rpx); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.followup-input {
-  flex: 1;
-  font-size: 26rpx;
-  color: #2C2A22;
-  min-height: 48rpx;
-}
-
-.followup-placeholder {
-  color: #C8C2B4;
-  font-size: 26rpx;
-}
-
-.followup-cancel {
-  font-size: 24rpx;
-  color: #6B4C8A;
-  font-weight: 500;
-  flex-shrink: 0;
-  padding: 8rpx 16rpx;
 }
 
 /* Card grid */

@@ -35,11 +35,10 @@ Component({
       });
     },
     onStarTap(e) {
-      var that = this;
       var cardId = this.properties.card.id || this.properties.card._id;
 
-      // If already favorited, remove from all lists
       if (this.data.isFav) {
+        // Remove from all lists
         var lists = storage.getLists();
         lists.forEach(function(list) {
           if (list.cards.indexOf(cardId) !== -1) {
@@ -48,26 +47,17 @@ Component({
         });
         this.setData({ isFav: false });
         wx.showToast({ title: '已取消收藏', icon: 'none', duration: 1000 });
-        return;
-      }
-
-      // Not favorited — show list picker
-      var lists = storage.getLists();
-      if (!lists.length) {
-        wx.showToast({ title: '请先创建收藏列表', icon: 'none' });
-        return;
-      }
-      var listNames = lists.map(function(l) { return l.name; });
-
-      wx.showActionSheet({
-        itemList: listNames,
-        success: function(res) {
-          var chosenList = lists[res.tapIndex];
-          storage.addCardToList(chosenList.id, cardId);
-          that.setData({ isFav: true });
-          wx.showToast({ title: '已添加到「' + chosenList.name + '」', icon: 'none', duration: 1500 });
+      } else {
+        // Add to first list silently
+        var lists = storage.getLists();
+        if (!lists.length) {
+          wx.showToast({ title: '请先创建收藏列表', icon: 'none' });
+          return;
         }
-      });
+        storage.addCardToList(lists[0].id, cardId);
+        this.setData({ isFav: true });
+        wx.showToast({ title: '已收藏', icon: 'none', duration: 1000 });
+      }
     },
     getRarityAbbr() {
       var r = this.properties.card.rarity;
