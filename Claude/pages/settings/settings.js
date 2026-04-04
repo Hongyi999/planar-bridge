@@ -216,6 +216,20 @@ Page({
     }).then(function(res) {
       wx.hideLoading();
       var r = res.result;
+      // Check if cloud function returned an error
+      if (!r || !r.success) {
+        wx.showModal({
+          title: '写入失败',
+          content: '云函数返回错误: ' + (r ? (r.error || JSON.stringify(r.errors || [])) : '无响应') + '\noffset=' + offset,
+          confirmText: '重试',
+          cancelText: '取消',
+          success: function(modal) {
+            if (modal.confirm) that._writeCardBatch(offset, batchSize);
+            else { that._allCardsCache = null; that.onRefreshDbStats(); }
+          }
+        });
+        return;
+      }
       var errCount = (r.errors && r.errors.length) || 0;
       var nextOffset = offset + batchSize;
       // Show errors if any
