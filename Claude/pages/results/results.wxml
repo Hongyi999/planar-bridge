@@ -13,8 +13,8 @@
     <text class="nav-title font-heading">搜索结果</text>
   </view>
 
-  <!-- Scrollable content -->
-  <scroll-view scroll-y class="results-scroll" style="padding-top: {{navFullHeight}}px;">
+  <!-- Fixed header area -->
+  <view class="results-fixed-header" style="top: {{navFullHeight}}px;">
     <!-- Search bar compact -->
     <view class="search-compact">
       <search-bar value="{{query}}" compact="{{true}}" bind:search="onSearch" />
@@ -35,7 +35,7 @@
     </view>
 
     <!-- Results meta -->
-    <view class="results-meta {{showResults ? 'show' : ''}}">
+    <view class="results-meta {{showResults ? 'show' : ''}}" wx:if="{{!isLoading}}">
       <text class="meta-left">{{resultCount}} 个结果 · 按价格降序</text>
       <view class="meta-actions">
         <view class="view-toggle" bindtap="onToggleView">
@@ -44,6 +44,16 @@
       </view>
     </view>
 
+    <!-- Loading dots -->
+    <view class="results-loading-dots" wx:if="{{isLoading && showResults}}">
+      <view class="r-loading-dot"></view>
+      <view class="r-loading-dot"></view>
+      <view class="r-loading-dot"></view>
+    </view>
+  </view>
+
+  <!-- Scrollable card results -->
+  <scroll-view scroll-y class="results-scroll" style="padding-top: {{headerHeight}}px;">
     <!-- Card grid -->
     <view class="card-grid {{showResults ? 'show' : ''}}" wx:if="{{viewMode === 'grid'}}">
       <card-tile wx:for="{{results}}" wx:key="id" card="{{item}}" index="{{index}}" />

@@ -55,33 +55,32 @@
   padding: 6rpx 16rpx;
 }
 
-/* Arrows overlaid at left/right edges */
-.lc-arrow-left, .lc-arrow-right {
+/* Reorder arrows: absolutely positioned at top corners, no height impact */
+.lc-arrow {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 36rpx;
-  height: 36rpx;
+  top: 12rpx;
+  width: 56rpx;
+  height: 40rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22rpx;
+  font-size: 24rpx;
   color: #6B6355;
   background: #FDFCF8;
-  border-radius: 50%;
+  border-radius: 12rpx;
   border: 2rpx solid #E8E3D8;
   z-index: 5;
 }
 .lc-arrow-left {
-  left: -12rpx;
+  left: 12rpx;
 }
 .lc-arrow-right {
-  right: -12rpx;
+  right: 12rpx;
 }
-.lc-arrow-left:active, .lc-arrow-right:active {
+.lc-arrow:active {
   background: #E8E3D8;
 }
-.lc-arrow-inner-disabled {
+.lc-arrow-disabled {
   opacity: 0.3;
 }
 

@@ -24,16 +24,6 @@
   <!-- Display preferences -->
   <view class="settings-group">
     <view class="group-title">显示偏好</view>
-    <view class="settings-item" bindtap="onToggleViewMode">
-      <view class="item-left">
-        <text class="item-label">结果显示方式</text>
-        <text class="item-desc">{{viewMode === 'grid' ? '网格视图' : '列表视图'}}</text>
-      </view>
-      <view class="item-toggle">
-        <view class="toggle-btn {{viewMode === 'grid' ? 'active' : ''}}" data-mode="grid" bindtap="onSetViewMode">网格</view>
-        <view class="toggle-btn {{viewMode === 'list' ? 'active' : ''}}" data-mode="list" bindtap="onSetViewMode">列表</view>
-      </view>
-    </view>
     <view class="settings-item" bindtap="onTogglePriceCurrency">
       <view class="item-left">
         <text class="item-label">价格货币</text>

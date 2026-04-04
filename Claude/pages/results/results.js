@@ -43,7 +43,8 @@ Page({
     results: [],
     showResults: false,
     isLoading: false,
-    viewMode: 'grid'
+    viewMode: 'grid',
+    headerHeight: 200
   },
 
   onLoad: function(options) {
@@ -86,6 +87,7 @@ Page({
         results: results,
         isLoading: false
       });
+      that._measureHeader();
     }).catch(function() {
       // Fallback to local search
       var filters = aiParser.parseQuery(query);
@@ -100,11 +102,25 @@ Page({
         results: results,
         isLoading: false
       });
+      that._measureHeader();
     });
   },
 
   onThinkingComplete: function() {
     this.setData({ showResults: true });
+    this._measureHeader();
+  },
+
+  _measureHeader: function() {
+    var that = this;
+    setTimeout(function() {
+      var query = wx.createSelectorQuery();
+      query.select('.results-fixed-header').boundingClientRect(function(rect) {
+        if (rect) {
+          that.setData({ headerHeight: rect.bottom });
+        }
+      }).exec();
+    }, 100);
   },
 
   onSearch: function(e) {
