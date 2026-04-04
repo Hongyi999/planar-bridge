@@ -93,17 +93,20 @@ Page({
 
   onRefreshDbStats() {
     var that = this;
-    wx.cloud.callFunction({ name: 'importCards', data: { action: 'stats' } }).then(function(res) {
-      that.setData({
-        dbCardCount: res.result.cardCount || 0,
-        dbSetCount: res.result.setCount || 0
-      });
-    }).catch(function() {
-      wx.showToast({ title: '查询失败', icon: 'none' });
+    var db = wx.cloud.database();
+    var _ = db.command;
+    // Count cards
+    db.collection('cards').count().then(function(res) {
+      that.setData({ dbCardCount: res.total || 0 });
     });
-    wx.cloud.callFunction({ name: 'importImages', data: { action: 'stats' } }).then(function(res) {
-      that.setData({ dbImageCount: res.result.withCloudImage || 0 });
-    }).catch(function() {});
+    // Count sets
+    db.collection('sets').count().then(function(res) {
+      that.setData({ dbSetCount: res.total || 0 });
+    });
+    // Count cards with cloud images
+    db.collection('cards').where({ cloudImageId: _.neq('') }).count().then(function(res) {
+      that.setData({ dbImageCount: res.total || 0 });
+    });
   },
 
   onImportCards() {
