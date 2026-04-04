@@ -306,12 +306,16 @@ async function upsertBatch(cards) {
   var errors = [];
   for (var i = 0; i < cards.length; i++) {
     var card = cards[i];
+    var docId = card._id;
+    // Remove _id from data — WeChat cloud DB sets it via .doc(id)
+    var data = {};
+    for (var key in card) {
+      if (key !== '_id') data[key] = card[key];
+    }
     try {
-      await db.collection('cards').doc(card._id).set({
-        data: card
-      });
+      await db.collection('cards').doc(docId).set({ data: data });
     } catch (e) {
-      errors.push(card._id + ': ' + e.message);
+      errors.push(docId + ': ' + e.message);
     }
   }
   return errors;
@@ -325,17 +329,20 @@ async function importSets(sets) {
   var errors = [];
   for (var i = 0; i < sets.length; i++) {
     var s = sets[i];
+    var docId = s.unique_id || s.id;
     try {
-      await db.collection('sets').doc(s.unique_id || s.id).set({
+      await db.collection('sets').doc(docId).set({
         data: {
-          _id: s.unique_id || s.id,
           id: s.id || '',
           name: s.name || '',
           printings: (s.printings || []).map(function(p) {
             return {
               uniqueId: p.unique_id || '',
               id: p.id || '',
-              edition: p.edition || ''
+              edition: p.edition || '',
+              releaseDate: p.initial_release_date || '',
+              outOfPrint: p.out_of_print || false,
+              setLogo: p.set_logo || ''
             };
           }),
           updatedAt: new Date()
