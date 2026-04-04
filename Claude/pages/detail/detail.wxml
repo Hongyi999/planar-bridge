@@ -35,11 +35,14 @@
       </view>
     </view>
 
-    <!-- Card placeholder -->
-    <view class="detail-card-placeholder" style="background: linear-gradient(145deg, #EDE9DC, #E4DFCF); transform: scale({{heroHeight > 560 ? 1 + (heroHeight - 560) / 680 : 1}}); transition: {{heroHeight === 560 ? 'transform 0.3s ease-out' : 'none'}};">
-      <text class="dcp-name font-heading">{{card.name}}</text>
-      <text class="dcp-name-cn" wx:if="{{card.nameCN}}">{{card.nameCN}}</text>
-      <text class="dcp-meta">{{card.setCode}} · {{card.rarityCN || card.rarity}}</text>
+    <!-- Card image or placeholder -->
+    <view class="detail-card-visual" style="transform: scale({{heroHeight > 560 ? 1 + (heroHeight - 560) / 680 : 1}}); transition: {{heroHeight === 560 ? 'transform 0.3s ease-out' : 'none'}};">
+      <image wx:if="{{card.cloudImageId || card.imageUrl}}" class="detail-card-image" src="{{card.cloudImageId || card.imageUrl}}" mode="aspectFit" show-menu-by-longpress />
+      <view wx:else class="detail-card-placeholder" style="background: linear-gradient(145deg, #EDE9DC, #E4DFCF);">
+        <text class="dcp-name font-heading">{{card.name}}</text>
+        <text class="dcp-name-cn" wx:if="{{card.nameCN}}">{{card.nameCN}}</text>
+        <text class="dcp-meta">{{card.setCode}} · {{card.rarityCN || card.rarity}}</text>
+      </view>
     </view>
   </view>
 
@@ -64,7 +67,7 @@
           <text class="dh-rarity">{{card.rarityCN || card.rarity}}</text>
         </view>
       </view>
-      <view class="dh-right">
+      <view class="dh-right" wx:if="{{card.priceMid != null}}">
         <text class="dh-price font-mono {{card.priceTrend > 0 ? 'price-up' : card.priceTrend < 0 ? 'price-down' : 'price-flat'}}">${{card.priceMid}}</text>
         <text class="dh-trend {{card.priceTrend > 0 ? 'price-up' : card.priceTrend < 0 ? 'price-down' : 'price-flat'}}">
           {{card.priceTrend > 0 ? '▲ ' + card.priceTrend + '%' : card.priceTrend < 0 ? '▼ ' + (-card.priceTrend) + '%' : '— 0%'}}
@@ -97,8 +100,8 @@
       <text class="card-text-content">{{card.text}}</text>
     </view>
 
-    <!-- Price row -->
-    <view class="price-row">
+    <!-- Price row (only show if prices available) -->
+    <view class="price-row" wx:if="{{card.priceMid != null}}">
       <view class="price-cell">
         <text class="price-label">TCG 最低</text>
         <text class="price-value font-mono">${{card.priceLow}}</text>

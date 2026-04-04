@@ -63,7 +63,8 @@
     <view class="card-list-view {{showResults ? 'show' : ''}}" wx:if="{{viewMode === 'list'}}">
       <view wx:for="{{results}}" wx:key="id" class="card-list-item" data-id="{{item.id || item._id}}" bindtap="onCardTap">
         <view class="cli-thumb" style="background: #EDE9DC">
-          <text class="cli-thumb-text font-heading">{{item.name}}</text>
+          <image wx:if="{{item.cloudImageId || item.imageUrl}}" class="cli-thumb-img" src="{{item.cloudImageId || item.imageUrl}}" mode="aspectFill" lazy-load />
+          <text wx:else class="cli-thumb-text font-heading">{{item.name}}</text>
         </view>
         <view class="cli-info">
           <text class="cli-name font-heading">{{item.name}}</text>

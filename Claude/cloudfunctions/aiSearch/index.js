@@ -9,7 +9,9 @@ const BOT_ID = 'ibot-planarbridg-wieezl';
 const CLASS_MAP = {
   '忍者': 'Ninja', '守护者': 'Guardian', '蛮兽': 'Brute', '战士': 'Warrior',
   '法师': 'Wizard', '机械师': 'Mechanologist', '游侠': 'Ranger',
-  '符文之刃': 'Runeblade', '刺客': 'Assassin', '幻术师': 'Illusionist', '通用': 'Generic'
+  '符文之刃': 'Runeblade', '符文剑士': 'Runeblade', '刺客': 'Assassin',
+  '幻术师': 'Illusionist', '通用': 'Generic', '吟游诗人': 'Bard',
+  '神秘使': 'Mystic', '海盗': 'Pirate'
 };
 const TYPE_MAP = {
   '装备': 'Equipment', '武器': 'Weapon', '攻击行动': 'Attack Action',
@@ -65,7 +67,7 @@ function fallbackParse(query) {
   if (allMaxes.length > 0) filters.priceMax = Math.min(...allMaxes);
 
   // Set code detection
-  var setCodes = ['WTR', 'ARC', 'CRU', 'MON', 'ELE', 'EVE', 'UPR', 'DYN', 'OUT', 'DTD', 'BRI', 'HVY', 'MST', 'ROS', 'HNT', 'SEA', 'SSM', 'HIS'];
+  var setCodes = ['WTR', 'ARC', 'CRU', 'MON', 'ELE', 'EVE', 'UPR', 'DYN', 'OUT', 'DTD', 'BRI', 'HVY', 'MST', 'ROS', 'HNT', 'SEA', 'SSM', 'HIS', 'TCC', 'BOL', 'FAI', 'LGS', 'PSM', 'AAZ', 'IRA', 'JDG', 'HP1'];
   for (var sc of setCodes) {
     if (query.toUpperCase().includes(sc)) { filters.setCode = sc; break; }
   }
@@ -182,6 +184,5 @@ function _buildFallbackSummary(query, cards) {
   var parts = ['找到 ' + count + ' 张匹配卡牌'];
   if (types.length > 0) parts.push('类型包括 ' + types.slice(0, 3).join('、'));
   if (sets.length > 0) parts.push('来自 ' + sets.slice(0, 3).join('、') + ' 系列');
-  parts.push('已获取 TCGPlayer 最新市价');
   return parts.join('，') + '。';
 }

@@ -27,6 +27,11 @@
   overflow: hidden;
 }
 
+.card-real-img {
+  width: 100%;
+  height: 100%;
+}
+
 .card-placeholder {
   width: 156rpx;
   height: 218rpx;

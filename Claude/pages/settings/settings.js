@@ -43,6 +43,9 @@ Page({
   data: {
     version: '1.0.0',
     cacheSize: '0 KB',
+    dbCardCount: '—',
+    dbSetCount: '—',
+    dbImageCount: '—',
     sortIndex: 0,
     sortOptions: ['价格从高到低', '价格从低到高', '名称 A-Z', '名称 Z-A', '系列'],
     searchLangIndex: 0,
@@ -76,6 +79,148 @@ Page({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 3 });
     }
+    this.onRefreshDbStats();
+  },
+
+  // --- Card Database Import ---
+  onRefreshDbStats() {
+    var that = this;
+    wx.cloud.callFunction({ name: 'importCards', data: { action: 'stats' } }).then(function(res) {
+      that.setData({
+        dbCardCount: res.result.cardCount || 0,
+        dbSetCount: res.result.setCount || 0
+      });
+    }).catch(function() {
+      wx.showToast({ title: '查询失败', icon: 'none' });
+    });
+    wx.cloud.callFunction({ name: 'importImages', data: { action: 'stats' } }).then(function(res) {
+      that.setData({ dbImageCount: res.result.withCloudImage || 0 });
+    }).catch(function() {});
+  },
+
+  onImportCards() {
+    var that = this;
+    wx.showModal({
+      title: '导入卡牌数据',
+      content: '将从 GitHub 拉取全部 FAB 卡牌数据并写入云数据库。每批导入 50 张，可能需要多次执行。是否开始？',
+      confirmText: '开始导入',
+      success: function(res) {
+        if (res.confirm) {
+          that._runCardImport(0);
+        }
+      }
+    });
+  },
+
+  _runCardImport(offset) {
+    var that = this;
+    wx.showLoading({ title: '导入中... ' + offset });
+    wx.cloud.callFunction({
+      name: 'importCards',
+      data: { action: 'importBatch', offset: offset, limit: 50 }
+    }).then(function(res) {
+      wx.hideLoading();
+      var r = res.result;
+      if (r.hasMore) {
+        wx.showModal({
+          title: '进度: ' + (r.offset + r.imported) + '/' + r.totalSource,
+          content: '已导入 ' + r.imported + ' 张卡牌（含 ' + r.printingsInBatch + ' 个版本）。继续下一批？',
+          confirmText: '继续',
+          cancelText: '暂停',
+          success: function(modal) {
+            if (modal.confirm) {
+              that._runCardImport(r.nextOffset);
+            } else {
+              that.onRefreshDbStats();
+            }
+          }
+        });
+      } else {
+        wx.showToast({ title: '全部导入完成！', icon: 'success' });
+        that.onRefreshDbStats();
+      }
+    }).catch(function(err) {
+      wx.hideLoading();
+      wx.showModal({
+        title: '导入出错',
+        content: err.message || '未知错误，请重试。当前 offset: ' + offset,
+        confirmText: '重试',
+        cancelText: '取消',
+        success: function(modal) {
+          if (modal.confirm) that._runCardImport(offset);
+        }
+      });
+    });
+  },
+
+  onImportImages() {
+    var that = this;
+    wx.showModal({
+      title: '下载卡牌图片',
+      content: '将下载官方卡图到微信云存储。每批处理 5 张，可能需要很多次执行。是否开始？',
+      confirmText: '开始下载',
+      success: function(res) {
+        if (res.confirm) {
+          that._runImageImport(0);
+        }
+      }
+    });
+  },
+
+  _runImageImport(round) {
+    var that = this;
+    wx.showLoading({ title: '下载图片 第' + (round + 1) + '批...' });
+    wx.cloud.callFunction({
+      name: 'importImages',
+      data: { action: 'processDefault', offset: 0, limit: 5 }
+    }).then(function(res) {
+      wx.hideLoading();
+      var r = res.result;
+      if (r.processed > 0) {
+        wx.showModal({
+          title: '已下载 ' + r.processed + ' 张图片',
+          content: (r.errors.length > 0 ? '错误: ' + r.errors.join(', ') + '\n' : '') + '继续下一批？',
+          confirmText: '继续',
+          cancelText: '暂停',
+          success: function(modal) {
+            if (modal.confirm) {
+              that._runImageImport(round + 1);
+            } else {
+              that.onRefreshDbStats();
+            }
+          }
+        });
+      } else {
+        wx.showToast({ title: '所有图片已下载完成！', icon: 'success' });
+        that.onRefreshDbStats();
+      }
+    }).catch(function(err) {
+      wx.hideLoading();
+      wx.showModal({
+        title: '下载出错',
+        content: err.message || '未知错误，请重试',
+        confirmText: '重试',
+        cancelText: '取消',
+        success: function(modal) {
+          if (modal.confirm) that._runImageImport(round);
+        }
+      });
+    });
+  },
+
+  onImportSets() {
+    wx.showLoading({ title: '导入系列数据...' });
+    wx.cloud.callFunction({
+      name: 'importCards',
+      data: { action: 'importSets' }
+    }).then(function(res) {
+      wx.hideLoading();
+      var r = res.result;
+      wx.showToast({ title: '已导入 ' + r.imported + ' 个系列', icon: 'success' });
+    }).catch(function(err) {
+      wx.hideLoading();
+      wx.showToast({ title: '导入失败: ' + (err.message || '未知错误'), icon: 'none' });
+    });
   },
 
   // --- Search preferences ---

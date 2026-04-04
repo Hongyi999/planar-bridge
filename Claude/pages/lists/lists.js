@@ -61,13 +61,14 @@ Page({
     }
   },
   loadData: function() {
+    var that = this;
     var lists = storageUtil.getLists();
     var totalCards = 0;
     var totalValue = 0;
 
+    // First pass: render with local data (instant)
     var enrichedLists = lists.map(function(list) {
       var cards = list.cards.map(function(id) {
-        // Use local cardData (synchronous) for instant rendering
         return cardData.getCardById(id);
       }).filter(Boolean);
       var listValue = cards.reduce(function(sum, c) { return sum + (c.priceMid || 0); }, 0);
@@ -78,22 +79,72 @@ Page({
         name: list.name,
         color: list.color,
         hexColor: colorToHex(list.color),
-        cardCount: cards.length,
+        cardCount: list.cards.length,
         value: listValue.toFixed(2),
         cards: cards
       };
     });
 
     var selectedCards = enrichedLists.length > 0
-      ? enrichedLists[Math.min(this.data.selectedIndex, enrichedLists.length - 1)].cards
+      ? enrichedLists[Math.min(that.data.selectedIndex, enrichedLists.length - 1)].cards
       : [];
 
-    this.setData({
+    that.setData({
       lists: enrichedLists,
       selectedCards: selectedCards,
       totalCards: totalCards,
       totalValue: totalValue.toFixed(2),
       isLoaded: true
+    });
+
+    // Second pass: enrich with cloud data (async, may have images)
+    var allCardIds = [];
+    lists.forEach(function(list) {
+      list.cards.forEach(function(id) {
+        if (allCardIds.indexOf(id) < 0) allCardIds.push(id);
+      });
+    });
+    if (allCardIds.length === 0) return;
+
+    var promises = allCardIds.map(function(id) { return cloudDB.getCardById(id); });
+    Promise.all(promises).then(function(cloudCards) {
+      var cardMap = {};
+      cloudCards.forEach(function(c) {
+        if (c) cardMap[c._id || c.id] = c;
+      });
+
+      var cloudTotalCards = 0;
+      var cloudTotalValue = 0;
+      var cloudEnriched = lists.map(function(list) {
+        var cards = list.cards.map(function(id) {
+          return cardMap[id] || cardData.getCardById(id);
+        }).filter(Boolean);
+        var listValue = cards.reduce(function(sum, c) { return sum + (c.priceMid || 0); }, 0);
+        cloudTotalCards += cards.length;
+        cloudTotalValue += listValue;
+        return {
+          id: list.id,
+          name: list.name,
+          color: list.color,
+          hexColor: colorToHex(list.color),
+          cardCount: list.cards.length,
+          value: listValue.toFixed(2),
+          cards: cards
+        };
+      });
+
+      var cloudSelectedCards = cloudEnriched.length > 0
+        ? cloudEnriched[Math.min(that.data.selectedIndex, cloudEnriched.length - 1)].cards
+        : [];
+
+      that.setData({
+        lists: cloudEnriched,
+        selectedCards: cloudSelectedCards,
+        totalCards: cloudTotalCards,
+        totalValue: cloudTotalValue.toFixed(2)
+      });
+    }).catch(function() {
+      // Keep local data on error
     });
   },
   onSelectList: function(e) {

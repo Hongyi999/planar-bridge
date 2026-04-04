@@ -83,6 +83,15 @@
   flex-shrink: 0;
   margin-left: 16rpx;
 }
+.item-refresh {
+  font-size: 22rpx;
+  color: #9B8644;
+  font-weight: 500;
+  padding: 6rpx 16rpx;
+  border: 2rpx solid #9B864430;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+}
 
 /* Toggle button group */
 .item-toggle {

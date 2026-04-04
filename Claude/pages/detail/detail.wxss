@@ -140,7 +140,19 @@
   height: 36rpx;
 }
 
-/* Card placeholder */
+/* Card visual (image or placeholder) */
+.detail-card-visual {
+  position: relative;
+  z-index: 3;
+}
+
+.detail-card-image {
+  width: 290rpx;
+  height: 406rpx;
+  border-radius: 20rpx;
+  box-shadow: 0 32rpx 96rpx #9B864420;
+}
+
 .detail-card-placeholder {
   width: 290rpx;
   height: 406rpx;
@@ -151,8 +163,6 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 32rpx 96rpx #9B864420;
-  position: relative;
-  z-index: 3;
   padding: 20rpx;
   text-align: center;
 }
