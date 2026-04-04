@@ -91,6 +91,9 @@
   flex-shrink: 0;
   position: relative;
 }
+.list-card.edit-mode {
+  padding-top: 64rpx;
+}
 
 .list-card.selected {
   box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.08);

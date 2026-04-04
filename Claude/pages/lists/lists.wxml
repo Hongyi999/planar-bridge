@@ -29,7 +29,7 @@
       <view
         wx:for="{{lists}}"
         wx:key="id"
-        class="list-card {{selectedIndex === index ? 'selected' : ''}} {{showHint ? 'wobble' : ''}}"
+        class="list-card {{selectedIndex === index ? 'selected' : ''}} {{showHint ? 'wobble' : ''}} {{isEditMode ? 'edit-mode' : ''}}"
         style="background: {{item.hexColor}}0A; border: 3rpx solid {{item.hexColor}}20; {{selectedIndex === index ? 'border-bottom: 6rpx solid ' + item.hexColor + ';' : ''}}"
         data-index="{{index}}"
         bindtap="onSelectList"
