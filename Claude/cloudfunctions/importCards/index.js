@@ -5,9 +5,15 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 var db = cloud.database();
 var _ = db.command;
 
-// Use jsDelivr CDN (works from China) instead of raw GitHub
-var CARD_JSON_URL = 'https://cdn.jsdelivr.net/gh/the-fab-cube/flesh-and-blood-cards@develop/json/english/card.json';
-var SET_JSON_URL = 'https://cdn.jsdelivr.net/gh/the-fab-cube/flesh-and-blood-cards@develop/json/english/set.json';
+// Use jsDelivr CDN (works from China), with GitHub raw as fallback
+var CARD_JSON_URLS = [
+  'https://cdn.jsdelivr.net/gh/the-fab-cube/flesh-and-blood-cards@develop/json/english/card.json',
+  'https://raw.githubusercontent.com/the-fab-cube/flesh-and-blood-cards/develop/json/english/card.json'
+];
+var SET_JSON_URLS = [
+  'https://cdn.jsdelivr.net/gh/the-fab-cube/flesh-and-blood-cards@develop/json/english/set.json',
+  'https://raw.githubusercontent.com/the-fab-cube/flesh-and-blood-cards/develop/json/english/set.json'
+];
 
 // Hero classes in FAB
 var HERO_CLASSES = [
@@ -248,14 +254,16 @@ function transformCard(card) {
  */
 function fetchJSON(url) {
   return new Promise(function(resolve, reject) {
+    console.log('Fetching: ' + url);
     https.get(url, { timeout: 40000 }, function(res) {
       // Handle redirects (jsDelivr may redirect)
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        console.log('Redirect to: ' + res.headers.location);
         fetchJSON(res.headers.location).then(resolve).catch(reject);
         return;
       }
       if (res.statusCode !== 200) {
-        reject(new Error('HTTP ' + res.statusCode));
+        reject(new Error('HTTP ' + res.statusCode + ' from ' + url));
         return;
       }
       var chunks = [];
@@ -263,16 +271,32 @@ function fetchJSON(url) {
       res.on('end', function() {
         try {
           var body = Buffer.concat(chunks).toString('utf8');
-          resolve(JSON.parse(body));
+          var data = JSON.parse(body);
+          console.log('Fetched OK, type=' + typeof data + ', isArray=' + Array.isArray(data) + ', length=' + (Array.isArray(data) ? data.length : 'N/A'));
+          resolve(data);
         } catch (e) {
           reject(new Error('JSON parse error: ' + e.message));
         }
       });
       res.on('error', reject);
     }).on('error', reject).on('timeout', function() {
-      reject(new Error('Request timeout'));
+      reject(new Error('Request timeout for ' + url));
     });
   });
+}
+
+/**
+ * Try fetching from multiple URLs (fallback)
+ */
+async function fetchJSONWithFallback(urls) {
+  for (var i = 0; i < urls.length; i++) {
+    try {
+      return await fetchJSON(urls[i]);
+    } catch (e) {
+      console.log('URL failed: ' + urls[i] + ' - ' + e.message);
+      if (i === urls.length - 1) throw e;
+    }
+  }
 }
 
 /**
@@ -348,8 +372,8 @@ exports.main = async function(event) {
   }
 
   if (action === 'importSets') {
-    console.log('Fetching sets data from GitHub...');
-    var sets = await fetchJSON(SET_JSON_URL);
+    console.log('Fetching sets data...');
+    var sets = await fetchJSONWithFallback(SET_JSON_URLS);
     console.log('Fetched ' + sets.length + ' sets');
     var result = await importSets(sets);
     return {
@@ -362,7 +386,7 @@ exports.main = async function(event) {
 
   if (action === 'count') {
     console.log('Fetching card data from GitHub...');
-    var cards = await fetchJSON(CARD_JSON_URL);
+    var cards = await fetchJSONWithFallback(CARD_JSON_URLS);
     return {
       success: true,
       total: cards.length
@@ -374,7 +398,7 @@ exports.main = async function(event) {
     var limit = event.limit || 50;
 
     console.log('Fetching card data from GitHub...');
-    var allCards = await fetchJSON(CARD_JSON_URL);
+    var allCards = await fetchJSONWithFallback(CARD_JSON_URLS);
     console.log('Total cards from source: ' + allCards.length);
 
     var batch = allCards.slice(offset, offset + limit);
