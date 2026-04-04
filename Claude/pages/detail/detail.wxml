@@ -1,4 +1,21 @@
-<view class="detail-page" wx:if="{{card}}">
+<!-- Loading state -->
+<view class="detail-loading" wx:if="{{isLoading}}">
+  <view class="loading-dot-row">
+    <view class="loading-dot"></view>
+    <view class="loading-dot"></view>
+    <view class="loading-dot"></view>
+  </view>
+  <text class="loading-text">加载卡牌信息...</text>
+</view>
+
+<!-- Error state -->
+<view class="detail-error" wx:elif="{{!card}}">
+  <text class="error-icon">⚠</text>
+  <text class="error-text">未找到该卡牌</text>
+  <view class="error-btn" bindtap="goBack">返回</view>
+</view>
+
+<view class="detail-page" wx:else>
   <!-- Hero area -->
   <view class="detail-hero" style="height: {{heroHeight}}rpx;">
     <!-- Decorative circles -->

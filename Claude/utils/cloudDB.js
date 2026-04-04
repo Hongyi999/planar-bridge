@@ -19,6 +19,8 @@ function _getDB() {
  */
 function getCardById(id) {
   return new Promise(function(resolve) {
+    if (!id) { resolve(null); return; }
+
     // Check local cache first
     var cacheKey = 'card_' + id;
     var cached = wx.getStorageSync(cacheKey);

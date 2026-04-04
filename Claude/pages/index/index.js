@@ -1,6 +1,8 @@
 Page({
   data: {
     statusBarHeight: 20,
+    searchValue: '',
+    searchFocus: false,
     chips: [
       { text: '传奇装备', type: 'gold', query: 'legendary equipment' },
       { text: '威严攻击', type: 'purple', query: 'majestic attack action' },
@@ -26,9 +28,7 @@ Page({
     }
   },
   onChipTap(e) {
-    var query = e.currentTarget.dataset.query;
-    wx.navigateTo({
-      url: '/pages/results/results?query=' + encodeURIComponent(query)
-    });
+    var text = e.currentTarget.dataset.text;
+    this.setData({ searchValue: text, searchFocus: true });
   }
 });

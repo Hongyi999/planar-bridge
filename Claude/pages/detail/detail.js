@@ -29,6 +29,8 @@ Page({
     // Try cloud first, fallback to local
     cloudDB.getCardById(options.id).then(function(card) {
       if (card) {
+        card.id = card.id || card._id;
+        card._id = card._id || card.id;
         that.setData({
           card: card,
           highlightedText: card.text,
@@ -37,6 +39,8 @@ Page({
       } else {
         that.setData({ isLoading: false });
       }
+    }).catch(function() {
+      that.setData({ isLoading: false });
     });
   },
   highlightKeywords(text, keywords) {
@@ -75,7 +79,7 @@ Page({
       itemList: names,
       success: function(res) {
         var list = lists[res.tapIndex];
-        storageUtil.addCardToList(list.id, that.data.card.id);
+        storageUtil.addCardToList(list.id, that.data.card.id || that.data.card._id);
         wx.showToast({
           title: '已加入 ' + list.name,
           icon: 'none',

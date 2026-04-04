@@ -101,6 +101,108 @@ Page({
     this.loadData();
     wx.showToast({ title: '已移除', icon: 'none' });
   },
+  onCreateList: function() {
+    var that = this;
+    var colors = ['gold', 'purple', 'green'];
+    var nextColor = colors[storageUtil.getLists().length % 3];
+
+    wx.showModal({
+      title: '新建列表',
+      placeholderText: '输入列表名称',
+      editable: true,
+      success: function(res) {
+        if (res.confirm && res.content && res.content.trim()) {
+          var lists = storageUtil.getLists();
+          lists.push({
+            id: 'list-' + Date.now(),
+            name: res.content.trim(),
+            color: nextColor,
+            cards: []
+          });
+          storageUtil.saveLists(lists);
+          that.loadData();
+          // Select the newly created list
+          that.setData({ selectedIndex: lists.length - 1 });
+          wx.showToast({ title: '已创建', icon: 'none' });
+        }
+      }
+    });
+  },
+  onListLongPress: function(e) {
+    var that = this;
+    var idx = e.currentTarget.dataset.index;
+
+    wx.showActionSheet({
+      itemList: ['重命名', '更换颜色', '删除列表'],
+      success: function(res) {
+        if (res.tapIndex === 0) {
+          that._renameList(idx);
+        } else if (res.tapIndex === 1) {
+          that._changeColor(idx);
+        } else if (res.tapIndex === 2) {
+          that._deleteList(idx);
+        }
+      }
+    });
+  },
+  _renameList: function(idx) {
+    var that = this;
+    var lists = storageUtil.getLists();
+    var list = lists[idx];
+
+    wx.showModal({
+      title: '重命名列表',
+      placeholderText: list.name,
+      editable: true,
+      success: function(res) {
+        if (res.confirm && res.content && res.content.trim()) {
+          lists[idx].name = res.content.trim();
+          storageUtil.saveLists(lists);
+          that.loadData();
+          wx.showToast({ title: '已重命名', icon: 'none' });
+        }
+      }
+    });
+  },
+  _changeColor: function(idx) {
+    var that = this;
+    var colorNames = ['金色', '紫色', '绿色'];
+    var colorValues = ['gold', 'purple', 'green'];
+
+    wx.showActionSheet({
+      itemList: colorNames,
+      success: function(res) {
+        var lists = storageUtil.getLists();
+        lists[idx].color = colorValues[res.tapIndex];
+        storageUtil.saveLists(lists);
+        that.loadData();
+        wx.showToast({ title: '已更换颜色', icon: 'none' });
+      }
+    });
+  },
+  _deleteList: function(idx) {
+    var that = this;
+    var lists = storageUtil.getLists();
+    var listName = lists[idx].name;
+
+    wx.showModal({
+      title: '删除列表',
+      content: '确定要删除「' + listName + '」吗？列表中的卡牌不会被删除。',
+      confirmText: '删除',
+      confirmColor: '#C4544A',
+      success: function(res) {
+        if (res.confirm) {
+          lists.splice(idx, 1);
+          storageUtil.saveLists(lists);
+          // Adjust selected index
+          var newIdx = Math.min(that.data.selectedIndex, Math.max(0, lists.length - 1));
+          that.setData({ selectedIndex: newIdx });
+          that.loadData();
+          wx.showToast({ title: '已删除', icon: 'none' });
+        }
+      }
+    });
+  },
   getInitials: function(name) {
     if (!name) return '';
     var words = name.split(' ');

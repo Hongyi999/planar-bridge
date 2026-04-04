@@ -30,7 +30,7 @@
 
     <!-- Search bar -->
     <view class="hero-search">
-      <search-bar placeholder="搜索 Ninja 的传奇装备..." bind:search="onSearch" />
+      <search-bar value="{{searchValue}}" focus="{{searchFocus}}" placeholder="搜索 Ninja 的传奇装备..." bind:search="onSearch" />
     </view>
 
     <!-- Suggestion chips -->
@@ -40,6 +40,7 @@
         wx:key="index"
         class="chip chip-{{item.type}}"
         data-query="{{item.query}}"
+        data-text="{{item.text}}"
         bindtap="onChipTap"
       >{{item.text}}</view>
     </view>

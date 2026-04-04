@@ -12,10 +12,16 @@
         class="list-card list-card-{{item.color}} {{selectedIndex === index ? 'selected' : ''}}"
         data-index="{{index}}"
         bindtap="onSelectList"
+        bindlongpress="onListLongPress"
       >
         <text class="lc-name">{{item.name}}</text>
         <text class="lc-count">{{item.cardCount}} 张卡</text>
         <text class="lc-value font-mono">${{item.value}}</text>
+      </view>
+      <!-- Add new list card -->
+      <view class="list-card list-card-add" bindtap="onCreateList">
+        <text class="lc-add-icon">+</text>
+        <text class="lc-add-text">新建列表</text>
       </view>
     </view>
   </scroll-view>
@@ -29,7 +35,7 @@
       wx:for="{{selectedCards}}"
       wx:key="id"
       class="card-item"
-      data-id="{{item.id}}"
+      data-id="{{item.id || item._id}}"
       bindtap="onCardTap"
     >
       <!-- Thumbnail -->
@@ -48,6 +54,8 @@
           {{item.priceTrend > 0 ? '▲ ' + item.priceTrend + '%' : item.priceTrend < 0 ? '▼ ' + (-item.priceTrend) + '%' : '— 0%'}}
         </text>
       </view>
+      <!-- Delete button -->
+      <view class="ci-delete" data-id="{{item.id || item._id}}" catchtap="onCardDelete">×</view>
     </view>
 
     <!-- Empty -->

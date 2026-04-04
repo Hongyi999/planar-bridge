@@ -42,7 +42,9 @@ Page({
     resultCount: 0,
     results: [],
     showResults: false,
-    isLoading: false
+    isLoading: false,
+    showFollowUp: false,
+    followUpValue: ''
   },
 
   onLoad: function(options) {
@@ -115,6 +117,24 @@ Page({
   },
 
   onFollowUp: function() {
-    wx.showToast({ title: '继续追问功能开发中', icon: 'none' });
+    this.setData({ showFollowUp: true });
+  },
+
+  onFollowUpInput: function(e) {
+    this.setData({ followUpValue: e.detail.value });
+  },
+
+  onFollowUpConfirm: function(e) {
+    var refinement = this.data.followUpValue || (e && e.detail && e.detail.value) || '';
+    if (refinement.trim()) {
+      var combined = this.data.query + ' ' + refinement.trim();
+      wx.redirectTo({
+        url: '/pages/results/results?query=' + encodeURIComponent(combined)
+      });
+    }
+  },
+
+  onFollowUpCancel: function() {
+    this.setData({ showFollowUp: false, followUpValue: '' });
   }
 });

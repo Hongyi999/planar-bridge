@@ -12,7 +12,7 @@ Component({
   lifetimes: {
     attached() {
       var that = this;
-      var cardId = this.properties.card.id;
+      var cardId = this.properties.card.id || this.properties.card._id;
       this.setData({ isFav: storage.isCardFavorited(cardId) });
       // Stagger animation
       setTimeout(function() {
@@ -23,11 +23,11 @@ Component({
   methods: {
     onTap() {
       wx.navigateTo({
-        url: '/pages/detail/detail?id=' + this.properties.card.id
+        url: '/pages/detail/detail?id=' + (this.properties.card.id || this.properties.card._id)
       });
     },
     onHeartTap(e) {
-      var cardId = this.properties.card.id;
+      var cardId = this.properties.card.id || this.properties.card._id;
       var result = storage.toggleFavorite(cardId);
       this.setData({ isFav: result });
       wx.showToast({

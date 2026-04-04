@@ -70,6 +70,30 @@
 }
 .list-card-green .lc-name { color: #3D7A5E; }
 
+/* Add list card */
+.list-card-add {
+  background: transparent;
+  border: 3rpx dashed #C8C2B4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 200rpx;
+}
+.list-card-add:active {
+  border-color: #9B8644;
+}
+.lc-add-icon {
+  font-size: 48rpx;
+  color: #A09A8C;
+  line-height: 1;
+  margin-bottom: 4rpx;
+}
+.lc-add-text {
+  font-size: 22rpx;
+  color: #A09A8C;
+}
+
 .lc-name {
   display: block;
   font-size: 24rpx;
@@ -190,6 +214,23 @@
   display: block;
   font-size: 18rpx;
   margin-top: 2rpx;
+}
+
+/* Delete button */
+.ci-delete {
+  flex-shrink: 0;
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: #C8C2B4;
+  border-radius: 50%;
+}
+.ci-delete:active {
+  color: #C4544A;
+  background: #C4544A10;
 }
 
 .price-up { color: #3D7A5E; }
