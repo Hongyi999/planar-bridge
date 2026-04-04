@@ -1,26 +1,46 @@
 var cloud = require('wx-server-sdk');
-var got = require('got');
+var https = require('https');
+var http = require('http');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 var db = cloud.database();
 var _ = db.command;
 
 /**
+ * Download buffer from URL (handles http/https and redirects)
+ */
+function downloadBuffer(url) {
+  return new Promise(function(resolve, reject) {
+    var mod = url.indexOf('https') === 0 ? https : http;
+    mod.get(url, { timeout: 15000 }, function(res) {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        downloadBuffer(res.headers.location).then(resolve).catch(reject);
+        return;
+      }
+      if (res.statusCode !== 200) {
+        reject(new Error('HTTP ' + res.statusCode));
+        return;
+      }
+      var chunks = [];
+      res.on('data', function(chunk) { chunks.push(chunk); });
+      res.on('end', function() { resolve(Buffer.concat(chunks)); });
+      res.on('error', reject);
+    }).on('error', reject).on('timeout', function() {
+      reject(new Error('Download timeout'));
+    });
+  });
+}
+
+/**
  * Download image from URL and upload to WeChat cloud storage
  * Returns the cloud fileID
  */
 async function downloadAndUpload(imageUrl, cloudPath) {
-  // Download the image
-  var response = await got(imageUrl, {
-    responseType: 'buffer',
-    timeout: { request: 15000 },
-    retry: { limit: 2 }
-  });
+  var buffer = await downloadBuffer(imageUrl);
 
-  // Upload to cloud storage
   var result = await cloud.uploadFile({
     cloudPath: cloudPath,
-    fileContent: response.body
+    fileContent: buffer
   });
 
   return result.fileID;

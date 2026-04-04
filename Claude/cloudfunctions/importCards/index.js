@@ -1,13 +1,13 @@
 var cloud = require('wx-server-sdk');
-var got = require('got');
+var https = require('https');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 var db = cloud.database();
 var _ = db.command;
 
-// GitHub raw URL for the-fab-cube card data
-var CARD_JSON_URL = 'https://raw.githubusercontent.com/the-fab-cube/flesh-and-blood-cards/develop/json/english/card.json';
-var SET_JSON_URL = 'https://raw.githubusercontent.com/the-fab-cube/flesh-and-blood-cards/develop/json/english/set.json';
+// Use jsDelivr CDN (works from China) instead of raw GitHub
+var CARD_JSON_URL = 'https://cdn.jsdelivr.net/gh/the-fab-cube/flesh-and-blood-cards@develop/json/english/card.json';
+var SET_JSON_URL = 'https://cdn.jsdelivr.net/gh/the-fab-cube/flesh-and-blood-cards@develop/json/english/set.json';
 
 // Hero classes in FAB
 var HERO_CLASSES = [
@@ -244,15 +244,35 @@ function transformCard(card) {
 }
 
 /**
- * Fetch JSON from URL
+ * Fetch JSON from URL using built-in https (no external dependency)
  */
-async function fetchJSON(url) {
-  var response = await got(url, {
-    responseType: 'json',
-    timeout: { request: 30000 },
-    retry: { limit: 2 }
+function fetchJSON(url) {
+  return new Promise(function(resolve, reject) {
+    https.get(url, { timeout: 40000 }, function(res) {
+      // Handle redirects (jsDelivr may redirect)
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        fetchJSON(res.headers.location).then(resolve).catch(reject);
+        return;
+      }
+      if (res.statusCode !== 200) {
+        reject(new Error('HTTP ' + res.statusCode));
+        return;
+      }
+      var chunks = [];
+      res.on('data', function(chunk) { chunks.push(chunk); });
+      res.on('end', function() {
+        try {
+          var body = Buffer.concat(chunks).toString('utf8');
+          resolve(JSON.parse(body));
+        } catch (e) {
+          reject(new Error('JSON parse error: ' + e.message));
+        }
+      });
+      res.on('error', reject);
+    }).on('error', reject).on('timeout', function() {
+      reject(new Error('Request timeout'));
+    });
   });
-  return response.body;
 }
 
 /**
