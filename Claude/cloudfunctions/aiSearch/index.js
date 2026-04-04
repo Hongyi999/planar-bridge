@@ -3,6 +3,8 @@ cloud.init({ env: 'dev-7gpmka26fbecea2a' });
 const db = cloud.database();
 const _ = db.command;
 
+const BOT_ID = 'ibot-planarbridg-wieezl';
+
 // Class/type/rarity mappings for Chinese query support
 const CLASS_MAP = {
   '忍者': 'Ninja', '守护者': 'Guardian', '蛮兽': 'Brute', '战士': 'Warrior',
@@ -80,7 +82,7 @@ exports.main = async (event) => {
   try {
     const ai = cloud.extend.AI;
     const parseResult = await ai.bot.sendMessage({
-      botId: event.botId || '',
+      botId: BOT_ID,
       msg: '你是 Flesh and Blood TCG 卡牌搜索助手。将以下用户查询解析为 JSON 过滤条件。\n' +
         '可用字段: class, type, subtype, rarity, setCode, keywords(数组), priceMax, priceMin, name(模糊匹配)\n' +
         '可用 class: Ninja, Guardian, Brute, Warrior, Wizard, Mechanologist, Ranger, Runeblade, Assassin, Illusionist, Generic\n' +
@@ -134,7 +136,7 @@ exports.main = async (event) => {
     try {
       const ai = cloud.extend.AI;
       const sumResult = await ai.bot.sendMessage({
-        botId: event.botId || '',
+        botId: BOT_ID,
         msg: '用一句简短中文（不超过50字）总结搜索结果：\n查询: "' + query + '"\n' +
           '找到 ' + count + ' 张卡牌' +
           (count > 0 ? '，包括: ' + results.data.slice(0, 3).map(function(c) { return c.nameCN || c.name; }).join('、') : '')
