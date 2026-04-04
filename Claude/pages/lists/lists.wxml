@@ -35,11 +35,9 @@
         bindtap="onSelectList"
         bindlongpress="onListLongPress"
       >
-        <!-- Move arrows inside card, above text -->
-        <view class="lc-arrows-inner" wx:if="{{isEditMode}}">
-          <view class="lc-arrow-inner {{index === 0 ? 'lc-arrow-inner-disabled' : ''}}" data-index="{{index}}" catchtap="onMoveLeft">←</view>
-          <view class="lc-arrow-inner {{index === lists.length - 1 ? 'lc-arrow-inner-disabled' : ''}}" data-index="{{index}}" catchtap="onMoveRight">→</view>
-        </view>
+        <!-- Move arrows overlaid at left/right edges -->
+        <view class="lc-arrow-left {{index === 0 ? 'lc-arrow-inner-disabled' : ''}}" wx:if="{{isEditMode}}" data-index="{{index}}" catchtap="onMoveLeft">←</view>
+        <view class="lc-arrow-right {{index === lists.length - 1 ? 'lc-arrow-inner-disabled' : ''}}" wx:if="{{isEditMode}}" data-index="{{index}}" catchtap="onMoveRight">→</view>
         <text class="lc-name" style="color: {{item.hexColor}};">{{item.name}}</text>
         <text class="lc-count">{{item.cardCount}} 张卡</text>
         <text class="lc-value font-mono">${{item.value}}</text>

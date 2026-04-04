@@ -55,26 +55,30 @@
   padding: 6rpx 16rpx;
 }
 
-/* Arrows inside card, above text */
-.lc-arrows-inner {
-  display: flex;
-  gap: 12rpx;
-  justify-content: center;
-  margin-bottom: 8rpx;
-}
-.lc-arrow-inner {
-  width: 44rpx;
+/* Arrows overlaid at left/right edges */
+.lc-arrow-left, .lc-arrow-right {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36rpx;
   height: 36rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #6B6355;
   background: #FDFCF8;
-  border-radius: 10rpx;
+  border-radius: 50%;
   border: 2rpx solid #E8E3D8;
+  z-index: 5;
 }
-.lc-arrow-inner:active {
+.lc-arrow-left {
+  left: -12rpx;
+}
+.lc-arrow-right {
+  right: -12rpx;
+}
+.lc-arrow-left:active, .lc-arrow-right:active {
   background: #E8E3D8;
 }
 .lc-arrow-inner-disabled {
@@ -86,6 +90,7 @@
   border-radius: 28rpx;
   padding: 28rpx;
   flex-shrink: 0;
+  position: relative;
 }
 
 .list-card.selected {
