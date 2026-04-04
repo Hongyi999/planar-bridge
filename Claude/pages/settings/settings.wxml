@@ -119,12 +119,13 @@
       </view>
       <text class="item-arrow">›</text>
     </view>
-    <view class="settings-item" bindtap="onImportImages">
+    <view class="settings-item" bindtap="{{imageImportRunning ? 'onPauseImageImport' : 'onImportImages'}}">
       <view class="item-left">
         <text class="item-label">下载卡牌图片</text>
-        <text class="item-desc">将官方卡图下载到云存储（分批处理）</text>
+        <text class="item-desc">{{imageImportProgress || '将官方卡图下载到云存储（自动批量）'}}</text>
       </view>
-      <text class="item-arrow">›</text>
+      <view wx:if="{{imageImportRunning}}" class="item-refresh" style="color:#c0392b;">暂停</view>
+      <text wx:else class="item-arrow">›</text>
     </view>
     <view class="settings-item" bindtap="onImportSets">
       <view class="item-left">

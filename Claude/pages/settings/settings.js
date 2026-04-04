@@ -55,7 +55,9 @@ Page({
     exportFields: DEFAULT_SETTINGS.exportFields,
     showExportModal: false,
     exportLists: [],
-    exportFormat: 'csv'
+    exportFormat: 'csv',
+    imageImportRunning: false,
+    imageImportProgress: ''
   },
 
   onLoad() {
@@ -270,54 +272,54 @@ Page({
     var that = this;
     wx.showModal({
       title: '下载卡牌图片',
-      content: '将下载官方卡图到微信云存储。每批处理 5 张，可能需要很多次执行。是否开始？',
+      content: '将自动批量下载官方卡图到微信云存储（每批10张，自动连续执行）。过程中可随时点击"暂停"。是否开始？',
       confirmText: '开始下载',
       success: function(res) {
         if (res.confirm) {
+          that._imageImportPaused = false;
+          that._imageImportTotal = 0;
+          that._imageImportErrors = 0;
+          that.setData({ imageImportRunning: true, imageImportProgress: '准备中...' });
           that._runImageImport(0);
         }
       }
     });
   },
 
+  onPauseImageImport() {
+    this._imageImportPaused = true;
+    this.setData({ imageImportRunning: false, imageImportProgress: '已暂停，共下载 ' + this._imageImportTotal + ' 张' });
+    this.onRefreshDbStats();
+  },
+
   _runImageImport(round) {
+    if (this._imageImportPaused) return;
     var that = this;
-    wx.showLoading({ title: '下载图片 第' + (round + 1) + '批...' });
+    var batchSize = 10;
+    that.setData({ imageImportProgress: '第' + (round + 1) + '批... 已完成 ' + that._imageImportTotal + ' 张' });
     wx.cloud.callFunction({
       name: 'importImages',
-      data: { action: 'processDefault', offset: 0, limit: 5 }
+      data: { action: 'processDefault', offset: 0, limit: batchSize }
     }).then(function(res) {
-      wx.hideLoading();
       var r = res.result;
       if (r.processed > 0) {
-        wx.showModal({
-          title: '已下载 ' + r.processed + ' 张图片',
-          content: (r.errors.length > 0 ? '错误: ' + r.errors.join(', ') + '\n' : '') + '继续下一批？',
-          confirmText: '继续',
-          cancelText: '暂停',
-          success: function(modal) {
-            if (modal.confirm) {
-              that._runImageImport(round + 1);
-            } else {
-              that.onRefreshDbStats();
-            }
-          }
-        });
+        that._imageImportTotal += r.processed;
+        that._imageImportErrors += (r.errors || []).length;
+        that.setData({ imageImportProgress: '已完成 ' + that._imageImportTotal + ' 张' + (that._imageImportErrors > 0 ? '（' + that._imageImportErrors + ' 个错误）' : '') });
+        // Auto-continue next batch
+        that._runImageImport(round + 1);
       } else {
-        wx.showToast({ title: '所有图片已下载完成！', icon: 'success' });
+        that.setData({ imageImportRunning: false, imageImportProgress: '全部完成！共 ' + that._imageImportTotal + ' 张' });
+        wx.showToast({ title: '图片下载完成！', icon: 'success' });
         that.onRefreshDbStats();
       }
     }).catch(function(err) {
-      wx.hideLoading();
-      wx.showModal({
-        title: '下载出错',
-        content: err.message || '未知错误，请重试',
-        confirmText: '重试',
-        cancelText: '取消',
-        success: function(modal) {
-          if (modal.confirm) that._runImageImport(round);
-        }
-      });
+      that._imageImportErrors++;
+      that.setData({ imageImportProgress: '第' + (round + 1) + '批出错: ' + (err.message || '未知错误') + '，3秒后重试...' });
+      // Auto-retry after 3 seconds
+      setTimeout(function() {
+        if (!that._imageImportPaused) that._runImageImport(round);
+      }, 3000);
     });
   },
 
