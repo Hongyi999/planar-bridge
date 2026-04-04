@@ -44,7 +44,8 @@ Page({
     showResults: false,
     isLoading: false,
     showFollowUp: false,
-    followUpValue: ''
+    followUpValue: '',
+    viewMode: 'grid'
   },
 
   onLoad: function(options) {
@@ -70,11 +71,21 @@ Page({
 
     // Try cloud AI search first, fallback to local
     aiParser.aiSearch(query, sortPref.field, sortPref.order).then(function(result) {
-      var results = sortResults(result.results || [], sortPref);
+      var results = result.results || [];
+      // Apply local price filters as safety net (cloud may not have latest parser)
+      var localFilters = aiParser.parseQuery(query);
+      if (localFilters.priceMin || localFilters.priceMax) {
+        results = results.filter(function(card) {
+          if (localFilters.priceMin && card.priceMid < localFilters.priceMin) return false;
+          if (localFilters.priceMax && card.priceMid > localFilters.priceMax) return false;
+          return true;
+        });
+      }
+      results = sortResults(results, sortPref);
       that.setData({
-        filters: result.filters || {},
+        filters: result.filters || localFilters,
         summary: result.summary || '',
-        resultCount: result.resultCount || results.length,
+        resultCount: results.length,
         results: results,
         isLoading: false
       });
@@ -136,5 +147,14 @@ Page({
 
   onFollowUpCancel: function() {
     this.setData({ showFollowUp: false, followUpValue: '' });
+  },
+
+  onToggleView: function() {
+    this.setData({ viewMode: this.data.viewMode === 'grid' ? 'list' : 'grid' });
+  },
+
+  onCardTap: function(e) {
+    var id = e.currentTarget.dataset.id;
+    wx.navigateTo({ url: '/pages/detail/detail?id=' + id });
   }
 });

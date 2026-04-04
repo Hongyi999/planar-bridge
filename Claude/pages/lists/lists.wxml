@@ -1,11 +1,25 @@
 <view class="lists-page">
   <!-- Title -->
   <text class="page-title font-heading">我的收藏</text>
-  <text class="page-subtitle">{{lists.length}} 个列表 · {{totalCards}} 张卡 · 约 ${{totalValue}}</text>
+  <text class="page-subtitle" wx:if="{{isLoaded}}">{{lists.length}} 个列表 · {{totalCards}} 张卡 · 约 ${{totalValue}}</text>
+
+  <!-- Loading -->
+  <view class="lists-loading" wx:if="{{!isLoaded}}">
+    <view class="loading-dot-row">
+      <view class="loading-dot"></view>
+      <view class="loading-dot"></view>
+      <view class="loading-dot"></view>
+    </view>
+  </view>
 
   <!-- Horizontal scroll list cards -->
-  <scroll-view scroll-x class="list-cards-scroll" enhanced show-scrollbar="{{false}}">
+  <scroll-view scroll-x class="list-cards-scroll" enhanced show-scrollbar="{{false}}" wx:if="{{isLoaded}}">
     <view class="list-cards-row">
+      <!-- Add new list card — first position -->
+      <view class="list-card-add-compact" bindtap="onCreateList">
+        <text class="lc-add-icon">+</text>
+        <text class="lc-add-text">新建</text>
+      </view>
       <view
         wx:for="{{lists}}"
         wx:key="id"
@@ -18,22 +32,17 @@
         <text class="lc-count">{{item.cardCount}} 张卡</text>
         <text class="lc-value font-mono">${{item.value}}</text>
       </view>
-      <!-- Add new list card -->
-      <view class="list-card list-card-add" bindtap="onCreateList">
-        <text class="lc-add-icon">+</text>
-        <text class="lc-add-text">新建列表</text>
-      </view>
     </view>
   </scroll-view>
 
   <!-- Selected list title + edit -->
-  <view class="selected-title-row" wx:if="{{lists.length > 0}}">
+  <view class="selected-title-row" wx:if="{{isLoaded && lists.length > 0}}">
     <text class="selected-title font-heading">{{lists[selectedIndex].name}}</text>
     <text class="selected-edit" data-index="{{selectedIndex}}" bindtap="onListLongPress">编辑</text>
   </view>
 
   <!-- Cards list -->
-  <view class="cards-list">
+  <view class="cards-list" wx:if="{{isLoaded}}">
     <view
       wx:for="{{selectedCards}}"
       wx:key="id"

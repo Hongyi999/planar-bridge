@@ -37,7 +37,12 @@
     <!-- Results meta -->
     <view class="results-meta {{showResults ? 'show' : ''}}">
       <text class="meta-left">{{resultCount}} 个结果 · 按价格降序</text>
-      <text class="meta-right" bindtap="onFollowUp">继续追问...</text>
+      <view class="meta-actions">
+        <view class="view-toggle" bindtap="onToggleView">
+          <image class="view-toggle-icon" src="/assets/icons/{{viewMode === 'grid' ? 'view-list' : 'view-grid'}}.svg" mode="aspectFit" />
+        </view>
+        <text class="meta-right" bindtap="onFollowUp">继续追问...</text>
+      </view>
     </view>
 
     <!-- Follow-up bar -->
@@ -53,12 +58,30 @@
     </view>
 
     <!-- Card grid -->
-    <view class="card-grid {{showResults ? 'show' : ''}}">
+    <view class="card-grid {{showResults ? 'show' : ''}}" wx:if="{{viewMode === 'grid'}}">
       <card-tile wx:for="{{results}}" wx:key="id" card="{{item}}" index="{{index}}" />
     </view>
 
-    <!-- Empty state -->
-    <view class="empty-state {{showResults && resultCount === 0 ? 'show' : ''}}" wx:if="{{resultCount === 0}}">
+    <!-- Card list view -->
+    <view class="card-list-view {{showResults ? 'show' : ''}}" wx:if="{{viewMode === 'list'}}">
+      <view wx:for="{{results}}" wx:key="id" class="card-list-item" data-id="{{item.id || item._id}}" bindtap="onCardTap">
+        <view class="cli-thumb" style="background: #EDE9DC">
+          <text class="cli-thumb-text font-heading">{{item.name}}</text>
+        </view>
+        <view class="cli-info">
+          <text class="cli-name font-heading">{{item.name}}</text>
+          <text class="cli-name-cn" wx:if="{{item.nameCN}}">{{item.nameCN}}</text>
+          <text class="cli-meta">{{item.classCN || item.class}} · {{item.typeCN || item.type}} · {{item.setCode}}</text>
+        </view>
+        <view class="cli-price">
+          <text class="cli-price-value font-mono">${{item.priceMid}}</text>
+          <text class="cli-trend {{item.priceTrend > 0 ? 'price-up' : item.priceTrend < 0 ? 'price-down' : 'price-flat'}}">{{item.priceTrend > 0 ? '▲' + item.priceTrend + '%' : item.priceTrend < 0 ? '▼' + (-item.priceTrend) + '%' : '—'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Empty state — only show after loading completes -->
+    <view class="empty-state {{showResults && !isLoading && resultCount === 0 ? 'show' : ''}}" wx:if="{{!isLoading && resultCount === 0}}">
       <text class="empty-text">未找到匹配卡牌</text>
       <text class="empty-hint">尝试其他关键词，如「传奇装备」或「威严攻击」</text>
     </view>

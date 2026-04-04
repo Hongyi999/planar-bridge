@@ -26,14 +26,39 @@ Component({
         url: '/pages/detail/detail?id=' + (this.properties.card.id || this.properties.card._id)
       });
     },
-    onHeartTap(e) {
+    onStarTap(e) {
+      var that = this;
       var cardId = this.properties.card.id || this.properties.card._id;
-      var result = storage.toggleFavorite(cardId);
-      this.setData({ isFav: result });
-      wx.showToast({
-        title: result ? '已收藏' : '已取消',
-        icon: 'none',
-        duration: 1000
+
+      // If already favorited, remove from all lists
+      if (this.data.isFav) {
+        var lists = storage.getLists();
+        lists.forEach(function(list) {
+          if (list.cards.indexOf(cardId) !== -1) {
+            storage.removeCardFromList(list.id, cardId);
+          }
+        });
+        this.setData({ isFav: false });
+        wx.showToast({ title: '已取消收藏', icon: 'none', duration: 1000 });
+        return;
+      }
+
+      // Not favorited — show list picker
+      var lists = storage.getLists();
+      if (!lists.length) {
+        wx.showToast({ title: '请先创建收藏列表', icon: 'none' });
+        return;
+      }
+      var listNames = lists.map(function(l) { return l.name; });
+
+      wx.showActionSheet({
+        itemList: listNames,
+        success: function(res) {
+          var chosenList = lists[res.tapIndex];
+          storage.addCardToList(chosenList.id, cardId);
+          that.setData({ isFav: true });
+          wx.showToast({ title: '已添加到「' + chosenList.name + '」', icon: 'none', duration: 1500 });
+        }
       });
     },
     getRarityAbbr() {

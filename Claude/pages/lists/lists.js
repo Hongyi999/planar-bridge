@@ -9,7 +9,8 @@ Page({
     selectedIndex: 0,
     selectedCards: [],
     totalCards: 0,
-    totalValue: '0.00'
+    totalValue: '0.00',
+    isLoaded: false
   },
   onShow: function() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
@@ -77,7 +78,8 @@ Page({
         lists: enrichedLists,
         selectedCards: selectedCards,
         totalCards: totalCards,
-        totalValue: totalValue.toFixed(2)
+        totalValue: totalValue.toFixed(2),
+        isLoaded: true
       });
     });
   },
