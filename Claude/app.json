@@ -1,0 +1,45 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/results/results",
+    "pages/detail/detail",
+    "pages/series/series",
+    "pages/lists/lists",
+    "pages/settings/settings"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#F2EFE4",
+    "navigationBarTitleText": "Planar Bridge",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F2EFE4",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#A09A8C",
+    "selectedColor": "#9B8644",
+    "backgroundColor": "#F2EFE4",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "搜索"
+      },
+      {
+        "pagePath": "pages/series/series",
+        "text": "系列"
+      },
+      {
+        "pagePath": "pages/lists/lists",
+        "text": "收藏"
+      },
+      {
+        "pagePath": "pages/settings/settings",
+        "text": "设置"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "cloud": true
+}

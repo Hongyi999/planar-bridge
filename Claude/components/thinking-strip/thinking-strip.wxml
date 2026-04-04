@@ -1,0 +1,34 @@
+<view class="thinking-strip">
+  <block wx:for="{{visibleSteps}}" wx:key="index">
+    <view class="ts-step animate-in" style="animation-delay: {{index * 100}}ms">
+      <!-- Shimmer overlay -->
+      <view class="ts-shimmer" wx:if="{{!item.done}}"></view>
+      <!-- Icon -->
+      <view class="ts-icon ts-icon-{{item.color}}">
+        <view wx:if="{{item.icon === 'clock'}}" class="icon-clock">
+          <view class="clock-face"></view>
+          <view class="clock-hand"></view>
+        </view>
+        <view wx:elif="{{item.icon === 'search'}}" class="icon-search-sm">
+          <view class="search-sm-circle"></view>
+          <view class="search-sm-handle"></view>
+        </view>
+        <view wx:elif="{{item.icon === 'dollar'}}" class="icon-dollar">
+          <text class="dollar-sign">$</text>
+        </view>
+      </view>
+      <!-- Body -->
+      <view class="ts-body">
+        <view class="ts-label" style="color: {{item.color === 'purple' ? '#6B4C8A' : item.color === 'gold' ? '#8B7A3E' : '#3D7A5E'}}">{{item.label}}</view>
+        <view class="ts-meta font-mono">{{item.meta}}</view>
+      </view>
+      <!-- Status -->
+      <view class="ts-status">
+        <view wx:if="{{item.done}}" class="ts-check">
+          <view class="check-mark"></view>
+        </view>
+        <view wx:elif="{{item.loading}}" class="ts-spinner"></view>
+      </view>
+    </view>
+  </block>
+</view>

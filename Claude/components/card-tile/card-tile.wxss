@@ -1,0 +1,165 @@
+.card-tile {
+  background: #FDFCF8;
+  border-radius: 32rpx;
+  overflow: hidden;
+  border: 2rpx solid #E8E3D8;
+  opacity: 0;
+  transform: translateY(20rpx);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out, box-shadow 0.2s;
+}
+
+.card-tile.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card-tile:active {
+  transform: scale(0.97);
+  box-shadow: 0 8rpx 24rpx #9B864412;
+}
+
+.card-img {
+  height: 310rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-real-img {
+  width: 100%;
+  height: 100%;
+}
+
+.card-placeholder {
+  width: 156rpx;
+  height: 218rpx;
+  border-radius: 10rpx;
+  border: 2rpx solid #9B864430;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18rpx;
+  color: #9B8644;
+  text-align: center;
+  padding: 8rpx;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.rarity-badge {
+  position: absolute;
+  top: 16rpx;
+  left: 16rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 12rpx;
+  font-size: 16rpx;
+  font-weight: 700;
+  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+}
+
+.rarity-Legendary {
+  background: linear-gradient(135deg, #9B86441A, #6B4C8A1A);
+  border: 2rpx solid #9B864430;
+  color: #8B7A3E;
+}
+
+.rarity-Majestic {
+  background: #9B86441A;
+  border: 2rpx solid #9B864430;
+  color: #8B7A3E;
+}
+
+.rarity-Rare {
+  background: #4A82B51A;
+  border: 2rpx solid #4A82B530;
+  color: #4A82B5;
+}
+
+.rarity-Common {
+  background: #A09A8C1A;
+  border: 2rpx solid #A09A8C30;
+  color: #A09A8C;
+}
+
+.rarity-Fabled {
+  background: #D4AF371A;
+  border: 2rpx solid #D4AF3730;
+  color: #D4AF37;
+}
+
+.star-btn {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+  width: 52rpx;
+  height: 52rpx;
+  background: #FDFCF8A0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.star-btn:active {
+  background: #FDFCF8;
+}
+.star-icon {
+  width: 32rpx;
+  height: 32rpx;
+}
+
+.card-info {
+  padding: 20rpx 24rpx;
+}
+
+.card-name {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #2C2A22;
+  margin-bottom: 2rpx;
+  letter-spacing: 0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-name-cn {
+  font-size: 20rpx;
+  color: #6B6355;
+  margin-bottom: 4rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-meta {
+  font-size: 20rpx;
+  color: #A09A8C;
+  margin-bottom: 10rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-price {
+  font-weight: 600;
+  font-size: 28rpx;
+}
+
+.card-trend {
+  font-size: 18rpx;
+  font-weight: 500;
+}
+
+.price-up { color: #3D7A5E; }
+.price-down { color: #C4544A; }
+.price-flat { color: #A09A8C; }

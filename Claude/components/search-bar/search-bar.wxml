@@ -1,0 +1,17 @@
+<view class="search-bar {{compact ? 'compact' : ''}}" bindtap="onTap">
+  <!-- Search icon -->
+  <view class="search-icon">
+    <view class="icon-circle"></view>
+    <view class="icon-handle"></view>
+  </view>
+  <input
+    class="search-input"
+    value="{{value}}"
+    placeholder="{{placeholder}}"
+    placeholder-class="search-placeholder"
+    confirm-type="search"
+    focus="{{focus}}"
+    bindinput="onInput"
+    bindconfirm="onConfirm"
+  />
+</view>

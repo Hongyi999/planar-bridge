@@ -1,0 +1,8 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "search-bar": "/components/search-bar/search-bar",
+    "thinking-strip": "/components/thinking-strip/thinking-strip",
+    "card-tile": "/components/card-tile/card-tile"
+  }
+}

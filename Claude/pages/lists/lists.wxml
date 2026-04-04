@@ -1,0 +1,124 @@
+<view class="lists-page">
+  <!-- Title -->
+  <text class="page-title font-heading">收藏列表</text>
+  <text class="page-subtitle" wx:if="{{isLoaded}}">{{lists.length}} 个列表 · {{totalCards}} 张卡 · 约 ${{totalValue}}</text>
+
+  <!-- Loading -->
+  <view class="lists-loading" wx:if="{{!isLoaded}}">
+    <view class="loading-dot-row">
+      <view class="loading-dot"></view>
+      <view class="loading-dot"></view>
+      <view class="loading-dot"></view>
+    </view>
+  </view>
+
+  <!-- List section header -->
+  <view class="list-section-header" wx:if="{{isLoaded}}">
+    <text class="list-section-title font-heading">全部列表</text>
+    <text class="list-section-action" bindtap="onToggleEditMode">{{isEditMode ? '完成' : '排序'}}</text>
+  </view>
+
+  <!-- Horizontal scroll list cards -->
+  <scroll-view scroll-x class="list-cards-scroll" enhanced show-scrollbar="{{false}}" wx:if="{{isLoaded}}">
+    <view class="list-cards-row">
+      <!-- Add new list card — first position -->
+      <view class="list-card-add-compact" bindtap="onCreateList">
+        <text class="lc-add-icon">+</text>
+        <text class="lc-add-text">新建</text>
+      </view>
+      <view
+        wx:for="{{lists}}"
+        wx:key="id"
+        class="list-card {{selectedIndex === index ? 'selected' : ''}} {{showHint ? 'wobble' : ''}} {{isEditMode ? 'edit-mode' : ''}}"
+        style="background: {{item.hexColor}}0A; border: 3rpx solid {{item.hexColor}}20; {{selectedIndex === index ? 'border-bottom: 6rpx solid ' + item.hexColor + ';' : ''}}"
+        data-index="{{index}}"
+        bindtap="onSelectList"
+        bindlongpress="onListLongPress"
+      >
+        <!-- Reorder arrows at top left/right corners, absolutely positioned -->
+        <view class="lc-arrow lc-arrow-left {{index === 0 ? 'lc-arrow-disabled' : ''}}" wx:if="{{isEditMode}}" data-index="{{index}}" catchtap="onMoveLeft">←</view>
+        <view class="lc-arrow lc-arrow-right {{index === lists.length - 1 ? 'lc-arrow-disabled' : ''}}" wx:if="{{isEditMode}}" data-index="{{index}}" catchtap="onMoveRight">→</view>
+        <text class="lc-name" style="color: {{item.hexColor}};">{{item.name}}</text>
+        <text class="lc-count">{{item.cardCount}} 张卡</text>
+        <text class="lc-value font-mono">${{item.value}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- Selected list title + edit -->
+  <view class="selected-title-row" wx:if="{{isLoaded && lists.length > 0}}">
+    <text class="selected-title font-heading">{{lists[selectedIndex].name}}</text>
+    <text class="selected-edit" bindtap="onOpenEditPanel">编辑</text>
+  </view>
+
+  <!-- Cards list -->
+  <view class="cards-list" wx:if="{{isLoaded}}">
+    <view
+      wx:for="{{selectedCards}}"
+      wx:key="id"
+      class="card-item"
+      data-id="{{item.id || item._id}}"
+      bindtap="onCardTap"
+    >
+      <!-- Thumbnail -->
+      <view class="ci-thumb" style="background: #EDE9DC">
+        <image wx:if="{{item.cloudImageId || item.imageUrl}}" class="ci-thumb-img" src="{{item.cloudImageId || item.imageUrl}}" mode="aspectFill" lazy-load />
+        <text wx:else class="ci-thumb-text font-heading">{{item.name}}</text>
+      </view>
+      <!-- Info -->
+      <view class="ci-info">
+        <text class="ci-name font-heading">{{item.name}}</text>
+        <text class="ci-meta">{{item.rarityCN || item.rarity}} · {{item.classCN || item.class}} {{item.typeCN || item.type}} · {{item.setCode}}</text>
+      </view>
+      <!-- Price -->
+      <view class="ci-price">
+        <text class="ci-price-value font-mono">${{item.priceMid}}</text>
+        <text class="ci-trend {{item.priceTrend > 0 ? 'price-up' : item.priceTrend < 0 ? 'price-down' : 'price-flat'}}">
+          {{item.priceTrend > 0 ? '▲ ' + item.priceTrend + '%' : item.priceTrend < 0 ? '▼ ' + (-item.priceTrend) + '%' : '— 0%'}}
+        </text>
+      </view>
+      <!-- Delete button -->
+      <view class="ci-delete" data-id="{{item.id || item._id}}" catchtap="onCardDelete">×</view>
+    </view>
+
+    <!-- Empty -->
+    <view class="empty-list" wx:if="{{selectedCards.length === 0}}">
+      <text class="empty-text">此列表暂无卡牌</text>
+      <text class="empty-hint">搜索并收藏卡牌，它们会出现在这里</text>
+    </view>
+  </view>
+
+  <!-- Edit panel modal -->
+  <view class="edit-mask" wx:if="{{showEditPanel}}" bindtap="onCloseEditPanel">
+    <view class="edit-panel" catchtap="onEditPanelNoop">
+      <text class="edit-panel-title font-heading">编辑列表</text>
+
+      <!-- Rename section -->
+      <view class="edit-section">
+        <text class="edit-section-label">重命名</text>
+        <input class="edit-rename-input" value="{{editName}}" bindinput="onEditNameInput" placeholder="输入新名称" />
+      </view>
+
+      <!-- Color section -->
+      <view class="edit-section">
+        <text class="edit-section-label">更换颜色</text>
+        <view class="edit-color-grid">
+          <view wx:for="{{colorPalette}}" wx:key="*this"
+            class="edit-color-cell {{editColor === item ? 'edit-color-cell-selected' : ''}}"
+            style="background: {{item}};"
+            data-color="{{item}}"
+            bindtap="onEditColorTap"
+          >
+            <text wx:if="{{editColor === item}}" class="edit-color-check">✓</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- Save button -->
+      <view class="edit-save-btn" bindtap="onEditSave">保存</view>
+
+      <!-- Delete section -->
+      <view class="edit-delete-btn" bindtap="onEditDelete">删除列表</view>
+    </view>
+  </view>
+</view>
