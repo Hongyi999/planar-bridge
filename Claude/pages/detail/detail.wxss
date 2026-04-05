@@ -77,7 +77,7 @@
   align-items: flex-end;
   justify-content: center;
   position: relative;
-  background: linear-gradient(180deg, #EBE7DA 0%, #F2EFE4 100%);
+  background: #F2EFE4;
   flex-shrink: 0;
   padding-bottom: 40rpx;
   box-sizing: content-box;

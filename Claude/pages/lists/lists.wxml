@@ -15,6 +15,10 @@
   <!-- List section header -->
   <view class="list-section-header" wx:if="{{isLoaded}}">
     <text class="list-section-title font-heading">全部列表</text>
+    <view class="section-header-actions">
+      <text class="section-header-btn" bindtap="onOpenEditPanel">编辑</text>
+      <text class="section-header-btn" bindtap="onToggleEditMode">{{isEditMode ? '完成' : '排序'}}</text>
+    </view>
   </view>
 
   <!-- Horizontal scroll list cards -->
@@ -43,12 +47,10 @@
     </view>
   </scroll-view>
 
-  <!-- Selected list title + edit + sort + view toggle -->
+  <!-- Selected list title + view toggle -->
   <view class="selected-title-row" wx:if="{{isLoaded && lists.length > 0}}">
     <text class="selected-title font-heading">{{lists[selectedIndex].name}}</text>
     <view class="selected-actions">
-      <text class="selected-edit" bindtap="onOpenEditPanel">编辑</text>
-      <text class="selected-edit" bindtap="onToggleEditMode">{{isEditMode ? '完成' : '排序'}}</text>
       <view class="view-toggle" bindtap="onToggleView">
         <image class="view-toggle-icon" src="/assets/icons/{{viewMode === 'grid' ? 'view-list' : 'view-grid'}}.svg" mode="aspectFit" />
       </view>

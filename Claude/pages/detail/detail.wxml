@@ -17,7 +17,7 @@
 
 <view class="detail-page" wx:else>
   <!-- Hero area -->
-  <view class="detail-hero" style="height: {{heroHeight}}rpx; padding-top: {{navTop + navHeight + 12}}px;">
+  <view class="detail-hero" style="height: {{heroHeight}}rpx; padding-top: {{navTop + navHeight + 20}}px;">
     <!-- Decorative circles -->
     <view class="deco-circle deco-1"></view>
     <view class="deco-circle deco-2"></view>
@@ -56,7 +56,7 @@
   </view>
 
   <!-- Pull-up sheet -->
-  <scroll-view scroll-y enhanced show-scrollbar="{{false}}" class="detail-sheet" style="height: calc(100vh - {{heroHeight}}rpx - 56rpx - {{navTop + navHeight + 12}}px);">
+  <scroll-view scroll-y enhanced show-scrollbar="{{false}}" class="detail-sheet" style="height: calc(100vh - {{heroHeight}}rpx - 56rpx - {{navTop + navHeight + 20}}px);">
     <!-- Header: name + price -->
     <view class="detail-header">
       <view class="dh-left">
