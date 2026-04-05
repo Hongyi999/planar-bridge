@@ -424,5 +424,30 @@ exports.main = async function(event) {
     }
   }
 
+  if (action === 'updateCardPrices') {
+    var prices = event.prices || [];
+    if (prices.length === 0) return { success: false, error: 'No prices provided' };
+    var updated = 0;
+    var errors = [];
+    for (var i = 0; i < prices.length; i++) {
+      var p = prices[i];
+      try {
+        await db.collection('cards').doc(p.cardId).update({
+          data: {
+            priceLow: p.priceLow || null,
+            priceMid: p.priceMid || null,
+            priceMarket: p.priceMarket || null,
+            priceTrend: p.priceTrend || null,
+            priceUpdatedAt: new Date()
+          }
+        });
+        updated++;
+      } catch (e) {
+        errors.push(p.cardId + ': ' + e.message);
+      }
+    }
+    return { success: true, updated: updated, errors: errors };
+  }
+
   return { success: false, error: 'Unknown action: ' + action };
 };

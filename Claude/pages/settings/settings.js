@@ -57,7 +57,9 @@ Page({
     exportLists: [],
     exportFormat: 'csv',
     imageImportRunning: false,
-    imageImportProgress: ''
+    imageImportProgress: '',
+    priceUpdateRunning: false,
+    priceUpdateProgress: ''
   },
 
   onLoad() {
@@ -396,6 +398,251 @@ Page({
         that._processImageQueue(cards, index + 1, round);
       }
     });
+  },
+
+  // --- Price Sync (TCGAPIs) ---
+  _TCGAPIS_KEY: '44ff7fda685944c01b6d035c9902ea3c77eac1a41f5009ae124f914e658ed73e',
+  _TCGAPIS_BASE: 'https://api.tcgapis.com/v2',
+
+  // Price update tiers by rarity
+  _PRICE_TIERS: {
+    daily: ['Fabled', 'Legendary'],
+    weekly: ['Majestic', 'Super Rare', 'Promo'],
+    monthly: ['Rare', 'Common', 'Token']
+  },
+
+  onSyncPrices() {
+    var that = this;
+    wx.showModal({
+      title: '同步卡牌价格',
+      content: '将从 TCGAPIs 获取卡牌市场价格并更新数据库。按稀有度分级更新。是否开始？',
+      confirmText: '开始同步',
+      success: function(res) {
+        if (res.confirm) {
+          that._priceUpdatePaused = false;
+          that._priceUpdateTotal = 0;
+          that._priceUpdateErrors = 0;
+          that._priceUpdateSkipped = 0;
+          that.setData({ priceUpdateRunning: true, priceUpdateProgress: '查询需要更新的卡牌...' });
+          that._fetchCardsForPriceUpdate();
+        }
+      }
+    });
+  },
+
+  onPausePriceUpdate() {
+    this._priceUpdatePaused = true;
+    this.setData({ priceUpdateRunning: false, priceUpdateProgress: '已暂停，共更新 ' + this._priceUpdateTotal + ' 张' });
+  },
+
+  _fetchCardsForPriceUpdate() {
+    var that = this;
+    var db = wx.cloud.database();
+    var _ = db.command;
+    var now = new Date();
+
+    // Determine which rarities need updating based on last update time
+    var dailyRarities = that._PRICE_TIERS.daily;
+    var weeklyRarities = that._PRICE_TIERS.weekly;
+    var monthlyRarities = that._PRICE_TIERS.monthly;
+
+    // Combine all, we'll check timing per-card
+    var allRarities = dailyRarities.concat(weeklyRarities).concat(monthlyRarities);
+
+    // Query cards that have a tcgplayerProductId in printings
+    // Process in batches of 20 (cloud DB limit)
+    that._priceCardQueue = [];
+    that._priceQueueIndex = 0;
+
+    // First get daily tier cards (always update)
+    that.setData({ priceUpdateProgress: '查询高价值卡牌...' });
+    that._loadPriceCardsForRarities(dailyRarities, 0, function() {
+      that.setData({ priceUpdateProgress: '查询中等价值卡牌...' });
+      // Weekly: skip if updated within 7 days
+      that._loadPriceCardsForRarities(weeklyRarities, 7, function() {
+        that.setData({ priceUpdateProgress: '查询普通卡牌...' });
+        // Monthly: skip if updated within 30 days
+        that._loadPriceCardsForRarities(monthlyRarities, 30, function() {
+          var total = that._priceCardQueue.length;
+          if (total === 0) {
+            that.setData({ priceUpdateRunning: false, priceUpdateProgress: '所有价格已是最新' });
+            wx.showToast({ title: '无需更新', icon: 'success' });
+            return;
+          }
+          that.setData({ priceUpdateProgress: '共 ' + total + ' 张卡需更新价格，开始获取...' });
+          that._processPriceQueue();
+        });
+      });
+    });
+  },
+
+  _loadPriceCardsForRarities(rarities, skipDays, callback) {
+    var that = this;
+    var db = wx.cloud.database();
+    var _ = db.command;
+    var cutoff = skipDays > 0 ? new Date(Date.now() - skipDays * 86400000) : null;
+    var loaded = 0;
+
+    function loadBatch(skip) {
+      var query = db.collection('cards').where({
+        rarity: _.in(rarities)
+      }).skip(skip).limit(20).field({
+        _id: true, name: true, rarity: true, printings: true, priceUpdatedAt: true
+      });
+
+      query.get().then(function(res) {
+        var cards = res.data;
+        if (cards.length === 0) {
+          callback();
+          return;
+        }
+        cards.forEach(function(card) {
+          // Skip if recently updated
+          if (cutoff && card.priceUpdatedAt && new Date(card.priceUpdatedAt) > cutoff) {
+            that._priceUpdateSkipped++;
+            return;
+          }
+          // Find first printing with tcgplayerProductId
+          var productId = '';
+          if (card.printings && card.printings.length > 0) {
+            for (var i = 0; i < card.printings.length; i++) {
+              if (card.printings[i].tcgplayerProductId) {
+                productId = card.printings[i].tcgplayerProductId;
+                break;
+              }
+            }
+          }
+          if (productId) {
+            that._priceCardQueue.push({
+              cardId: card._id,
+              name: card.name,
+              rarity: card.rarity,
+              productId: productId
+            });
+          }
+        });
+        loaded += cards.length;
+        loadBatch(skip + 20);
+      }).catch(function(err) {
+        console.error('Load price cards error:', err);
+        callback();
+      });
+    }
+
+    loadBatch(0);
+  },
+
+  _processPriceQueue() {
+    if (this._priceUpdatePaused) return;
+    var that = this;
+    var queue = that._priceCardQueue;
+    var idx = that._priceQueueIndex;
+
+    if (idx >= queue.length) {
+      that.setData({
+        priceUpdateRunning: false,
+        priceUpdateProgress: '完成！更新 ' + that._priceUpdateTotal + ' 张' +
+          (that._priceUpdateErrors > 0 ? '，' + that._priceUpdateErrors + ' 个错误' : '') +
+          (that._priceUpdateSkipped > 0 ? '，跳过 ' + that._priceUpdateSkipped + ' 张（近期已更新）' : '')
+      });
+      wx.showToast({ title: '价格同步完成', icon: 'success' });
+      return;
+    }
+
+    var card = queue[idx];
+    that.setData({
+      priceUpdateProgress: '(' + (idx + 1) + '/' + queue.length + ') ' + card.name + ' [' + card.rarity + ']'
+    });
+
+    // Call TCGAPIs for price
+    wx.request({
+      url: that._TCGAPIS_BASE + '/prices/' + card.productId,
+      method: 'GET',
+      header: { 'x-api-key': that._TCGAPIS_KEY },
+      timeout: 10000,
+      success: function(res) {
+        if (res.statusCode !== 200 || !res.data) {
+          console.error('Price API error for ' + card.name + ': HTTP ' + res.statusCode);
+          that._priceUpdateErrors++;
+          that._priceQueueIndex++;
+          that._processPriceQueue();
+          return;
+        }
+
+        // Parse price data from response
+        var priceData = that._parseTcgApiPrice(res.data);
+
+        // Update DB via cloud function
+        wx.cloud.callFunction({
+          name: 'importCards',
+          data: {
+            action: 'updateCardPrices',
+            prices: [{
+              cardId: card.cardId,
+              priceLow: priceData.low,
+              priceMid: priceData.mid,
+              priceMarket: priceData.market,
+              priceTrend: priceData.trend
+            }]
+          }
+        }).then(function(cfRes) {
+          if (cfRes.result && cfRes.result.success) {
+            that._priceUpdateTotal++;
+          } else {
+            that._priceUpdateErrors++;
+          }
+          that._priceQueueIndex++;
+          that._processPriceQueue();
+        }).catch(function(err) {
+          console.error('Price DB update error:', err);
+          that._priceUpdateErrors++;
+          that._priceQueueIndex++;
+          that._processPriceQueue();
+        });
+      },
+      fail: function(err) {
+        console.error('Price API call failed:', err);
+        that._priceUpdateErrors++;
+        that._priceQueueIndex++;
+        // Delay on failure to avoid rate limiting
+        setTimeout(function() { that._processPriceQueue(); }, 1000);
+      }
+    });
+  },
+
+  _parseTcgApiPrice(data) {
+    // TCGAPIs v2 response format - extract price fields
+    // Adapt based on actual response structure
+    var result = { low: null, mid: null, market: null, trend: null };
+    try {
+      if (Array.isArray(data)) {
+        // May return array of price entries (normal, foil, etc.)
+        var normal = data.find(function(p) { return p.subTypeName === 'Normal' || p.printing === 'Normal'; }) || data[0];
+        if (normal) {
+          result.low = normal.lowPrice || normal.low_price || null;
+          result.mid = normal.midPrice || normal.mid_price || null;
+          result.market = normal.marketPrice || normal.market_price || null;
+          result.trend = normal.directLowPrice || normal.trend_price || null;
+        }
+      } else if (data.prices) {
+        var prices = Array.isArray(data.prices) ? data.prices : [data.prices];
+        var normal = prices.find(function(p) { return p.subTypeName === 'Normal' || p.printing === 'Normal'; }) || prices[0];
+        if (normal) {
+          result.low = normal.lowPrice || normal.low_price || null;
+          result.mid = normal.midPrice || normal.mid_price || null;
+          result.market = normal.marketPrice || normal.market_price || null;
+          result.trend = normal.directLowPrice || normal.trend_price || null;
+        }
+      } else {
+        result.low = data.lowPrice || data.low_price || null;
+        result.mid = data.midPrice || data.mid_price || null;
+        result.market = data.marketPrice || data.market_price || null;
+        result.trend = data.directLowPrice || data.trend_price || null;
+      }
+    } catch (e) {
+      console.error('Parse price error:', e);
+    }
+    return result;
   },
 
   onImportSets() {

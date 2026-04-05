@@ -127,6 +127,14 @@
       <view wx:if="{{imageImportRunning}}" class="item-refresh" style="color:#c0392b;">暂停</view>
       <text wx:else class="item-arrow">›</text>
     </view>
+    <view class="settings-item" bindtap="{{priceUpdateRunning ? 'onPausePriceUpdate' : 'onSyncPrices'}}">
+      <view class="item-left">
+        <text class="item-label">同步卡牌价格</text>
+        <text class="item-desc">{{priceUpdateProgress || '从 TCGAPIs 获取市场价格（按稀有度分级更新）'}}</text>
+      </view>
+      <view wx:if="{{priceUpdateRunning}}" class="item-refresh" style="color:#c0392b;">暂停</view>
+      <text wx:else class="item-arrow">›</text>
+    </view>
     <view class="settings-item" bindtap="onImportSets">
       <view class="item-left">
         <text class="item-label">导入系列数据</text>
