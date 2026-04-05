@@ -954,34 +954,27 @@ Page({
 
     var csv = '\uFEFF' + rows.join('\n'); // BOM for Excel compatibility
 
-    // Save as .xls so wx.openDocument can open it (csv is not a supported fileType)
-    // CSV content with .xls extension opens correctly in WPS/Excel
+    // Write CSV file then share directly (skip openDocument preview which can't parse CSV)
     var fs = wx.getFileSystemManager();
-    var filePath = wx.env.USER_DATA_PATH + '/PlanarBridge_export.xls';
+    var filePath = wx.env.USER_DATA_PATH + '/PlanarBridge_export.csv';
     fs.writeFile({
       filePath: filePath,
       data: csv,
       encoding: 'utf8',
       success: function() {
-        // Open with system document viewer (WPS/Excel), showMenu allows user to save/share
-        wx.openDocument({
+        // Share file directly — user can send to 文件传输助手 or forward to save
+        wx.shareFileMessage({
           filePath: filePath,
-          showMenu: true,
-          fileType: 'xls',
-          success: function() {},
+          fileName: 'PlanarBridge_export.csv',
+          success: function() {
+            wx.showToast({ title: '文件已发送', icon: 'success' });
+          },
           fail: function() {
-            // Fallback: share as file message
-            wx.shareFileMessage({
-              filePath: filePath,
-              fileName: 'PlanarBridge_export.xls',
-              success: function() {},
-              fail: function() {
-                wx.setClipboardData({
-                  data: csv,
-                  success: function() {
-                    wx.showToast({ title: 'CSV已复制到剪贴板', icon: 'success' });
-                  }
-                });
+            // User cancelled or API not supported, copy to clipboard as fallback
+            wx.setClipboardData({
+              data: csv,
+              success: function() {
+                wx.showToast({ title: '已复制到剪贴板', icon: 'success' });
               }
             });
           }
@@ -991,7 +984,7 @@ Page({
         wx.setClipboardData({
           data: csv,
           success: function() {
-            wx.showToast({ title: 'CSV已复制到剪贴板', icon: 'success' });
+            wx.showToast({ title: '已复制到剪贴板', icon: 'success' });
           }
         });
       }
