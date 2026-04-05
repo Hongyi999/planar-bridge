@@ -212,7 +212,6 @@
 .card-list-view {
   display: flex;
   flex-direction: column;
-  gap: 12rpx;
 }
 
 .card-list-view.show {
@@ -221,28 +220,30 @@
 
 .card-list-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 20rpx;
-  background: #FDFCF8;
-  border-radius: 20rpx;
-  padding: 16rpx 20rpx;
-  border: 2rpx solid #E8E3D8;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #E8E3D8;
+}
+
+.card-list-item:last-child {
+  border-bottom: none;
 }
 
 .card-list-item:active {
-  border-color: #9B864430;
+  background: #F8F5EC;
 }
 
 .cli-thumb {
-  width: 64rpx;
-  height: 90rpx;
+  width: 80rpx;
+  height: 112rpx;
   border-radius: 10rpx;
   flex-shrink: 0;
   border: 2rpx solid #9B864420;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4rpx;
+  padding: 2rpx;
   overflow: hidden;
 }
 
@@ -264,6 +265,7 @@
 .cli-info {
   flex: 1;
   min-width: 0;
+  padding-top: 4rpx;
 }
 
 .cli-name {

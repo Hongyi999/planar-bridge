@@ -49,12 +49,36 @@
   letter-spacing: 0.02em;
 }
 
+/* Reorder arrows */
+.lc-arrow {
+  position: absolute;
+  top: 12rpx;
+  width: 56rpx;
+  height: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  color: #6B6355;
+  background: #FDFCF8;
+  border-radius: 12rpx;
+  border: 2rpx solid #E8E3D8;
+  z-index: 5;
+}
+.lc-arrow-left { left: 12rpx; }
+.lc-arrow-right { right: 12rpx; }
+.lc-arrow:active { background: #E8E3D8; }
+.lc-arrow-disabled { opacity: 0.3; }
+
 .list-card {
   min-width: 256rpx;
   border-radius: 28rpx;
   padding: 28rpx;
   flex-shrink: 0;
   position: relative;
+}
+.list-card.edit-mode {
+  padding-top: 64rpx;
 }
 
 .list-card.selected {
@@ -250,9 +274,9 @@
 
 .card-item {
   display: flex;
-  align-items: center;
-  gap: 22rpx;
-  padding: 20rpx 0;
+  align-items: flex-start;
+  gap: 20rpx;
+  padding: 18rpx 0;
   border-bottom: 1rpx solid #E8E3D8;
 }
 
@@ -265,42 +289,43 @@
 }
 
 .ci-thumb {
-  width: 110rpx;
-  height: 154rpx;
-  border-radius: 12rpx;
+  width: 80rpx;
+  height: 112rpx;
+  border-radius: 10rpx;
   flex-shrink: 0;
   border: 2rpx solid #9B864420;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4rpx;
+  padding: 2rpx;
   overflow: hidden;
 }
 
 .ci-thumb-img {
   width: 100%;
   height: 100%;
-  border-radius: 12rpx;
+  border-radius: 10rpx;
 }
 .ci-thumb-text {
-  font-size: 12rpx;
+  font-size: 10rpx;
   color: #9B8644;
   text-align: center;
   font-weight: 600;
   line-height: 1.2;
   word-break: break-all;
   overflow: hidden;
-  max-height: 140rpx;
+  max-height: 100rpx;
 }
 
 .ci-info {
   flex: 1;
   min-width: 0;
+  padding-top: 4rpx;
 }
 
 .ci-name {
   display: block;
-  font-size: 26rpx;
+  font-size: 24rpx;
   font-weight: 600;
   color: #2C2A22;
   letter-spacing: 0.01em;
@@ -313,7 +338,7 @@
   display: block;
   font-size: 20rpx;
   color: #A09A8C;
-  margin-top: 4rpx;
+  margin-top: 2rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -460,25 +485,6 @@
   font-weight: 700;
   text-shadow: 0 1rpx 4rpx rgba(0,0,0,0.3);
 }
-.edit-sort-row {
-  display: flex;
-  gap: 16rpx;
-}
-.edit-sort-btn {
-  flex: 1;
-  text-align: center;
-  padding: 16rpx 0;
-  border-radius: 16rpx;
-  font-size: 26rpx;
-  color: #6B6355;
-  background: #F2EFE4;
-  border: 2rpx solid #E8E3D8;
-  font-weight: 500;
-}
-.edit-sort-btn:active {
-  background: #E8E3D8;
-}
-
 .edit-save-btn {
   width: 100%;
   text-align: center;

@@ -23,6 +23,7 @@ Page({
     totalValue: '0.00',
     isLoaded: true,
     viewMode: 'grid',
+    isEditMode: false,
     showHint: false,
     showEditPanel: false,
     editName: '',
@@ -196,8 +197,11 @@ Page({
   onToggleView: function() {
     this.setData({ viewMode: this.data.viewMode === 'grid' ? 'list' : 'grid' });
   },
-  onMoveLeft: function() {
-    var idx = this.data._editIndex;
+  onToggleEditMode: function() {
+    this.setData({ isEditMode: !this.data.isEditMode });
+  },
+  onMoveListLeft: function(e) {
+    var idx = e.currentTarget.dataset.index;
     if (idx <= 0) return;
     var lists = storageUtil.getLists();
     var temp = lists[idx];
@@ -207,12 +211,11 @@ Page({
     var sel = this.data.selectedIndex;
     if (sel === idx) sel = idx - 1;
     else if (sel === idx - 1) sel = idx;
-    this.setData({ selectedIndex: sel, _editIndex: idx - 1 });
+    this.setData({ selectedIndex: sel });
     this.loadData();
-    wx.showToast({ title: '已左移', icon: 'none', duration: 800 });
   },
-  onMoveRight: function() {
-    var idx = this.data._editIndex;
+  onMoveListRight: function(e) {
+    var idx = e.currentTarget.dataset.index;
     var lists = storageUtil.getLists();
     if (idx >= lists.length - 1) return;
     var temp = lists[idx];
@@ -222,9 +225,8 @@ Page({
     var sel = this.data.selectedIndex;
     if (sel === idx) sel = idx + 1;
     else if (sel === idx + 1) sel = idx;
-    this.setData({ selectedIndex: sel, _editIndex: idx + 1 });
+    this.setData({ selectedIndex: sel });
     this.loadData();
-    wx.showToast({ title: '已右移', icon: 'none', duration: 800 });
   },
   onListLongPress: function(e) {
     var idx = e.currentTarget.dataset.index;
