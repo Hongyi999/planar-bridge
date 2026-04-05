@@ -37,7 +37,7 @@
 
     <!-- Card image or placeholder -->
     <view class="detail-card-visual" style="transform: scale({{heroHeight > 620 ? 1 + (heroHeight - 620) / 680 : 1}}); transition: {{heroHeight === 620 ? 'transform 0.3s ease-out' : 'none'}};">
-      <image wx:if="{{card.cloudImageId || card.imageUrl}}" class="detail-card-image" src="{{card.cloudImageId || card.imageUrl}}" mode="aspectFit" show-menu-by-longpress />
+      <image wx:if="{{card.cloudImageId || card.imageUrl}}" class="detail-card-image" src="{{card.cloudImageId || card.imageUrl}}" mode="aspectFit" show-menu-by-longpress bindtap="onPreviewImage" />
       <view wx:else class="detail-card-placeholder" style="background: linear-gradient(145deg, #EDE9DC, #E4DFCF);">
         <text class="dcp-name font-heading">{{card.name}}</text>
         <text class="dcp-name-cn" wx:if="{{card.nameCN}}">{{card.nameCN}}</text>

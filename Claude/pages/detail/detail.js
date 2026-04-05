@@ -150,6 +150,15 @@ Page({
   onModalCancel: function() {
     this.setData({ showListModal: false });
   },
+  onPreviewImage() {
+    var url = this.data.card.cloudImageId || this.data.card.imageUrl;
+    if (url) {
+      wx.previewImage({
+        current: url,
+        urls: [url]
+      });
+    }
+  },
   onCopyLink() {
     if (this.data.card && this.data.card.tcgplayerUrl) {
       wx.setClipboardData({
