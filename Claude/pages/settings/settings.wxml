@@ -102,9 +102,9 @@
     </view>
   </view>
 
-  <!-- Card Database Import (Admin) -->
-  <view class="settings-group">
-    <view class="group-title">卡牌数据库</view>
+  <!-- Card Database Import (Admin only — tap "关于" 5 times to unlock) -->
+  <view class="settings-group" wx:if="{{adminMode}}">
+    <view class="group-title">卡牌数据库（管理）</view>
     <view class="settings-item">
       <view class="item-left">
         <text class="item-label">数据库状态</text>

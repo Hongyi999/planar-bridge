@@ -60,7 +60,9 @@ Page({
     imageImportRunning: false,
     imageImportProgress: '',
     priceUpdateRunning: false,
-    priceUpdateProgress: ''
+    priceUpdateProgress: '',
+    adminMode: false,
+    _adminTapCount: 0
   },
 
   onLoad() {
@@ -1044,12 +1046,27 @@ Page({
 
   // --- About ---
   onAbout() {
-    wx.showModal({
-      title: 'Planar Bridge v1.0.0',
-      content: 'AI 驱动的 Flesh and Blood TCG 卡牌搜索与收藏管理工具。\n\n数据来源: TCGPlayer\nAI 引擎: 腾讯混元\n框架: 微信小程序云开发',
-      showCancel: false,
-      confirmText: '好的'
-    });
+    var that = this;
+    var count = this.data._adminTapCount + 1;
+    if (count >= 5 && !this.data.adminMode) {
+      this.setData({ adminMode: true, _adminTapCount: 0 });
+      wx.showToast({ title: '已开启管理模式', icon: 'none' });
+      return;
+    }
+    this.setData({ _adminTapCount: count });
+    // Reset tap counter after 3 seconds
+    if (this._adminTimer) clearTimeout(this._adminTimer);
+    this._adminTimer = setTimeout(function() {
+      that.setData({ _adminTapCount: 0 });
+    }, 3000);
+    if (count === 1) {
+      wx.showModal({
+        title: 'Planar Bridge v1.0.0',
+        content: 'AI 驱动的 Flesh and Blood TCG 卡牌搜索与收藏管理工具。\n\n数据来源: TCGPlayer\nAI 引擎: 腾讯混元\n框架: 微信小程序云开发',
+        showCancel: false,
+        confirmText: '好的'
+      });
+    }
   },
 
   onFeedback() {
