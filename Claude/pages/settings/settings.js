@@ -456,10 +456,11 @@ Page({
           }
           // Group into batches of 20 (free tier limit)
           that._priceBatches = [];
+          that._priceBatchesDone = 0;
           for (var i = 0; i < total; i += 20) {
             that._priceBatches.push(that._priceCardQueue.slice(i, i + 20));
           }
-          that.setData({ priceUpdateProgress: '共 ' + total + ' 张卡，' + that._priceBatches.length + ' 批，开始获取...' });
+          that.setData({ priceUpdateProgress: '共 ' + total + ' 张卡，' + that._priceBatches.length + ' 批（每天最多90批），开始获取...' });
           that._processPriceBatch();
         });
       });
@@ -520,6 +521,16 @@ Page({
     var batches = that._priceBatches;
     var bIdx = that._priceBatchIndex;
 
+    // Daily limit: stop at 90 batches to stay under 100/day
+    if (that._priceBatchesDone >= 90) {
+      that.setData({
+        priceUpdateRunning: false,
+        priceUpdateProgress: '今日额度已用完（90批/天）。已更新 ' + that._priceUpdateTotal + ' 张，明天继续剩余 ' + (batches.length - bIdx) + ' 批'
+      });
+      wx.showToast({ title: '明天继续', icon: 'none' });
+      return;
+    }
+
     if (bIdx >= batches.length) {
       that.setData({
         priceUpdateRunning: false,
@@ -552,11 +563,18 @@ Page({
       data: postBody,
       timeout: 15000,
       success: function(res) {
+        if (res.statusCode === 429) {
+          console.warn('Rate limited, waiting 60s before retry...');
+          that.setData({ priceUpdateProgress: '频率限制，等待60秒后重试... 已更新 ' + that._priceUpdateTotal + ' 张' });
+          setTimeout(function() { that._processPriceBatch(); }, 60000);
+          return;
+        }
         if (res.statusCode !== 200 || !res.data) {
           console.error('JustTCG API error: HTTP ' + res.statusCode, res.data);
           that._priceUpdateErrors += batch.length;
           that._priceBatchIndex++;
-          setTimeout(function() { that._processPriceBatch(); }, 2000);
+          that._priceBatchesDone++;
+          setTimeout(function() { that._processPriceBatch(); }, 7000);
           return;
         }
 
@@ -587,13 +605,15 @@ Page({
             that._priceUpdateErrors += priceUpdates.length;
           }
           that._priceBatchIndex++;
-          // Rate limit: free tier = 10 requests/min, wait 6s between batches
-          setTimeout(function() { that._processPriceBatch(); }, 6500);
+          that._priceBatchesDone++;
+          // Rate limit: free tier = 10 req/min, wait 7s between batches
+          setTimeout(function() { that._processPriceBatch(); }, 7000);
         }).catch(function(err) {
           console.error('Price DB update error:', err);
           that._priceUpdateErrors += priceUpdates.length;
           that._priceBatchIndex++;
-          setTimeout(function() { that._processPriceBatch(); }, 6500);
+          that._priceBatchesDone++;
+          setTimeout(function() { that._processPriceBatch(); }, 7000);
         });
       },
       fail: function(err) {
