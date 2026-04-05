@@ -57,8 +57,7 @@
 }
 
 .detail-page,
-.detail-page view,
-.detail-page scroll-view {
+.detail-page view {
   box-sizing: border-box;
 }
 
@@ -144,16 +143,6 @@
   height: 36rpx;
 }
 
-/* Transparent overlay to capture touch for drag-to-enlarge */
-.hero-touch-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 5;
-}
-
 /* Card visual (image or placeholder) */
 .detail-card-visual {
   position: relative;
@@ -235,13 +224,6 @@
   width: 100%;
 }
 
-/* Hide scrollbar */
-.detail-sheet ::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
-  color: transparent;
-}
 
 /* Header */
 .detail-header {

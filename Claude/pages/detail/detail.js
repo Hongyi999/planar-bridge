@@ -9,10 +9,10 @@ Page({
     navHeight: 32,
     card: null,
     highlightedText: '',
-    heroHeight: 640,
+    heroHeight: 588,
     isLoading: true,
     _touchStartY: 0,
-    _startHeroHeight: 640,
+    _startHeroHeight: 588,
     isInCollection: false,
     collectionListNames: [],
     showListModal: false,
@@ -77,30 +77,31 @@ Page({
   goHome() {
     wx.switchTab({ url: '/pages/index/index' });
   },
-  onHandleTouchStart(e) {
+  onPageTouchStart(e) {
     this._touchStartY = e.touches[0].clientY;
     this._startHeroHeight = this.data.heroHeight;
     this._pxToRpx = 750 / wx.getSystemInfoSync().windowWidth;
     this._isDragging = false;
   },
-  onHandleTouchMove(e) {
+  onPageTouchMove(e) {
     var deltaY = e.touches[0].clientY - this._touchStartY;
     var deltaRpx = deltaY * this._pxToRpx;
-    if (Math.abs(deltaRpx) > 10) this._isDragging = true;
-    var newHeight = this._startHeroHeight + deltaRpx;
-    // Clamp between 640 (default) and 960 (expanded)
-    newHeight = Math.max(640, Math.min(960, newHeight));
-    this.setData({ heroHeight: newHeight });
+    // Only enlarge on downward drag
+    if (deltaRpx > 10) {
+      this._isDragging = true;
+      var newHeight = this._startHeroHeight + deltaRpx;
+      newHeight = Math.min(960, newHeight);
+      this.setData({ heroHeight: newHeight });
+    }
   },
-  onHandleTouchEnd() {
+  onPageTouchEnd() {
     if (this._isDragging) {
-      // Snap back to default height
-      this.setData({ heroHeight: 640 });
-    } else {
-      // It was a tap, open preview
-      this.onPreviewImage();
+      this.setData({ heroHeight: 588 });
     }
     this._isDragging = false;
+  },
+  onHeroTap() {
+    this.onPreviewImage();
   },
   onAddToList() {
     var cardId = this.data.card.id || this.data.card._id;
