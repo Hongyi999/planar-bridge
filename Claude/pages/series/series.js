@@ -1,5 +1,4 @@
 var seriesData = require('../../utils/seriesData.js');
-var cloudDB = require('../../utils/cloudDB.js');
 
 Page({
   data: {
@@ -8,26 +7,9 @@ Page({
     isLoading: true
   },
   onLoad: function() {
-    var that = this;
-
-    // Show local data immediately
-    that.setData({
+    this.setData({
       seriesGroups: seriesData.getSeriesChronological(),
-      isLoading: true
-    });
-
-    // Try to fetch from cloud
-    cloudDB.getSetsGroupedByYear().then(function(groups) {
-      if (groups && groups.length > 0) {
-        that.setData({
-          seriesGroups: groups,
-          isLoading: false
-        });
-      } else {
-        that.setData({ isLoading: false });
-      }
-    }).catch(function() {
-      that.setData({ isLoading: false });
+      isLoading: false
     });
   },
   onShow: function() {
@@ -57,11 +39,11 @@ Page({
     });
   },
   onSetTap: function(e) {
-    var code = e.currentTarget.dataset.code;
-    wx.showToast({
-      title: code + ' — 即将上线',
-      icon: 'none',
-      duration: 1500
+    var ds = e.currentTarget.dataset;
+    wx.navigateTo({
+      url: '/pages/set-detail/set-detail?code=' + ds.code +
+        '&name=' + encodeURIComponent(ds.name || '') +
+        '&nameCN=' + encodeURIComponent(ds.nameCn || '')
     });
   }
 });

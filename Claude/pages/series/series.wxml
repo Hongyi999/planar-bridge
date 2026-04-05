@@ -24,6 +24,8 @@
         wx:key="code"
         class="set-item"
         data-code="{{set.code}}"
+        data-name="{{set.name}}"
+        data-name-cn="{{set.nameCN}}"
         bindtap="onSetTap"
       >
         <!-- Icon badge -->

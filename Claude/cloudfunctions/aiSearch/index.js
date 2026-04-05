@@ -131,8 +131,8 @@ exports.main = async (event) => {
   }
 
   // Step 3: Query database
-  var sort = sortField || 'priceMid';
-  var order = sortOrder || 'desc';
+  var sort = sortField || 'name';
+  var order = sortOrder || 'asc';
   var results;
   try {
     results = await db.collection('cards')

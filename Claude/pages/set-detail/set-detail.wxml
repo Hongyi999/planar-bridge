@@ -1,4 +1,4 @@
-<view class="results-page">
+<view class="set-detail-page">
   <!-- Custom navigation bar -->
   <view class="custom-nav" style="top: {{navTop}}px; height: {{navHeight}}px;">
     <view class="nav-btn-group" style="height: {{navHeight}}px; border-radius: {{navHeight / 2}}px;">
@@ -10,58 +10,42 @@
         <image class="nav-icon" src="/assets/icons/nav-home.svg" mode="aspectFit" />
       </view>
     </view>
-    <text class="nav-title font-heading">搜索结果</text>
+    <text class="nav-title font-heading">{{setName}}</text>
   </view>
 
-  <!-- Fixed header area -->
-  <view class="results-fixed-header" style="top: {{navFullHeight}}px;">
-    <!-- Search bar compact -->
-    <view class="search-compact">
-      <search-bar value="{{query}}" compact="{{true}}" bind:search="onSearch" />
-    </view>
-
-    <!-- Thinking strip -->
-    <view class="thinking-section">
-      <thinking-strip steps="{{thinkingSteps}}" bind:complete="onThinkingComplete" />
-    </view>
-
-    <!-- AI Summary -->
-    <view class="summary-card {{showResults ? 'show' : ''}}" wx:if="{{summary}}">
-      <view class="summary-header">
-        <text class="summary-label font-heading">AI 搜索摘要</text>
-        <text class="summary-count font-mono">{{resultCount}} 个结果</text>
+  <!-- Header area -->
+  <view class="set-header" style="padding-top: {{navFullHeight}}px;">
+    <view class="set-header-inner">
+      <view class="set-header-left">
+        <text class="set-header-code font-mono">{{setCode}}</text>
+        <text class="set-header-count">{{cards.length}} 张卡牌{{hasMore ? '+' : ''}}</text>
       </view>
-      <text class="summary-text">{{summary}}</text>
-    </view>
-
-    <!-- Results meta -->
-    <view class="results-meta {{showResults ? 'show' : ''}}" wx:if="{{!isLoading}}">
-      <text class="meta-left">{{resultCount}} 个结果 · 按名称排序</text>
       <view class="meta-actions">
         <view class="view-toggle" bindtap="onToggleView">
           <image class="view-toggle-icon" src="/assets/icons/{{viewMode === 'grid' ? 'view-list' : 'view-grid'}}.svg" mode="aspectFit" />
         </view>
       </view>
     </view>
+    <text class="set-header-name-cn" wx:if="{{setNameCN}}">{{setNameCN}}</text>
+  </view>
 
-    <!-- Loading dots -->
-    <view class="results-loading-dots" wx:if="{{isLoading && showResults}}">
+  <!-- Scrollable card list -->
+  <scroll-view scroll-y class="set-scroll" style="padding-top: {{navFullHeight + 100}}px;" bindscrolltolower="onScrollToLower" lower-threshold="200">
+    <!-- Loading state -->
+    <view class="loading-dots" wx:if="{{isLoading}}">
       <view class="r-loading-dot"></view>
       <view class="r-loading-dot"></view>
       <view class="r-loading-dot"></view>
     </view>
-  </view>
 
-  <!-- Scrollable card results -->
-  <scroll-view scroll-y class="results-scroll" style="padding-top: {{headerHeight}}px;">
     <!-- Card grid -->
-    <view class="card-grid {{showResults ? 'show' : ''}}" wx:if="{{viewMode === 'grid'}}">
-      <card-tile wx:for="{{results}}" wx:key="id" card="{{item}}" index="{{index}}" />
+    <view class="card-grid show" wx:if="{{!isLoading && viewMode === 'grid'}}">
+      <card-tile wx:for="{{cards}}" wx:key="_id" card="{{item}}" index="{{index}}" />
     </view>
 
     <!-- Card list view -->
-    <view class="card-list-view {{showResults ? 'show' : ''}}" wx:if="{{viewMode === 'list'}}">
-      <view wx:for="{{results}}" wx:key="id" class="card-list-item" data-id="{{item.id || item._id}}" bindtap="onCardTap">
+    <view class="card-list-view show" wx:if="{{!isLoading && viewMode === 'list'}}">
+      <view wx:for="{{cards}}" wx:key="_id" class="card-list-item" data-id="{{item._id || item.id}}" bindtap="onCardTap">
         <view class="cli-thumb" style="background: #EDE9DC">
           <image wx:if="{{item.cloudImageId || item.imageUrl}}" class="cli-thumb-img" src="{{item.cloudImageId || item.imageUrl}}" mode="aspectFill" lazy-load />
           <text wx:else class="cli-thumb-text font-heading">{{item.name}}</text>
@@ -69,7 +53,7 @@
         <view class="cli-info">
           <text class="cli-name font-heading">{{item.name}}</text>
           <text class="cli-name-cn" wx:if="{{item.nameCN}}">{{item.nameCN}}</text>
-          <text class="cli-meta">{{item.classCN || item.class}} · {{item.typeCN || item.type}} · {{item.setCode}}</text>
+          <text class="cli-meta">{{item.classCN || item.class}} · {{item.typeCN || item.type}} · {{item.cardCode}}</text>
         </view>
         <view class="cli-price" wx:if="{{item.priceMid != null}}">
           <text class="cli-price-value font-mono">${{item.priceMid}}</text>
@@ -78,10 +62,16 @@
       </view>
     </view>
 
-    <!-- Empty state — only show after loading completes -->
-    <view class="empty-state {{showResults && !isLoading && resultCount === 0 ? 'show' : ''}}" wx:if="{{!isLoading && resultCount === 0}}">
-      <text class="empty-text">未找到匹配卡牌</text>
-      <text class="empty-hint">尝试其他关键词，如「传奇装备」或「威严攻击」</text>
+    <!-- Loading more -->
+    <view class="loading-more" wx:if="{{isLoadingMore}}">
+      <view class="r-loading-dot"></view>
+      <view class="r-loading-dot"></view>
+      <view class="r-loading-dot"></view>
+    </view>
+
+    <!-- Empty state -->
+    <view class="empty-state show" wx:if="{{!isLoading && cards.length === 0}}">
+      <text class="empty-text">该系列暂无卡牌数据</text>
     </view>
 
     <view class="bottom-spacer"></view>

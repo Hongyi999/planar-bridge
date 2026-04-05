@@ -3,6 +3,7 @@
     "pages/index/index",
     "pages/results/results",
     "pages/detail/detail",
+    "pages/set-detail/set-detail",
     "pages/series/series",
     "pages/lists/lists",
     "pages/settings/settings"

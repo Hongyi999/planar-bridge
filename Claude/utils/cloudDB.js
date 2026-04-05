@@ -49,8 +49,8 @@ function getCardById(id) {
 function searchCards(filters, options) {
   var page = (options && options.page) || 1;
   var pageSize = (options && options.pageSize) || 20;
-  var sortField = (options && options.sortField) || 'priceMid';
-  var sortOrder = (options && options.sortOrder) || 'desc';
+  var sortField = (options && options.sortField) || 'name';
+  var sortOrder = (options && options.sortOrder) || 'asc';
 
   return new Promise(function(resolve) {
     var db = _getDB();

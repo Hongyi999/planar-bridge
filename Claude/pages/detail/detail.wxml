@@ -87,11 +87,11 @@
       </view>
       <view class="stat-chip">
         <text class="stat-label">智力</text>
-        <text class="stat-value">{{card.intellect !== null ? card.intellect : '—'}}</text>
+        <text class="stat-value">{{card.intelligence != null ? card.intelligence : (card.intellect != null ? card.intellect : '—')}}</text>
       </view>
       <view class="stat-chip">
         <text class="stat-label">生命</text>
-        <text class="stat-value">{{card.life !== null ? card.life : '—'}}</text>
+        <text class="stat-value">{{card.health != null ? card.health : (card.life != null ? card.life : '—')}}</text>
       </view>
     </view>
 

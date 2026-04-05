@@ -3,11 +3,11 @@ var aiParser = require('../../utils/aiParser.js');
 
 // Sort options mapping
 var SORT_MAP = [
-  { field: 'priceMid', order: 'desc' },   // 0: 价格从高到低
-  { field: 'priceMid', order: 'asc' },    // 1: 价格从低到高
-  { field: 'name', order: 'asc' },         // 2: 名称 A-Z
-  { field: 'name', order: 'desc' },        // 3: 名称 Z-A
-  { field: 'setCode', order: 'asc' }       // 4: 系列
+  { field: 'name', order: 'asc' },         // 0: 名称 A-Z
+  { field: 'name', order: 'desc' },        // 1: 名称 Z-A
+  { field: 'setCode', order: 'asc' },      // 2: 系列
+  { field: 'priceMid', order: 'desc' },    // 3: 价格从高到低
+  { field: 'priceMid', order: 'asc' }      // 4: 价格从低到高
 ];
 
 function getSortPreference() {
