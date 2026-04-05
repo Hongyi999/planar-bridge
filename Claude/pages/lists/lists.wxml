@@ -70,6 +70,12 @@
     </view>
   </view>
 
+  <!-- Empty state for grid view -->
+  <view class="empty-list" wx:if="{{isLoaded && viewMode === 'grid' && selectedCards.length === 0}}">
+    <text class="empty-text">此列表暂无卡牌</text>
+    <text class="empty-hint">搜索并收藏卡牌，它们会出现在这里</text>
+  </view>
+
   <!-- Card list view -->
   <view class="cards-list" wx:if="{{isLoaded && viewMode === 'list'}}">
     <view

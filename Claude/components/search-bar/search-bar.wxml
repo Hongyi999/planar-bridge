@@ -1,9 +1,6 @@
 <view class="search-bar {{compact ? 'compact' : ''}}" bindtap="onTap">
   <!-- Search icon -->
-  <view class="search-icon">
-    <view class="icon-circle"></view>
-    <view class="icon-handle"></view>
-  </view>
+  <image class="search-icon-img" src="/assets/icons/tab-search.svg" mode="aspectFit" />
   <input
     class="search-input"
     value="{{value}}"

@@ -78,12 +78,11 @@
 /* Hero */
 .detail-hero {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   position: relative;
   background: #F2EFE4;
   flex-shrink: 0;
-  padding-bottom: 40rpx;
 }
 
 .deco-circle {
