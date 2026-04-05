@@ -74,11 +74,12 @@
 /* Hero */
 .detail-hero {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   position: relative;
   background: linear-gradient(180deg, #EBE7DA 0%, #F2EFE4 100%);
   flex-shrink: 0;
+  padding-bottom: 40rpx;
 }
 
 .deco-circle {
@@ -147,15 +148,15 @@
 }
 
 .detail-card-image {
-  width: 290rpx;
-  height: 406rpx;
+  width: 420rpx;
+  height: 588rpx;
   border-radius: 20rpx;
   box-shadow: 0 32rpx 96rpx #9B864420;
 }
 
 .detail-card-placeholder {
-  width: 290rpx;
-  height: 406rpx;
+  width: 420rpx;
+  height: 588rpx;
   border-radius: 20rpx;
   border: 4rpx solid #9B864450;
   display: flex;

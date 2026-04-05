@@ -54,9 +54,18 @@
 
   <!-- Scrollable card results -->
   <scroll-view scroll-y class="results-scroll" style="padding-top: {{headerHeight}}px;">
-    <!-- Card grid -->
+    <!-- Card grid (image-only) -->
     <view class="card-grid {{showResults ? 'show' : ''}}" wx:if="{{viewMode === 'grid'}}">
-      <card-tile wx:for="{{results}}" wx:key="id" card="{{item}}" index="{{index}}" />
+      <view wx:for="{{results}}" wx:key="id" class="card-grid-item" data-id="{{item.id || item._id}}" bindtap="onCardTap">
+        <image wx:if="{{item.cloudImageId || item.imageUrl}}" class="card-grid-img" src="{{item.cloudImageId || item.imageUrl}}" mode="widthFix" lazy-load binderror="onImgError" data-index="{{index}}" />
+        <view wx:else class="card-grid-placeholder font-heading">
+          <text>{{item.name}}</text>
+        </view>
+        <!-- Favorite star -->
+        <view class="grid-star-btn" catchtap="onStarTap" data-id="{{item.id || item._id}}" data-index="{{index}}">
+          <image class="grid-star-icon" src="/assets/icons/{{item._isFav ? 'star-filled' : 'star-outline'}}.svg" mode="aspectFit" />
+        </view>
+      </view>
     </view>
 
     <!-- Card list view -->

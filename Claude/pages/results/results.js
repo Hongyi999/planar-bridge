@@ -1,5 +1,6 @@
 var cardData = require('../../utils/cardData.js');
 var aiParser = require('../../utils/aiParser.js');
+var storageUtil = require('../../utils/storage.js');
 
 // Sort options mapping
 var SORT_MAP = [
@@ -80,6 +81,7 @@ Page({
         });
       }
       results = sortResults(results, sortPref);
+      that._markFavorites(results);
       that.setData({
         filters: result.filters || localFilters,
         summary: result.summary || '',
@@ -93,6 +95,7 @@ Page({
       var filters = aiParser.parseQuery(query);
       var results = cardData.searchCards(filters);
       results = sortResults(results, sortPref);
+      that._markFavorites(results);
       var summary = aiParser.generateSummary(query, results);
 
       that.setData({
@@ -147,5 +150,24 @@ Page({
   onCardTap: function(e) {
     var id = e.currentTarget.dataset.id;
     wx.navigateTo({ url: '/pages/detail/detail?id=' + id });
+  },
+
+  onStarTap: function(e) {
+    var id = e.currentTarget.dataset.id;
+    var index = e.currentTarget.dataset.index;
+    var isFav = storageUtil.toggleFavorite(id);
+    var key = 'results[' + index + ']._isFav';
+    var update = {};
+    update[key] = isFav;
+    this.setData(update);
+    wx.showToast({ title: isFav ? '已收藏' : '已取消收藏', icon: 'none', duration: 1000 });
+  },
+
+  _markFavorites: function(results) {
+    results.forEach(function(card) {
+      var cardId = card.id || card._id;
+      card._isFav = storageUtil.isCardFavorited(cardId);
+    });
+    return results;
   }
 });

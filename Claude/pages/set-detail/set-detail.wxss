@@ -149,12 +149,19 @@
   width: calc(50% - 8rpx);
   border-radius: 16rpx;
   overflow: hidden;
+  position: relative;
 }
 
 .card-grid-img {
   width: 100%;
   display: block;
   border-radius: 16rpx;
+  animation: fadeIn 0.35s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .card-grid-placeholder {
@@ -176,6 +183,30 @@
   text-align: center;
   width: 80%;
   word-break: break-word;
+}
+
+/* Favorite star on grid cards */
+.grid-star-btn {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+  width: 56rpx;
+  height: 56rpx;
+  background: rgba(253, 252, 248, 0.7);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.grid-star-btn:active {
+  background: rgba(253, 252, 248, 0.95);
+}
+
+.grid-star-icon {
+  width: 32rpx;
+  height: 32rpx;
 }
 
 /* Card list view */
