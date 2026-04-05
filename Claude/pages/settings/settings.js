@@ -962,18 +962,19 @@ Page({
       data: csv,
       encoding: 'utf8',
       success: function() {
-        // Try to let user save/share the file
-        wx.openDocument({
+        // Primary: share file directly so user can save/send
+        wx.shareFileMessage({
           filePath: filePath,
-          showMenu: true,
+          fileName: 'PlanarBridge_export.csv',
           success: function() {
             wx.showToast({ title: '已导出CSV文件', icon: 'success' });
           },
           fail: function() {
-            // Fallback: share as file message
-            wx.shareFileMessage({
+            // Fallback: open with system viewer (showMenu allows saving)
+            wx.openDocument({
               filePath: filePath,
-              fileName: 'PlanarBridge_export.csv',
+              showMenu: true,
+              fileType: 'csv',
               success: function() {
                 wx.showToast({ title: '已导出CSV文件', icon: 'success' });
               },
