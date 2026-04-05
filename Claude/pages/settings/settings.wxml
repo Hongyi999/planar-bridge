@@ -58,7 +58,7 @@
     <view class="settings-item" bindtap="onExportStart">
       <view class="item-left">
         <text class="item-label">选择列表并导出</text>
-        <text class="item-desc">选择需要导出的列表，支持文本和 CSV 格式</text>
+        <text class="item-desc">选择需要导出的列表，支持 Markdown 和 Excel 格式</text>
       </view>
       <text class="item-arrow">›</text>
     </view>
@@ -85,12 +85,12 @@
       <text class="export-step-label" style="margin-top: 24rpx;">选择导出格式</text>
       <view class="export-format-row">
         <view class="export-format-btn {{exportFormat === 'text' ? 'active' : ''}}" data-format="text" bindtap="onSetExportFormat">
-          <text class="efb-label">文本</text>
-          <text class="efb-desc">复制到剪贴板</text>
+          <text class="efb-label">Markdown</text>
+          <text class="efb-desc">复制到剪贴板（.md 格式）</text>
         </view>
         <view class="export-format-btn {{exportFormat === 'csv' ? 'active' : ''}}" data-format="csv" bindtap="onSetExportFormat">
-          <text class="efb-label">CSV</text>
-          <text class="efb-desc">保存为文件</text>
+          <text class="efb-label">Excel</text>
+          <text class="efb-desc">导出为 .xls 文件</text>
         </view>
       </view>
 
