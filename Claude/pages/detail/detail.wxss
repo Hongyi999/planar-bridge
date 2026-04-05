@@ -62,6 +62,10 @@
   box-sizing: border-box;
 }
 
+.detail-page .detail-hero {
+  box-sizing: content-box;
+}
+
 .detail-page {
   min-height: 100vh;
   background: #F2EFE4;
@@ -80,7 +84,6 @@
   background: #F2EFE4;
   flex-shrink: 0;
   padding-bottom: 40rpx;
-  box-sizing: content-box;
 }
 
 .deco-circle {

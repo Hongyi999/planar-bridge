@@ -813,6 +813,10 @@ Page({
     this.setData({ exportFormat: e.currentTarget.dataset.format });
   },
 
+  onExportNoop() {
+    // Prevent tap from bubbling to mask
+  },
+
   onExportCancel() {
     this.setData({ showExportModal: false });
   },

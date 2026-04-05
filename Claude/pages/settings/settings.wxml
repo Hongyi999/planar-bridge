@@ -66,7 +66,7 @@
 
   <!-- Export modal -->
   <view class="export-modal-mask" wx:if="{{showExportModal}}" bindtap="onExportCancel">
-    <view class="export-modal" catchtap="">
+    <view class="export-modal" catchtap="onExportNoop">
       <text class="export-modal-title font-heading">导出收藏列表</text>
 
       <!-- Step 1: Select lists -->

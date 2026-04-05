@@ -31,11 +31,11 @@
 
   <!-- Scrollable card list -->
   <scroll-view scroll-y class="set-scroll" style="padding-top: {{navFullHeight + 56}}px;" bindscrolltolower="onScrollToLower" lower-threshold="200">
-    <!-- Loading state -->
-    <view class="loading-dots" wx:if="{{isLoading}}">
-      <view class="r-loading-dot"></view>
-      <view class="r-loading-dot"></view>
-      <view class="r-loading-dot"></view>
+    <!-- Loading skeleton -->
+    <view class="card-grid show" wx:if="{{isLoading}}">
+      <view class="skeleton-card" wx:for="{{[1,2,3,4,5,6]}}" wx:key="*this">
+        <view class="skeleton-shimmer"></view>
+      </view>
     </view>
 
     <!-- Card grid (image-only, MTGso style) -->

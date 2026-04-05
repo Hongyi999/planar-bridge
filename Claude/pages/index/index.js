@@ -6,8 +6,8 @@ Page({
     chips: [
       { text: '传奇装备', type: 'gold', query: 'legendary equipment' },
       { text: '威严攻击', type: 'purple', query: 'majestic attack action' },
-      { text: '$5 以下好牌', type: 'green', query: 'under $5' },
-      { text: 'Uprising 热门卡', type: 'gold', query: 'uprising' }
+      { text: 'Ninja 英雄', type: 'green', query: 'ninja hero' },
+      { text: 'Rosetta 新卡', type: 'gold', query: 'rosetta' }
     ]
   },
   onLoad() {

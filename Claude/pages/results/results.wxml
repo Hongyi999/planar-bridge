@@ -54,8 +54,15 @@
 
   <!-- Scrollable card results -->
   <scroll-view scroll-y class="results-scroll" style="padding-top: {{headerHeight}}px;">
+    <!-- Loading skeleton -->
+    <view class="card-grid show" wx:if="{{isLoading && showResults}}">
+      <view class="skeleton-card" wx:for="{{[1,2,3,4,5,6]}}" wx:key="*this">
+        <view class="skeleton-shimmer"></view>
+      </view>
+    </view>
+
     <!-- Card grid (image-only) -->
-    <view class="card-grid {{showResults ? 'show' : ''}}" wx:if="{{viewMode === 'grid'}}">
+    <view class="card-grid {{showResults ? 'show' : ''}}" wx:if="{{!isLoading && viewMode === 'grid'}}">
       <view wx:for="{{results}}" wx:key="id" class="card-grid-item" data-id="{{item.id || item._id}}" bindtap="onCardTap">
         <image wx:if="{{item.cloudImageId || item.imageUrl}}" class="card-grid-img" src="{{item.cloudImageId || item.imageUrl}}" mode="widthFix" lazy-load binderror="onImgError" data-index="{{index}}" />
         <view wx:else class="card-grid-placeholder font-heading">
