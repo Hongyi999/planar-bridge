@@ -38,9 +38,14 @@
       <view class="r-loading-dot"></view>
     </view>
 
-    <!-- Card grid -->
+    <!-- Card grid (image-only, MTGso style) -->
     <view class="card-grid show" wx:if="{{!isLoading && viewMode === 'grid'}}">
-      <card-tile wx:for="{{cards}}" wx:key="_id" card="{{item}}" index="{{index}}" />
+      <view wx:for="{{cards}}" wx:key="_id" class="card-grid-item" data-id="{{item._id || item.id}}" bindtap="onCardTap">
+        <image wx:if="{{item.cloudImageId || item.imageUrl}}" class="card-grid-img" src="{{item.cloudImageId || item.imageUrl}}" mode="widthFix" lazy-load />
+        <view wx:else class="card-grid-placeholder font-heading">
+          <text>{{item.name}}</text>
+        </view>
+      </view>
     </view>
 
     <!-- Card list view -->

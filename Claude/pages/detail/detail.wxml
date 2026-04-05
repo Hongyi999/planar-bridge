@@ -17,7 +17,7 @@
 
 <view class="detail-page" wx:else>
   <!-- Hero area -->
-  <view class="detail-hero" style="height: {{heroHeight}}rpx;">
+  <view class="detail-hero" style="height: {{heroHeight}}rpx; padding-top: {{navTop + navHeight + 12}}px;">
     <!-- Decorative circles -->
     <view class="deco-circle deco-1"></view>
     <view class="deco-circle deco-2"></view>

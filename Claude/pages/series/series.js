@@ -18,12 +18,9 @@ Page({
     }
   },
   onSortChrono: function() {
-    var groups = this.data.seriesGroups;
-    // Re-sort by year descending
-    groups.sort(function(a, b) { return b.year.localeCompare(a.year); });
     this.setData({
       sortMode: 'chrono',
-      seriesGroups: groups
+      seriesGroups: seriesData.getSeriesChronological()
     });
   },
   onSortAlpha: function() {

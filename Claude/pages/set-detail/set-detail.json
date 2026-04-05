@@ -1,6 +1,4 @@
 {
   "navigationStyle": "custom",
-  "usingComponents": {
-    "card-tile": "/components/card-tile/card-tile"
-  }
+  "usingComponents": {}
 }

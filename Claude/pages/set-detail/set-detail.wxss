@@ -130,18 +130,52 @@
 /* Scroll area */
 .set-scroll {
   height: 100vh;
-  padding: 0 28rpx;
+  padding: 0 20rpx;
+  overflow-x: hidden;
 }
 
-/* Card grid */
+/* Card grid (image-only, MTGso style) */
 .card-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
 }
 
 .card-grid.show {
   opacity: 1;
+}
+
+.card-grid-item {
+  width: calc(50% - 8rpx);
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.card-grid-img {
+  width: 100%;
+  display: block;
+  border-radius: 16rpx;
+}
+
+.card-grid-placeholder {
+  width: 100%;
+  padding-bottom: 140%;
+  position: relative;
+  background: linear-gradient(135deg, #EBE7DA, #E0DBCC);
+  border-radius: 16rpx;
+  border: 2rpx solid #9B864430;
+}
+
+.card-grid-placeholder text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 22rpx;
+  color: #9B8644;
+  text-align: center;
+  width: 80%;
+  word-break: break-word;
 }
 
 /* Card list view */
