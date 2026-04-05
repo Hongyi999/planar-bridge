@@ -19,9 +19,6 @@
   <!-- Hero area -->
   <view class="detail-hero"
     style="height: {{heroHeight}}rpx; padding-top: {{navTop + navHeight + 20}}px;"
-    bindtouchstart="onHandleTouchStart"
-    bindtouchmove="onHandleTouchMove"
-    bindtouchend="onHandleTouchEnd"
   >
     <!-- Decorative circles -->
     <view class="deco-circle deco-1"></view>
@@ -41,14 +38,21 @@
     </view>
 
     <!-- Card image or placeholder -->
-    <view class="detail-card-visual" style="transform: scale({{heroHeight > 580 ? 1 + (heroHeight - 580) / 680 : 1}}); transition: {{heroHeight === 580 ? 'transform 0.3s ease-out' : 'none'}};">
-      <image wx:if="{{card.cloudImageId || card.imageUrl}}" class="detail-card-image" src="{{card.cloudImageId || card.imageUrl}}" mode="aspectFit" show-menu-by-longpress bindtap="onPreviewImage" />
+    <view class="detail-card-visual" style="transform: scale({{heroHeight > 640 ? 1 + (heroHeight - 640) / 680 : 1}}); transition: {{heroHeight === 640 ? 'transform 0.3s ease-out' : 'none'}};">
+      <image wx:if="{{card.cloudImageId || card.imageUrl}}" class="detail-card-image" src="{{card.cloudImageId || card.imageUrl}}" mode="aspectFit" />
       <view wx:else class="detail-card-placeholder" style="background: linear-gradient(145deg, #EDE9DC, #E4DFCF);">
         <text class="dcp-name font-heading">{{card.name}}</text>
         <text class="dcp-name-cn" wx:if="{{card.nameCN}}">{{card.nameCN}}</text>
         <text class="dcp-meta">{{card.setCode}} · {{card.rarityCN || card.rarity}}</text>
       </view>
     </view>
+
+    <!-- Transparent touch overlay to capture drag gestures -->
+    <view class="hero-touch-overlay"
+      catchtouchstart="onHandleTouchStart"
+      catchtouchmove="onHandleTouchMove"
+      catchtouchend="onHandleTouchEnd"
+    ></view>
   </view>
 
   <!-- Drag handle (outside scroll-view for visibility) -->

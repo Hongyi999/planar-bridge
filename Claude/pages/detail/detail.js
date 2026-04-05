@@ -9,10 +9,10 @@ Page({
     navHeight: 32,
     card: null,
     highlightedText: '',
-    heroHeight: 580,
+    heroHeight: 640,
     isLoading: true,
     _touchStartY: 0,
-    _startHeroHeight: 580,
+    _startHeroHeight: 640,
     isInCollection: false,
     collectionListNames: [],
     showListModal: false,
@@ -81,18 +81,26 @@ Page({
     this._touchStartY = e.touches[0].clientY;
     this._startHeroHeight = this.data.heroHeight;
     this._pxToRpx = 750 / wx.getSystemInfoSync().windowWidth;
+    this._isDragging = false;
   },
   onHandleTouchMove(e) {
     var deltaY = e.touches[0].clientY - this._touchStartY;
     var deltaRpx = deltaY * this._pxToRpx;
+    if (Math.abs(deltaRpx) > 10) this._isDragging = true;
     var newHeight = this._startHeroHeight + deltaRpx;
-    // Clamp between 580 (default) and 920 (expanded)
-    newHeight = Math.max(580, Math.min(920, newHeight));
+    // Clamp between 640 (default) and 960 (expanded)
+    newHeight = Math.max(640, Math.min(960, newHeight));
     this.setData({ heroHeight: newHeight });
   },
   onHandleTouchEnd() {
-    // Snap back to default height
-    this.setData({ heroHeight: 580 });
+    if (this._isDragging) {
+      // Snap back to default height
+      this.setData({ heroHeight: 640 });
+    } else {
+      // It was a tap, open preview
+      this.onPreviewImage();
+    }
+    this._isDragging = false;
   },
   onAddToList() {
     var cardId = this.data.card.id || this.data.card._id;
