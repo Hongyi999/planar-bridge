@@ -925,68 +925,72 @@ Page({
   },
 
   _exportAsCSVFile(lists, fields, currency, cardMap) {
-    // CSV header
-    var header = ['列表名称'];
-    fields.forEach(function(f) { header.push(f.label); });
-    var rows = [header.join(',')];
+    // Build HTML table that Excel/WPS can open as .xls
+    var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+    html += '<head><meta charset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>收藏导出</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>';
+    html += '<body><table border="1">';
 
+    // Header row
+    html += '<tr><th style="background:#f0f0f0;font-weight:bold;">列表名称</th>';
+    fields.forEach(function(f) {
+      html += '<th style="background:#f0f0f0;font-weight:bold;">' + f.label + '</th>';
+    });
+    html += '</tr>';
+
+    // Data rows
     lists.forEach(function(list) {
       if (!list.cards || !list.cards.length) return;
       list.cards.forEach(function(cardId) {
         var card = cardMap[cardId];
         if (!card) return;
-        var row = ['"' + list.name + '"'];
+        html += '<tr><td>' + list.name + '</td>';
         fields.forEach(function(f) {
           var val = card[f.key];
           if (val === null || val === undefined) {
-            row.push('');
+            html += '<td></td>';
           } else if (f.key === 'priceMid' || f.key === 'priceLow' || f.key === 'priceMarket') {
-            row.push(currency === 'CNY' ? (val * 7.2).toFixed(0) : val);
-          } else if (typeof val === 'string' && (val.indexOf(',') >= 0 || val.indexOf('"') >= 0 || val.indexOf('\n') >= 0)) {
-            row.push('"' + val.replace(/"/g, '""') + '"');
+            html += '<td>' + (currency === 'CNY' ? (val * 7.2).toFixed(0) : val) + '</td>';
           } else {
-            row.push(val);
+            var str = String(val).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            html += '<td>' + str + '</td>';
           }
         });
-        rows.push(row.join(','));
+        html += '</tr>';
       });
     });
 
-    var csv = '\uFEFF' + rows.join('\n'); // BOM for Excel compatibility
+    html += '</table></body></html>';
 
-    // Write CSV file then share directly (skip openDocument preview which can't parse CSV)
+    // Write as .xls and open with document viewer
     var fs = wx.getFileSystemManager();
-    var filePath = wx.env.USER_DATA_PATH + '/PlanarBridge_export.csv';
+    var filePath = wx.env.USER_DATA_PATH + '/PlanarBridge_export.xls';
     fs.writeFile({
       filePath: filePath,
-      data: csv,
+      data: html,
       encoding: 'utf8',
       success: function() {
-        // Share file directly — user can send to 文件传输助手 or forward to save
-        wx.shareFileMessage({
+        wx.openDocument({
           filePath: filePath,
-          fileName: 'PlanarBridge_export.csv',
-          success: function() {
-            wx.showToast({ title: '文件已发送', icon: 'success' });
-          },
-          fail: function() {
-            // User cancelled or API not supported, copy to clipboard as fallback
-            wx.setClipboardData({
-              data: csv,
-              success: function() {
-                wx.showToast({ title: '已复制到剪贴板', icon: 'success' });
+          showMenu: true,
+          fileType: 'xls',
+          success: function() {},
+          fail: function(err) {
+            console.error('openDocument fail:', err);
+            // Fallback: try shareFileMessage
+            wx.shareFileMessage({
+              filePath: filePath,
+              fileName: 'PlanarBridge_export.xls',
+              success: function() {},
+              fail: function() {
+                wx.showToast({ title: '导出失败，请重试', icon: 'none' });
               }
             });
           }
         });
       },
-      fail: function() {
-        wx.setClipboardData({
-          data: csv,
-          success: function() {
-            wx.showToast({ title: '已复制到剪贴板', icon: 'success' });
-          }
-        });
+      fail: function(err) {
+        console.error('writeFile fail:', err);
+        wx.showToast({ title: '文件写入失败', icon: 'none' });
       }
     });
   },
