@@ -628,33 +628,53 @@ Page({
   _parseJustTcgResponse(data, batch) {
     var results = [];
     try {
-      var items = Array.isArray(data) ? data : (data.data || data.results || []);
-      // Build a map from tcgplayerId to card info
+      // JustTCG response: { data: [{ tcgplayerId, name, variants: [{ condition, printing, marketPrice, lowPrice, midPrice, ... }] }] }
+      var items = data.data || (Array.isArray(data) ? data : []);
+
+      // Build map from tcgplayerId to card info
       var cardMap = {};
       batch.forEach(function(card) {
         cardMap[String(card.productId)] = card;
       });
 
       items.forEach(function(item) {
-        var tcgId = String(item.tcgplayerId || item.tcgplayer_id || item.id || '');
+        var tcgId = String(item.tcgplayerId || '');
         var card = cardMap[tcgId];
         if (!card) return;
 
-        // Extract prices - try various field names
-        var low = item.lowPrice || item.low_price || item.price_low || null;
-        var mid = item.midPrice || item.mid_price || item.price_mid || null;
-        var market = item.marketPrice || item.market_price || item.price_market || item.price || null;
-        var trend = item.directLowPrice || item.direct_low_price || null;
+        // Find best variant: prefer "Near Mint" + "Normal" printing
+        var variants = item.variants || [];
+        if (variants.length === 0) return;
 
-        // JustTCG might nest prices differently
-        if (item.prices) {
-          var p = item.prices;
-          low = low || p.low || p.lowPrice || null;
-          mid = mid || p.mid || p.midPrice || null;
-          market = market || p.market || p.marketPrice || null;
+        var best = null;
+        // Priority 1: Near Mint Normal
+        for (var i = 0; i < variants.length; i++) {
+          var v = variants[i];
+          if (v.condition === 'Near Mint' && (v.printing === 'Normal' || v.printing === 'Unlimited')) {
+            best = v; break;
+          }
+        }
+        // Priority 2: any Near Mint
+        if (!best) {
+          for (var i = 0; i < variants.length; i++) {
+            if (variants[i].condition === 'Near Mint') { best = variants[i]; break; }
+          }
+        }
+        // Priority 3: first variant
+        if (!best) best = variants[0];
+
+        // Log first item's variant for debugging
+        if (results.length === 0) {
+          console.log('JustTCG variant sample:', JSON.stringify(best).substring(0, 500));
         }
 
-        if (low !== null || mid !== null || market !== null) {
+        // Extract prices from variant - try various field names
+        var market = best.marketPrice || best.market_price || best.price || null;
+        var low = best.lowPrice || best.low_price || null;
+        var mid = best.midPrice || best.mid_price || null;
+        var trend = best.directLowPrice || best.direct_low_price || null;
+
+        if (market !== null || low !== null || mid !== null) {
           results.push({
             cardId: card.cardId,
             priceLow: low,
