@@ -954,30 +954,27 @@ Page({
 
     var csv = '\uFEFF' + rows.join('\n'); // BOM for Excel compatibility
 
-    // Save as file
+    // Save as .xls so wx.openDocument can open it (csv is not a supported fileType)
+    // CSV content with .xls extension opens correctly in WPS/Excel
     var fs = wx.getFileSystemManager();
-    var filePath = wx.env.USER_DATA_PATH + '/PlanarBridge_export.csv';
+    var filePath = wx.env.USER_DATA_PATH + '/PlanarBridge_export.xls';
     fs.writeFile({
       filePath: filePath,
       data: csv,
       encoding: 'utf8',
       success: function() {
-        // Primary: share file directly so user can save/send
-        wx.shareFileMessage({
+        // Open with system document viewer (WPS/Excel), showMenu allows user to save/share
+        wx.openDocument({
           filePath: filePath,
-          fileName: 'PlanarBridge_export.csv',
-          success: function() {
-            wx.showToast({ title: '已导出CSV文件', icon: 'success' });
-          },
+          showMenu: true,
+          fileType: 'xls',
+          success: function() {},
           fail: function() {
-            // Fallback: open with system viewer (showMenu allows saving)
-            wx.openDocument({
+            // Fallback: share as file message
+            wx.shareFileMessage({
               filePath: filePath,
-              showMenu: true,
-              fileType: 'csv',
-              success: function() {
-                wx.showToast({ title: '已导出CSV文件', icon: 'success' });
-              },
+              fileName: 'PlanarBridge_export.xls',
+              success: function() {},
               fail: function() {
                 wx.setClipboardData({
                   data: csv,
