@@ -15,7 +15,6 @@
   <!-- List section header -->
   <view class="list-section-header" wx:if="{{isLoaded}}">
     <text class="list-section-title font-heading">全部列表</text>
-    <text class="list-section-action" bindtap="onToggleEditMode">{{isEditMode ? '完成' : '排序'}}</text>
   </view>
 
   <!-- Horizontal scroll list cards -->
@@ -29,15 +28,12 @@
       <view
         wx:for="{{lists}}"
         wx:key="id"
-        class="list-card {{selectedIndex === index ? 'selected' : ''}} {{showHint ? 'wobble' : ''}} {{isEditMode ? 'edit-mode' : ''}}"
+        class="list-card {{selectedIndex === index ? 'selected' : ''}} {{showHint ? 'wobble' : ''}}"
         style="background: {{item.hexColor}}0A; border: 3rpx solid {{item.hexColor}}20; {{selectedIndex === index ? 'border-bottom: 6rpx solid ' + item.hexColor + ';' : ''}}"
         data-index="{{index}}"
         bindtap="onSelectList"
         bindlongpress="onListLongPress"
       >
-        <!-- Reorder arrows at top left/right corners, absolutely positioned -->
-        <view class="lc-arrow lc-arrow-left {{index === 0 ? 'lc-arrow-disabled' : ''}}" wx:if="{{isEditMode}}" data-index="{{index}}" catchtap="onMoveLeft">←</view>
-        <view class="lc-arrow lc-arrow-right {{index === lists.length - 1 ? 'lc-arrow-disabled' : ''}}" wx:if="{{isEditMode}}" data-index="{{index}}" catchtap="onMoveRight">→</view>
         <text class="lc-name" style="color: {{item.hexColor}};">{{item.name}}</text>
         <text class="lc-count">{{item.cardCount}} 张卡</text>
         <text class="lc-value font-mono">${{item.value}}</text>
@@ -45,14 +41,32 @@
     </view>
   </scroll-view>
 
-  <!-- Selected list title + edit -->
+  <!-- Selected list title + edit + view toggle -->
   <view class="selected-title-row" wx:if="{{isLoaded && lists.length > 0}}">
     <text class="selected-title font-heading">{{lists[selectedIndex].name}}</text>
-    <text class="selected-edit" bindtap="onOpenEditPanel">编辑</text>
+    <view class="selected-actions">
+      <text class="selected-edit" bindtap="onOpenEditPanel">编辑</text>
+      <view class="view-toggle" bindtap="onToggleView">
+        <image class="view-toggle-icon" src="/assets/icons/{{viewMode === 'grid' ? 'view-list' : 'view-grid'}}.svg" mode="aspectFit" />
+      </view>
+    </view>
   </view>
 
-  <!-- Cards list -->
-  <view class="cards-list" wx:if="{{isLoaded}}">
+  <!-- Card grid view -->
+  <view class="card-grid" wx:if="{{isLoaded && viewMode === 'grid'}}">
+    <view wx:for="{{selectedCards}}" wx:key="id" class="card-grid-item" data-id="{{item.id || item._id}}" bindtap="onCardTap">
+      <image wx:if="{{item.cloudImageId || item.imageUrl}}" class="card-grid-img" src="{{item.cloudImageId || item.imageUrl}}" mode="widthFix" lazy-load />
+      <view wx:else class="card-grid-placeholder font-heading">
+        <text>{{item.name}}</text>
+      </view>
+      <view class="grid-star-btn" catchtap="onCardDelete" data-id="{{item.id || item._id}}">
+        <text class="grid-delete-icon">×</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Card list view -->
+  <view class="cards-list" wx:if="{{isLoaded && viewMode === 'list'}}">
     <view
       wx:for="{{selectedCards}}"
       wx:key="id"
@@ -70,12 +84,9 @@
         <text class="ci-name font-heading">{{item.name}}</text>
         <text class="ci-meta">{{item.rarityCN || item.rarity}} · {{item.classCN || item.class}} {{item.typeCN || item.type}} · {{item.setCode}}</text>
       </view>
-      <!-- Price -->
-      <view class="ci-price">
+      <!-- Price (only show if not null) -->
+      <view class="ci-price" wx:if="{{item.priceMid != null}}">
         <text class="ci-price-value font-mono">${{item.priceMid}}</text>
-        <text class="ci-trend {{item.priceTrend > 0 ? 'price-up' : item.priceTrend < 0 ? 'price-down' : 'price-flat'}}">
-          {{item.priceTrend > 0 ? '▲ ' + item.priceTrend + '%' : item.priceTrend < 0 ? '▼ ' + (-item.priceTrend) + '%' : '— 0%'}}
-        </text>
       </view>
       <!-- Delete button -->
       <view class="ci-delete" data-id="{{item.id || item._id}}" catchtap="onCardDelete">×</view>
@@ -111,6 +122,15 @@
           >
             <text wx:if="{{editColor === item}}" class="edit-color-check">✓</text>
           </view>
+        </view>
+      </view>
+
+      <!-- Sort section -->
+      <view class="edit-section">
+        <text class="edit-section-label">排序列表</text>
+        <view class="edit-sort-row">
+          <view class="edit-sort-btn" data-index="{{_editIndex}}" data-dir="left" bindtap="onMoveLeft">← 左移</view>
+          <view class="edit-sort-btn" data-index="{{_editIndex}}" data-dir="right" bindtap="onMoveRight">右移 →</view>
         </view>
       </view>
 

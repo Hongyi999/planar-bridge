@@ -1,5 +1,6 @@
 var storageUtil = require('../../utils/storage.js');
 var cardData = require('../../utils/cardData.js');
+var cloudDB = require('../../utils/cloudDB.js');
 
 var DEFAULT_SETTINGS = {
   sortIndex: 0,
@@ -828,36 +829,82 @@ Page({
     var lists = allLists.filter(function(l) { return selectedIds.indexOf(l.id) >= 0; });
     var fields = this.data.exportFields.filter(function(f) { return f.checked; });
     var currency = this.data.currency;
+    var format = this.data.exportFormat;
 
-    if (this.data.exportFormat === 'text') {
-      this._exportAsText(lists, fields, currency);
-    } else {
-      this._exportAsCSVFile(lists, fields, currency);
-    }
     this.setData({ showExportModal: false });
+    wx.showLoading({ title: '正在导出...' });
+
+    // Collect all unique card IDs
+    var allCardIds = [];
+    lists.forEach(function(list) {
+      (list.cards || []).forEach(function(id) {
+        if (allCardIds.indexOf(id) < 0) allCardIds.push(id);
+      });
+    });
+
+    if (allCardIds.length === 0) {
+      wx.hideLoading();
+      if (format === 'text') {
+        var emptyOutput = lists.map(function(l) { return '## ' + l.name + '\n（空列表）'; }).join('\n\n');
+        wx.setClipboardData({
+          data: emptyOutput,
+          success: function() { wx.showToast({ title: '已复制到剪贴板', icon: 'success' }); }
+        });
+      } else {
+        wx.showToast({ title: '没有卡牌数据可导出', icon: 'none' });
+      }
+      return;
+    }
+
+    // Fetch all card data from cloud (fallback to local)
+    var promises = allCardIds.map(function(id) {
+      return cloudDB.getCardById(id).then(function(c) {
+        return c || cardData.getCardById(id);
+      }).catch(function() {
+        return cardData.getCardById(id);
+      });
+    });
+
+    Promise.all(promises).then(function(cards) {
+      var cardMap = {};
+      cards.forEach(function(c) {
+        if (c) cardMap[c._id || c.id] = c;
+      });
+      wx.hideLoading();
+
+      if (format === 'text') {
+        that._exportAsText(lists, fields, currency, cardMap);
+      } else {
+        that._exportAsCSVFile(lists, fields, currency, cardMap);
+      }
+    }).catch(function() {
+      wx.hideLoading();
+      wx.showToast({ title: '导出失败，请重试', icon: 'none' });
+    });
   },
 
-  _exportAsText(lists, fields, currency) {
-    var output = '';
+  _exportAsText(lists, fields, currency, cardMap) {
+    var output = '# Planar Bridge 收藏导出\n\n';
     lists.forEach(function(list) {
-      output += '【' + list.name + '】\n';
+      output += '## ' + list.name + '\n\n';
       if (!list.cards || !list.cards.length) {
         output += '（空列表）\n\n';
         return;
       }
+      output += '| ' + fields.map(function(f) { return f.label; }).join(' | ') + ' |\n';
+      output += '| ' + fields.map(function() { return '---'; }).join(' | ') + ' |\n';
       list.cards.forEach(function(cardId) {
-        var card = cardData.getCardById(cardId);
+        var card = cardMap[cardId];
         if (!card) return;
-        var parts = [];
-        fields.forEach(function(f) {
+        var cells = fields.map(function(f) {
           var val = card[f.key];
-          if (val === null || val === undefined) return;
+          if (val === null || val === undefined) return '—';
           if (f.key === 'priceMid' || f.key === 'priceLow' || f.key === 'priceMarket') {
-            val = (currency === 'CNY' ? '¥' + (val * 7.2).toFixed(0) : '$' + val);
+            return currency === 'CNY' ? '¥' + (val * 7.2).toFixed(0) : '$' + val;
           }
-          parts.push(f.label + ': ' + val);
+          return String(val).replace(/\|/g, '\\|').replace(/\n/g, ' ');
         });
-        output += parts.join(' | ') + '\n';
+        output += '| ' + cells.join(' | ') + ' |\n';
       });
       output += '\n';
     });
@@ -866,11 +913,14 @@ Page({
       data: output.trim(),
       success: function() {
         wx.showToast({ title: '已复制到剪贴板', icon: 'success' });
+      },
+      fail: function() {
+        wx.showToast({ title: '复制失败', icon: 'none' });
       }
     });
   },
 
-  _exportAsCSVFile(lists, fields, currency) {
+  _exportAsCSVFile(lists, fields, currency, cardMap) {
     // CSV header
     var header = ['列表名称'];
     fields.forEach(function(f) { header.push(f.label); });
@@ -879,7 +929,7 @@ Page({
     lists.forEach(function(list) {
       if (!list.cards || !list.cards.length) return;
       list.cards.forEach(function(cardId) {
-        var card = cardData.getCardById(cardId);
+        var card = cardMap[cardId];
         if (!card) return;
         var row = ['"' + list.name + '"'];
         fields.forEach(function(f) {
@@ -888,7 +938,7 @@ Page({
             row.push('');
           } else if (f.key === 'priceMid' || f.key === 'priceLow' || f.key === 'priceMarket') {
             row.push(currency === 'CNY' ? (val * 7.2).toFixed(0) : val);
-          } else if (typeof val === 'string' && (val.indexOf(',') >= 0 || val.indexOf('"') >= 0)) {
+          } else if (typeof val === 'string' && (val.indexOf(',') >= 0 || val.indexOf('"') >= 0 || val.indexOf('\n') >= 0)) {
             row.push('"' + val.replace(/"/g, '""') + '"');
           } else {
             row.push(val);
@@ -900,32 +950,34 @@ Page({
 
     var csv = '\uFEFF' + rows.join('\n'); // BOM for Excel compatibility
 
-    // Save as file for download
+    // Save as file
     var fs = wx.getFileSystemManager();
-    var filePath = wx.env.USER_DATA_PATH + '/planar_bridge_export.csv';
+    var filePath = wx.env.USER_DATA_PATH + '/PlanarBridge_export.csv';
     fs.writeFile({
       filePath: filePath,
       data: csv,
       encoding: 'utf8',
       success: function() {
-        wx.shareFileMessage({
+        // Try to let user save/share the file
+        wx.openDocument({
           filePath: filePath,
-          fileName: 'PlanarBridge收藏导出.csv',
+          showMenu: true,
           success: function() {
-            wx.showToast({ title: '导出成功', icon: 'success' });
+            wx.showToast({ title: '已导出CSV文件', icon: 'success' });
           },
           fail: function() {
-            // Fallback: open file
-            wx.openDocument({
+            // Fallback: share as file message
+            wx.shareFileMessage({
               filePath: filePath,
-              showMenu: true,
-              success: function() {},
+              fileName: 'PlanarBridge_export.csv',
+              success: function() {
+                wx.showToast({ title: '已导出CSV文件', icon: 'success' });
+              },
               fail: function() {
-                // Last fallback: copy to clipboard
                 wx.setClipboardData({
                   data: csv,
                   success: function() {
-                    wx.showToast({ title: 'CSV 已复制到剪贴板', icon: 'success' });
+                    wx.showToast({ title: 'CSV已复制到剪贴板', icon: 'success' });
                   }
                 });
               }
@@ -934,11 +986,10 @@ Page({
         });
       },
       fail: function() {
-        // Fallback: copy
         wx.setClipboardData({
           data: csv,
           success: function() {
-            wx.showToast({ title: 'CSV 已复制到剪贴板', icon: 'success' });
+            wx.showToast({ title: 'CSV已复制到剪贴板', icon: 'success' });
           }
         });
       }

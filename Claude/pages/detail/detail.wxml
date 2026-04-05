@@ -56,7 +56,7 @@
   </view>
 
   <!-- Pull-up sheet -->
-  <scroll-view scroll-y enhanced show-scrollbar="{{false}}" class="detail-sheet" style="height: calc(100vh - {{heroHeight}}rpx - 56rpx);">
+  <scroll-view scroll-y enhanced show-scrollbar="{{false}}" class="detail-sheet" style="height: calc(100vh - {{heroHeight}}rpx - 56rpx - {{navTop + navHeight + 12}}px);">
     <!-- Header: name + price -->
     <view class="detail-header">
       <view class="dh-left">

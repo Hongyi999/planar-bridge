@@ -22,7 +22,7 @@ Page({
     totalCards: 0,
     totalValue: '0.00',
     isLoaded: true,
-    isEditMode: false,
+    viewMode: 'grid',
     showHint: false,
     showEditPanel: false,
     editName: '',
@@ -193,26 +193,26 @@ Page({
       }
     });
   },
-  onToggleEditMode: function() {
-    this.setData({ isEditMode: !this.data.isEditMode });
+  onToggleView: function() {
+    this.setData({ viewMode: this.data.viewMode === 'grid' ? 'list' : 'grid' });
   },
-  onMoveLeft: function(e) {
-    var idx = e.currentTarget.dataset.index;
+  onMoveLeft: function() {
+    var idx = this.data._editIndex;
     if (idx <= 0) return;
     var lists = storageUtil.getLists();
     var temp = lists[idx];
     lists[idx] = lists[idx - 1];
     lists[idx - 1] = temp;
     storageUtil.saveLists(lists);
-    // Adjust selectedIndex if affected
     var sel = this.data.selectedIndex;
     if (sel === idx) sel = idx - 1;
     else if (sel === idx - 1) sel = idx;
-    this.setData({ selectedIndex: sel });
+    this.setData({ selectedIndex: sel, _editIndex: idx - 1 });
     this.loadData();
+    wx.showToast({ title: '已左移', icon: 'none', duration: 800 });
   },
-  onMoveRight: function(e) {
-    var idx = e.currentTarget.dataset.index;
+  onMoveRight: function() {
+    var idx = this.data._editIndex;
     var lists = storageUtil.getLists();
     if (idx >= lists.length - 1) return;
     var temp = lists[idx];
@@ -222,8 +222,9 @@ Page({
     var sel = this.data.selectedIndex;
     if (sel === idx) sel = idx + 1;
     else if (sel === idx + 1) sel = idx;
-    this.setData({ selectedIndex: sel });
+    this.setData({ selectedIndex: sel, _editIndex: idx + 1 });
     this.loadData();
+    wx.showToast({ title: '已右移', icon: 'none', duration: 800 });
   },
   onListLongPress: function(e) {
     var idx = e.currentTarget.dataset.index;

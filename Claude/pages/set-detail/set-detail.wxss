@@ -136,8 +136,8 @@
 
 /* Card grid (image-only, MTGso style) */
 .card-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 16rpx;
 }
 
@@ -146,7 +146,6 @@
 }
 
 .card-grid-item {
-  width: calc(50% - 8rpx);
   border-radius: 16rpx;
   overflow: hidden;
   position: relative;

@@ -80,6 +80,7 @@
   background: linear-gradient(180deg, #EBE7DA 0%, #F2EFE4 100%);
   flex-shrink: 0;
   padding-bottom: 40rpx;
+  box-sizing: content-box;
 }
 
 .deco-circle {
