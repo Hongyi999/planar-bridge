@@ -75,7 +75,7 @@
 
 .hero-sub-detail {
   font-size: 24rpx;
-  color: #A09A8C;
+  color: #9B8644;
   margin-top: 36rpx;
 }
 
