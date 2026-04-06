@@ -43,6 +43,14 @@ Page({
       this.getTabBar().setData({ selected: 2 });
     }
 
+    // Quick check: skip reload if lists data hasn't changed (avoids flash on back-navigate)
+    var lists = storageUtil.getLists();
+    var listsSnapshot = JSON.stringify(lists);
+    if (this._listsSnapshot === listsSnapshot && this.data.lists.length > 0) {
+      return;
+    }
+    this._listsSnapshot = listsSnapshot;
+
     // Immediate: render from local storage (synchronous)
     this.loadData();
 
@@ -64,6 +72,7 @@ Page({
   loadData: function() {
     var that = this;
     var lists = storageUtil.getLists();
+    this._listsSnapshot = JSON.stringify(lists);
     var totalCards = 0;
     var totalValue = 0;
 
