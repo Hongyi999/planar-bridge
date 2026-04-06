@@ -70,13 +70,13 @@
   font-size: 26rpx;
   color: #8C8474;
   line-height: 1.5;
-  margin-bottom: 4rpx;
+  margin-bottom: 48rpx;
 }
 
 .hero-sub-detail {
-  font-size: 26rpx;
-  color: #8C8474;
-  margin-bottom: 56rpx;
+  font-size: 24rpx;
+  color: #A09A8C;
+  margin-top: 36rpx;
 }
 
 /* Search */

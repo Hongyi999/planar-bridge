@@ -1,6 +1,7 @@
 <view class="search-bar {{compact ? 'compact' : ''}}" bindtap="onTap">
-  <!-- Search icon -->
-  <image class="search-icon-img" src="/assets/icons/tab-search.svg" mode="aspectFit" />
+  <!-- Left icon: plus (home) or magnifying glass (compact/results) -->
+  <image wx:if="{{compact}}" class="search-icon-img" src="/assets/icons/tab-search.svg" mode="aspectFit" />
+  <image wx:else class="search-icon-img plus-icon" src="/assets/icons/icon-plus.svg" mode="aspectFit" catchtap="onCameraTap" />
   <input
     class="search-input"
     value="{{value}}"
@@ -11,4 +12,6 @@
     bindinput="onInput"
     bindconfirm="onConfirm"
   />
+  <!-- Right mic icon: home only -->
+  <image wx:if="{{!compact}}" class="search-icon-img mic-icon" src="/assets/icons/icon-mic.svg" mode="aspectFit" catchtap="onMicTap" />
 </view>

@@ -14,6 +14,12 @@ Component({
     },
     onTap() {
       this.triggerEvent('tap');
+    },
+    onCameraTap() {
+      this.triggerEvent('camera');
+    },
+    onMicTap() {
+      this.triggerEvent('mic');
     }
   }
 });

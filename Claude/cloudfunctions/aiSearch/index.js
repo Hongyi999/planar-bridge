@@ -76,7 +76,72 @@ function fallbackParse(query) {
 }
 
 exports.main = async (event) => {
-  const { query, sortField, sortOrder } = event;
+  const { query, sortField, sortOrder, imageFileID } = event;
+
+  // --- Image search: identify card from photo ---
+  if (imageFileID) {
+    try {
+      // Get temporary URL for the uploaded image
+      const urlRes = await cloud.getTempFileURL({ fileList: [imageFileID] });
+      const imageUrl = urlRes.fileList[0].tempFileURL;
+
+      // Use Hunyuan Vision to identify the card
+      const ai = cloud.extend.AI;
+      const visionResult = await ai.createModel('hunyuan-vision').generateText({
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image_url', image_url: { url: imageUrl } },
+            { type: 'text', text: '这是一张 Flesh and Blood TCG 卡牌的照片。请识别这张卡牌并返回 JSON 格式：{"name": "卡牌英文名", "class": "职业", "type": "类型", "rarity": "稀有度"}。只返回 JSON，不要其他文字。如果无法识别，返回 {"name": ""}。' }
+          ]
+        }]
+      });
+
+      let recognized = {};
+      try {
+        const text = visionResult.text || visionResult.content || '';
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) recognized = JSON.parse(jsonMatch[0]);
+      } catch (e) { /* parse error, use empty */ }
+
+      if (!recognized.name) {
+        // Fallback: try OCR
+        try {
+          const ocrRes = await cloud.openapi.ocr.printedText({ imgUrl: imageUrl });
+          const ocrText = (ocrRes.items || []).map(i => i.text).join(' ');
+          if (ocrText.trim()) {
+            recognized.name = ocrText.trim().substring(0, 100);
+          }
+        } catch (ocrErr) {
+          console.error('OCR fallback error:', ocrErr);
+        }
+      }
+
+      if (!recognized.name) {
+        return { filters: {}, results: [], resultCount: 0, summary: '未能识别卡牌，请尝试更清晰的照片', recognizedQuery: '' };
+      }
+
+      // Search by recognized name
+      const nameQuery = db.RegExp({ regexp: recognized.name, options: 'i' });
+      const imgResults = await db.collection('cards')
+        .where({ name: nameQuery })
+        .orderBy('name', 'asc')
+        .limit(50)
+        .get();
+
+      return {
+        filters: { name: recognized.name },
+        results: imgResults.data,
+        resultCount: imgResults.data.length,
+        summary: '识别为「' + recognized.name + '」，找到 ' + imgResults.data.length + ' 张匹配卡牌',
+        recognizedQuery: recognized.name,
+        aiUsed: true
+      };
+    } catch (imgErr) {
+      console.error('Image search error:', imgErr);
+      return { filters: {}, results: [], resultCount: 0, summary: '图片识别失败: ' + imgErr.message, recognizedQuery: '' };
+    }
+  }
 
   if (!query || !query.trim()) {
     return { filters: {}, results: [], resultCount: 0, summary: '请输入搜索关键词' };

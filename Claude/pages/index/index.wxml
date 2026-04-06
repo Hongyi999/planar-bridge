@@ -14,12 +14,11 @@
     <view class="hero-heading font-heading">你在找什么卡牌？</view>
 
     <!-- Subtitle -->
-    <view class="hero-sub">用自然语言搜索 Flesh and Blood 卡牌</view>
-    <view class="hero-sub-detail">实时价格 · 系列浏览 · 个人收藏</view>
+    <view class="hero-sub">输入、拍照或说出你想找的卡</view>
 
     <!-- Search bar -->
     <view class="hero-search">
-      <search-bar value="{{searchValue}}" focus="{{searchFocus}}" placeholder="搜索 Ninja 的传奇装备..." bind:search="onSearch" />
+      <search-bar value="{{searchValue}}" focus="{{searchFocus}}" placeholder="搜索 Ninja 的传奇装备..." bind:search="onSearch" bind:camera="onCameraSearch" bind:mic="onVoiceSearch" />
     </view>
 
     <!-- Suggestion chips -->
@@ -33,5 +32,8 @@
         bindtap="onChipTap"
       >{{item.text}}</view>
     </view>
+
+    <!-- Detail line (moved below chips) -->
+    <view class="hero-sub-detail">实时价格 · 系列浏览 · 个人收藏</view>
   </view>
 </view>
