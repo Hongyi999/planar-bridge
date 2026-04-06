@@ -120,43 +120,11 @@
       <view wx:if="{{batchUpdateRunning}}" class="item-refresh" style="color:#c0392b;">暂停</view>
       <text wx:else class="item-arrow">›</text>
     </view>
-    <view class="settings-item" bindtap="onImportCards">
-      <view class="item-left">
-        <text class="item-label">导入卡牌数据</text>
-        <text class="item-desc">从 GitHub 拉取全部 FAB 卡牌（分批导入）</text>
-      </view>
-      <text class="item-arrow">›</text>
-    </view>
-    <view class="settings-item" bindtap="{{imageImportRunning ? 'onPauseImageImport' : 'onImportImages'}}">
-      <view class="item-left">
-        <text class="item-label">下载卡牌图片</text>
-        <text class="item-desc">{{imageImportProgress || '将官方卡图下载到云存储（自动批量）'}}</text>
-      </view>
-      <view wx:if="{{imageImportRunning}}" class="item-refresh" style="color:#c0392b;">暂停</view>
-      <text wx:else class="item-arrow">›</text>
-    </view>
-    <view class="settings-item" bindtap="{{priceUpdateRunning ? 'onPausePriceUpdate' : 'onSyncPrices'}}">
-      <view class="item-left">
-        <text class="item-label">同步卡牌价格</text>
-        <text class="item-desc">{{priceUpdateProgress || '从 TCGAPIs 获取市场价格（按稀有度分级更新）'}}</text>
-      </view>
-      <view wx:if="{{priceUpdateRunning}}" class="item-refresh" style="color:#c0392b;">暂停</view>
-      <text wx:else class="item-arrow">›</text>
-    </view>
-    <view class="settings-item" bindtap="onImportSets">
-      <view class="item-left">
-        <text class="item-label">导入系列数据</text>
-        <text class="item-desc">导入全部 FAB 系列/扩展包信息</text>
-      </view>
-      <text class="item-arrow">›</text>
-    </view>
-    <view class="settings-item" bindtap="{{supplementRunning ? 'onPauseSupplement' : 'onSupplementCards'}}">
-      <view class="item-left">
-        <text class="item-label">补充缺失卡牌</text>
-        <text class="item-desc">{{supplementProgress || '从 JustTCG 拉取缺失的 FAB 卡牌数据'}}</text>
-      </view>
-      <view wx:if="{{supplementRunning}}" class="item-refresh" style="color:#c0392b;">暂停</view>
-      <text wx:else class="item-arrow">›</text>
+    <!-- Sub-step progress (visible during or after batch update) -->
+    <view wx:if="{{batchUpdateRunning || batchUpdateStep}}" class="batch-status-list">
+      <text class="batch-status-item" wx:if="{{imageImportProgress}}">图片: {{imageImportProgress}}</text>
+      <text class="batch-status-item" wx:if="{{priceUpdateProgress}}">价格: {{priceUpdateProgress}}</text>
+      <text class="batch-status-item" wx:if="{{supplementProgress}}">补充: {{supplementProgress}}</text>
     </view>
   </view>
 
