@@ -31,16 +31,6 @@
   opacity: 0.8;
 }
 
-.mic-icon {
-  opacity: 0.35;
-  width: 34rpx;
-  height: 34rpx;
-}
-
-.mic-icon:active {
-  opacity: 0.7;
-}
-
 .search-input {
   flex: 1;
   font-size: 26rpx;
@@ -52,39 +42,4 @@
 .search-placeholder {
   color: #B8AD96;
   font-size: 26rpx;
-}
-
-/* Recording waveform */
-.stop-btn {
-  width: 48rpx;
-  height: 48rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.stop-icon {
-  width: 20rpx;
-  height: 20rpx;
-  background: #C74A4A;
-  border-radius: 4rpx;
-}
-
-.wave-bars {
-  display: flex;
-  align-items: center;
-  gap: 6rpx;
-  flex: 1;
-  justify-content: center;
-  height: 48rpx;
-}
-
-.wave-bar {
-  width: 6rpx;
-  min-height: 8rpx;
-  max-height: 48rpx;
-  background: #9B8644;
-  border-radius: 3rpx;
-  transition: height 0.1s ease;
 }

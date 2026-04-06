@@ -1,35 +1,16 @@
 <view class="search-bar {{compact ? 'compact' : ''}}" bindtap="onTap">
-  <!-- Recording state: waveform animation -->
-  <block wx:if="{{recording}}">
-    <view class="stop-btn" catchtap="onMicTap">
-      <view class="stop-icon"></view>
-    </view>
-    <view class="wave-bars">
-      <view class="wave-bar" style="height: {{bars[0] || 8}}rpx"></view>
-      <view class="wave-bar" style="height: {{bars[1] || 8}}rpx"></view>
-      <view class="wave-bar" style="height: {{bars[2] || 8}}rpx"></view>
-      <view class="wave-bar" style="height: {{bars[3] || 8}}rpx"></view>
-      <view class="wave-bar" style="height: {{bars[4] || 8}}rpx"></view>
-      <view class="wave-bar" style="height: {{bars[5] || 8}}rpx"></view>
-      <view class="wave-bar" style="height: {{bars[6] || 8}}rpx"></view>
-    </view>
-  </block>
-  <!-- Normal search state -->
-  <block wx:else>
-    <!-- Left icon: plus (home) or magnifying glass (compact/results) -->
-    <image wx:if="{{compact}}" class="search-icon-img" src="/assets/icons/tab-search.svg" mode="aspectFit" />
-    <image wx:else class="search-icon-img plus-icon" src="/assets/icons/icon-plus.svg" mode="aspectFit" catchtap="onCameraTap" />
-    <input
-      class="search-input"
-      value="{{value}}"
-      placeholder="{{placeholder}}"
-      placeholder-class="search-placeholder"
-      confirm-type="search"
-      focus="{{focus}}"
-      bindinput="onInput"
-      bindconfirm="onConfirm"
-    />
-    <!-- Right mic icon: home only -->
-    <image wx:if="{{!compact}}" class="search-icon-img mic-icon" src="/assets/icons/icon-mic.svg" mode="aspectFit" catchtap="onMicTap" />
-  </block>
+  <!-- Left icon: magnifying glass -->
+  <image class="search-icon-img" src="/assets/icons/tab-search.svg" mode="aspectFit" />
+  <input
+    class="search-input"
+    value="{{value}}"
+    placeholder="{{placeholder}}"
+    placeholder-class="search-placeholder"
+    confirm-type="search"
+    focus="{{focus}}"
+    bindinput="onInput"
+    bindconfirm="onConfirm"
+  />
+  <!-- Right plus icon: home only, for camera/album -->
+  <image wx:if="{{!compact}}" class="search-icon-img plus-icon" src="/assets/icons/icon-plus.svg" mode="aspectFit" catchtap="onCameraTap" />
 </view>

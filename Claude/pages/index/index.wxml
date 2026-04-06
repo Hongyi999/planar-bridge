@@ -14,11 +14,11 @@
     <view class="hero-heading font-heading">你在找什么卡牌？</view>
 
     <!-- Subtitle -->
-    <view class="hero-sub">输入、拍照或说出你想找的卡</view>
+    <view class="hero-sub">输入或拍照找到你想要的卡</view>
 
     <!-- Search bar -->
     <view class="hero-search">
-      <search-bar value="{{searchValue}}" focus="{{searchFocus}}" placeholder="{{searchPlaceholder || '搜索 Ninja 的传奇装备...'}}" recording="{{isRecording}}" bars="{{voiceBars}}" bind:search="onSearch" bind:camera="onCameraSearch" bind:mic="onVoiceSearch" />
+      <search-bar value="{{searchValue}}" focus="{{searchFocus}}" placeholder="搜索 Ninja 的传奇装备..." bind:search="onSearch" bind:camera="onCameraSearch" />
     </view>
 
     <!-- Suggestion chips -->
