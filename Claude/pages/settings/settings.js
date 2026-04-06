@@ -63,6 +63,8 @@ Page({
     priceUpdateProgress: '',
     supplementRunning: false,
     supplementProgress: '',
+    batchUpdateRunning: false,
+    batchUpdateStep: '',
     adminMode: false,
     _adminTapCount: 0
   },
@@ -89,6 +91,163 @@ Page({
       this.getTabBar().setData({ selected: 3 });
     }
     this.onRefreshDbStats();
+  },
+
+  // --- One-click batch update ---
+  onBatchUpdate() {
+    var that = this;
+    if (this.data.batchUpdateRunning) return;
+
+    wx.showModal({
+      title: '一键更新全部',
+      content: '将依次执行：\n1. 导入卡牌数据（GitHub）\n2. 导入系列数据\n3. 补充缺失卡牌（JustTCG）\n4. 下载卡牌图片\n5. 同步卡牌价格\n\n每步完成后自动进入下一步，可随时暂停。',
+      confirmText: '开始',
+      success: function(res) {
+        if (!res.confirm) return;
+        that._batchSteps = [
+          { label: '导入卡牌数据', fn: '_batchImportCards' },
+          { label: '导入系列数据', fn: '_batchImportSets' },
+          { label: '补充缺失卡牌', fn: '_batchSupplement' },
+          { label: '下载卡牌图片', fn: '_batchImportImages' },
+          { label: '同步卡牌价格', fn: '_batchSyncPrices' }
+        ];
+        that._batchStepIndex = 0;
+        that.setData({ batchUpdateRunning: true });
+        that._runNextBatchStep();
+      }
+    });
+  },
+
+  onPauseBatchUpdate() {
+    this._batchUpdatePaused = true;
+    // Pause any running sub-tasks
+    this._imageImportPaused = true;
+    this._priceUpdatePaused = true;
+    this._supplementPaused = true;
+    this.setData({
+      batchUpdateRunning: false,
+      batchUpdateStep: '已暂停',
+      imageImportRunning: false,
+      priceUpdateRunning: false,
+      supplementRunning: false
+    });
+  },
+
+  _runNextBatchStep() {
+    var that = this;
+    if (this._batchUpdatePaused) return;
+    var idx = this._batchStepIndex;
+    var steps = this._batchSteps;
+
+    if (idx >= steps.length) {
+      that.setData({ batchUpdateRunning: false, batchUpdateStep: '全部完成！' });
+      that.onRefreshDbStats();
+      wx.showToast({ title: '全部更新完成', icon: 'success' });
+      return;
+    }
+
+    var step = steps[idx];
+    that.setData({ batchUpdateStep: '(' + (idx + 1) + '/' + steps.length + ') ' + step.label });
+    that[step.fn](function() {
+      that._batchStepIndex++;
+      that.onRefreshDbStats();
+      // Small delay between steps
+      setTimeout(function() { that._runNextBatchStep(); }, 1000);
+    });
+  },
+
+  _batchImportCards(done) {
+    var that = this;
+    wx.request({
+      url: that._DATA_URLS.cards,
+      method: 'GET',
+      dataType: 'json',
+      timeout: 60000,
+      success: function(res) {
+        if (res.statusCode !== 200 || !Array.isArray(res.data)) {
+          that.setData({ batchUpdateStep: '卡牌数据下载失败，跳过' });
+          setTimeout(done, 1000);
+          return;
+        }
+        that._allCardsCache = res.data;
+        that._batchDoneCallback = done;
+        that._writeCardBatch(0, 5);
+      },
+      fail: function() {
+        that.setData({ batchUpdateStep: '卡牌数据网络错误，跳过' });
+        setTimeout(done, 1000);
+      }
+    });
+  },
+
+  _batchImportSets(done) {
+    var that = this;
+    wx.request({
+      url: that._DATA_URLS.sets,
+      method: 'GET',
+      dataType: 'json',
+      timeout: 30000,
+      success: function(res) {
+        if (res.statusCode !== 200 || !Array.isArray(res.data)) {
+          that.setData({ batchUpdateStep: '系列数据下载失败，跳过' });
+          setTimeout(done, 1000);
+          return;
+        }
+        wx.cloud.callFunction({
+          name: 'importCards',
+          data: { action: 'writeSets', sets: res.data }
+        }).then(function() { done(); }).catch(function() {
+          that.setData({ batchUpdateStep: '系列写入失败，跳过' });
+          setTimeout(done, 1000);
+        });
+      },
+      fail: function() {
+        that.setData({ batchUpdateStep: '系列数据网络错误，跳过' });
+        setTimeout(done, 1000);
+      }
+    });
+  },
+
+  _batchSupplement(done) {
+    var that = this;
+    that._batchDoneCallback = done;
+    that._supplementPaused = false;
+    that._supplementWritten = 0;
+    that._supplementSkipped = 0;
+    that._supplementOffset = 0;
+    that.setData({ supplementRunning: true, supplementProgress: '正在获取游戏列表...' });
+    that._supplementFindGameId();
+  },
+
+  _batchImportImages(done) {
+    var that = this;
+    that._batchDoneCallback = done;
+    that._imageImportPaused = false;
+    that._imageImportTotal = 0;
+    that._imageImportErrors = 0;
+    that.setData({ imageImportRunning: true, imageImportProgress: '准备中...' });
+    that._runImageImport(0);
+  },
+
+  _batchSyncPrices(done) {
+    var that = this;
+    that._batchDoneCallback = done;
+    that._priceUpdatePaused = false;
+    that._priceUpdateTotal = 0;
+    that._priceUpdateErrors = 0;
+    that._priceUpdateSkipped = 0;
+    that._priceUpdateNoId = 0;
+    that.setData({ priceUpdateRunning: true, priceUpdateProgress: '查询需要更新的卡牌...' });
+    that._fetchCardsForPriceUpdate();
+  },
+
+  // Called at completion of each sub-task to advance batch pipeline
+  _checkBatchDone() {
+    if (this._batchDoneCallback) {
+      var cb = this._batchDoneCallback;
+      this._batchDoneCallback = null;
+      cb();
+    }
   },
 
   // --- Card Database Import ---
@@ -213,8 +372,9 @@ Page({
     var batch = allCards.slice(offset, offset + batchSize);
     if (batch.length === 0) {
       that._allCardsCache = null;
-      wx.showToast({ title: '全部导入完成！', icon: 'success' });
+      if (!that.data.batchUpdateRunning) wx.showToast({ title: '全部导入完成！', icon: 'success' });
       that.onRefreshDbStats();
+      that._checkBatchDone();
       return;
     }
 
@@ -230,16 +390,22 @@ Page({
       var r = res.result;
       // Check if cloud function returned an error
       if (!r || !r.success) {
-        wx.showModal({
-          title: '写入失败',
-          content: '云函数返回错误: ' + (r ? (r.error || JSON.stringify(r.errors || [])) : '无响应') + '\noffset=' + offset,
-          confirmText: '重试',
-          cancelText: '取消',
-          success: function(modal) {
-            if (modal.confirm) that._writeCardBatch(offset, batchSize);
-            else { that._allCardsCache = null; that.onRefreshDbStats(); }
-          }
-        });
+        if (that.data.batchUpdateRunning) {
+          // Auto-retry in batch mode
+          console.error('Batch write error at offset ' + offset + ', retrying...', r);
+          setTimeout(function() { that._writeCardBatch(offset, batchSize); }, 2000);
+        } else {
+          wx.showModal({
+            title: '写入失败',
+            content: '云函数返回错误: ' + (r ? (r.error || JSON.stringify(r.errors || [])) : '无响应') + '\noffset=' + offset,
+            confirmText: '重试',
+            cancelText: '取消',
+            success: function(modal) {
+              if (modal.confirm) that._writeCardBatch(offset, batchSize);
+              else { that._allCardsCache = null; that.onRefreshDbStats(); }
+            }
+          });
+        }
         return;
       }
       var errCount = (r.errors && r.errors.length) || 0;
@@ -257,24 +423,30 @@ Page({
         }, 200);
       } else {
         that._allCardsCache = null;
-        wx.showToast({ title: '全部 ' + allCards.length + ' 张卡牌导入完成！', icon: 'success' });
+        if (!that.data.batchUpdateRunning) wx.showToast({ title: '全部 ' + allCards.length + ' 张卡牌导入完成！', icon: 'success' });
         that.onRefreshDbStats();
+        that._checkBatchDone();
       }
     }).catch(function(err) {
       wx.hideLoading();
-      wx.showModal({
-        title: '写入出错 (offset: ' + offset + ')',
-        content: (err.message || err.errMsg || '未知错误') + '\n是否重试？',
-        confirmText: '重试',
-        cancelText: '取消',
-        success: function(modal) {
-          if (modal.confirm) that._writeCardBatch(offset, batchSize);
-          else {
-            that._allCardsCache = null;
-            that.onRefreshDbStats();
+      if (that.data.batchUpdateRunning) {
+        console.error('Batch write catch at offset ' + offset + ', retrying...', err);
+        setTimeout(function() { that._writeCardBatch(offset, batchSize); }, 2000);
+      } else {
+        wx.showModal({
+          title: '写入出错 (offset: ' + offset + ')',
+          content: (err.message || err.errMsg || '未知错误') + '\n是否重试？',
+          confirmText: '重试',
+          cancelText: '取消',
+          success: function(modal) {
+            if (modal.confirm) that._writeCardBatch(offset, batchSize);
+            else {
+              that._allCardsCache = null;
+              that.onRefreshDbStats();
+            }
           }
-        }
-      });
+        });
+      }
     });
   },
 
@@ -321,8 +493,9 @@ Page({
         var cards = res.data;
         if (cards.length === 0) {
           that.setData({ imageImportRunning: false, imageImportProgress: '全部完成！共 ' + that._imageImportTotal + ' 张' });
-          wx.showToast({ title: '图片下载完成！', icon: 'success' });
+          if (!that.data.batchUpdateRunning) wx.showToast({ title: '图片下载完成！', icon: 'success' });
           that.onRefreshDbStats();
+          that._checkBatchDone();
           return;
         }
 
@@ -456,7 +629,8 @@ Page({
           var total = that._priceCardQueue.length;
           if (total === 0) {
             that.setData({ priceUpdateRunning: false, priceUpdateProgress: '所有价格已是最新' + (that._priceUpdateNoId > 0 ? '（' + that._priceUpdateNoId + ' 张无产品ID）' : '') });
-            wx.showToast({ title: '无需更新', icon: 'success' });
+            if (!that.data.batchUpdateRunning) wx.showToast({ title: '无需更新', icon: 'success' });
+            that._checkBatchDone();
             return;
           }
           // Group into batches of 20 (free tier limit)
@@ -532,7 +706,8 @@ Page({
         priceUpdateRunning: false,
         priceUpdateProgress: '今日额度已用完（90批/天）。已更新 ' + that._priceUpdateTotal + ' 张，明天继续剩余 ' + (batches.length - bIdx) + ' 批'
       });
-      wx.showToast({ title: '明天继续', icon: 'none' });
+      if (!that.data.batchUpdateRunning) wx.showToast({ title: '明天继续', icon: 'none' });
+      that._checkBatchDone();
       return;
     }
 
@@ -544,7 +719,8 @@ Page({
           (that._priceUpdateSkipped > 0 ? '，跳过 ' + that._priceUpdateSkipped + ' 张' : '') +
           (that._priceUpdateNoId > 0 ? '，' + that._priceUpdateNoId + ' 张无产品ID' : '')
       });
-      wx.showToast({ title: '价格同步完成', icon: 'success' });
+      if (!that.data.batchUpdateRunning) wx.showToast({ title: '价格同步完成', icon: 'success' });
+      that._checkBatchDone();
       return;
     }
 
@@ -762,6 +938,7 @@ Page({
         console.log('Games API response:', res.statusCode, JSON.stringify(res.data).substring(0, 500));
         if (res.statusCode !== 200 || !res.data || !res.data.data) {
           that.setData({ supplementRunning: false, supplementProgress: '获取游戏列表失败 (HTTP ' + res.statusCode + ')' });
+          that._checkBatchDone();
           return;
         }
         var games = res.data.data;
@@ -776,6 +953,7 @@ Page({
         }
         if (!fabGame) {
           that.setData({ supplementRunning: false, supplementProgress: '未找到 FAB 游戏' });
+          that._checkBatchDone();
           console.log('Available games:', JSON.stringify(games.map(function(g) { return g.id + ':' + g.name; })));
           return;
         }
@@ -793,6 +971,7 @@ Page({
       fail: function(err) {
         console.error('Games API fail:', JSON.stringify(err));
         that.setData({ supplementRunning: false, supplementProgress: '网络错误: ' + (err.errMsg || '未知') });
+        that._checkBatchDone();
       }
     });
   },
@@ -833,6 +1012,7 @@ Page({
             supplementProgress: '完成！新增 ' + that._supplementWritten + ' 张，跳过 ' + that._supplementSkipped + ' 张'
           });
           that.onRefreshDbStats();
+          that._checkBatchDone();
           return;
         }
 
@@ -856,6 +1036,7 @@ Page({
               supplementProgress: '完成！新增 ' + that._supplementWritten + ' 张，跳过 ' + that._supplementSkipped + ' 张'
             });
             that.onRefreshDbStats();
+            that._checkBatchDone();
           }
         }).catch(function(err) {
           console.error('Supplement write error:', err);

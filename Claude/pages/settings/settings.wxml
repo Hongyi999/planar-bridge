@@ -112,6 +112,14 @@
       </view>
       <view class="item-refresh" bindtap="onRefreshDbStats">刷新</view>
     </view>
+    <view class="settings-item" bindtap="{{batchUpdateRunning ? 'onPauseBatchUpdate' : 'onBatchUpdate'}}">
+      <view class="item-left">
+        <text class="item-label">一键更新全部</text>
+        <text class="item-desc">{{batchUpdateStep || '自动执行：导入卡牌→系列→补充→图片→价格'}}</text>
+      </view>
+      <view wx:if="{{batchUpdateRunning}}" class="item-refresh" style="color:#c0392b;">暂停</view>
+      <text wx:else class="item-arrow">›</text>
+    </view>
     <view class="settings-item" bindtap="onImportCards">
       <view class="item-left">
         <text class="item-label">导入卡牌数据</text>
