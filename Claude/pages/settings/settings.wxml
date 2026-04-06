@@ -142,6 +142,14 @@
       </view>
       <text class="item-arrow">›</text>
     </view>
+    <view class="settings-item" bindtap="{{supplementRunning ? 'onPauseSupplement' : 'onSupplementCards'}}">
+      <view class="item-left">
+        <text class="item-label">补充缺失卡牌</text>
+        <text class="item-desc">{{supplementProgress || '从 JustTCG 拉取缺失的 FAB 卡牌数据'}}</text>
+      </view>
+      <view wx:if="{{supplementRunning}}" class="item-refresh" style="color:#c0392b;">暂停</view>
+      <text wx:else class="item-arrow">›</text>
+    </view>
   </view>
 
   <!-- Data management -->

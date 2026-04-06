@@ -449,5 +449,147 @@ exports.main = async function(event) {
     return { success: true, updated: updated, errors: errors };
   }
 
+  if (action === 'writeJustTcgCards') {
+    var jtcgCards = event.cards || [];
+    if (jtcgCards.length === 0) return { success: false, error: 'No cards provided' };
+    console.log('Supplementing ' + jtcgCards.length + ' cards from JustTCG...');
+
+    var written = 0;
+    var skipped = 0;
+    var errors = [];
+
+    for (var i = 0; i < jtcgCards.length; i++) {
+      var jc = jtcgCards[i];
+      var docId = 'jtcg_' + (jc.tcgplayerId || jc.id);
+
+      // Check if card already exists by tcgplayerId in printings
+      try {
+        var existing = await db.collection('cards')
+          .where({ 'printings.tcgplayerProductId': String(jc.tcgplayerId) })
+          .limit(1)
+          .get();
+
+        if (existing.data && existing.data.length > 0) {
+          skipped++;
+          continue;
+        }
+      } catch (e) {
+        // Continue with write attempt
+      }
+
+      // Also check by exact docId
+      try {
+        var doc = await db.collection('cards').doc(docId).get();
+        if (doc.data) {
+          skipped++;
+          continue;
+        }
+      } catch (e) {
+        // Document doesn't exist, proceed to create
+      }
+
+      // Build card record from JustTCG data
+      var rarity = jc.rarity || '';
+      var rarityCN = RARITY_CN[rarity] || '';
+
+      var priceData = { priceLow: null, priceMid: null, priceMarket: null, priceTrend: null };
+      if (jc.variants && jc.variants.length > 0) {
+        // Find Near Mint Normal variant
+        var best = null;
+        for (var v = 0; v < jc.variants.length; v++) {
+          var vt = jc.variants[v];
+          if (vt.condition === 'Near Mint' && (vt.printing === 'Normal' || vt.printing === 'Unlimited')) {
+            best = vt; break;
+          }
+        }
+        if (!best) {
+          for (var v = 0; v < jc.variants.length; v++) {
+            if (jc.variants[v].condition === 'Near Mint') { best = jc.variants[v]; break; }
+          }
+        }
+        if (!best) best = jc.variants[0];
+
+        if (best) {
+          priceData.priceMarket = best.price || null;
+          priceData.priceMid = best.avgPrice7d || best.price || null;
+          priceData.priceLow = best.minPrice7d || null;
+          priceData.priceTrend = best.priceChange7d || null;
+        }
+      }
+
+      var cardRecord = {
+        name: jc.name || '',
+        nameCN: '',
+        class: 'Generic',
+        classCN: '通用',
+        classDisplay: 'Generic',
+        talent: '',
+        talentCN: '',
+        type: '',
+        typeCN: '',
+        subtype: '',
+        rarity: rarity,
+        rarityCN: rarityCN,
+        set: '',
+        setCode: jc.set || '',
+        setName: jc.set_name || '',
+        cardCode: jc.number || '',
+        color: '',
+        pitch: '',
+        cost: null,
+        power: null,
+        defense: null,
+        health: null,
+        intelligence: null,
+        types: [],
+        traits: [],
+        keywords: [],
+        abilitiesAndEffects: [],
+        text: '',
+        textMd: '',
+        typeText: '',
+        playedHorizontally: false,
+        blitzLegal: false,
+        ccLegal: false,
+        commonerLegal: false,
+        imageUrl: '',
+        cloudImageId: '',
+        tcgplayerUrl: jc.tcgplayerId ? ('https://www.tcgplayer.com/product/' + jc.tcgplayerId) : '',
+        priceLow: priceData.priceLow,
+        priceMid: priceData.priceMid,
+        priceMarket: priceData.priceMarket,
+        priceTrend: priceData.priceTrend,
+        printings: [{
+          uniqueId: '',
+          id: jc.number || '',
+          setId: jc.set || '',
+          edition: '',
+          rarity: rarity,
+          rarityCode: '',
+          foiling: '',
+          imageUrl: '',
+          cloudImageId: '',
+          tcgplayerProductId: String(jc.tcgplayerId || ''),
+          tcgplayerUrl: jc.tcgplayerId ? ('https://www.tcgplayer.com/product/' + jc.tcgplayerId) : '',
+          artists: [],
+          artVariations: [],
+          flavorText: ''
+        }],
+        printingCount: 1,
+        source: 'justtcg',
+        updatedAt: new Date()
+      };
+
+      try {
+        await db.collection('cards').doc(docId).set({ data: cardRecord });
+        written++;
+      } catch (e) {
+        errors.push(docId + ': ' + e.message);
+      }
+    }
+
+    return { success: true, written: written, skipped: skipped, errors: errors };
+  }
+
   return { success: false, error: 'Unknown action: ' + action };
 };

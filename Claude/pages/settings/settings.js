@@ -61,6 +61,8 @@ Page({
     imageImportProgress: '',
     priceUpdateRunning: false,
     priceUpdateProgress: '',
+    supplementRunning: false,
+    supplementProgress: '',
     adminMode: false,
     _adminTapCount: 0
   },
@@ -723,6 +725,145 @@ Page({
       fail: function(err) {
         wx.hideLoading();
         wx.showToast({ title: '网络错误', icon: 'none' });
+      }
+    });
+  },
+
+  // --- Supplement missing cards from JustTCG ---
+  onSupplementCards() {
+    var that = this;
+    if (this.data.supplementRunning) return;
+
+    wx.showModal({
+      title: '补充缺失卡牌',
+      content: '从 JustTCG 拉取 FAB 全部卡牌列表，补充数据库中缺失的卡牌（含价格）。这会消耗 API 请求配额。',
+      confirmText: '开始',
+      success: function(res) {
+        if (!res.confirm) return;
+        that.setData({ supplementRunning: true, supplementProgress: '正在获取游戏列表...' });
+        that._supplementFindGameId();
+      }
+    });
+  },
+
+  onPauseSupplement() {
+    this._supplementPaused = true;
+    this.setData({ supplementRunning: false, supplementProgress: '已暂停 · ' + this.data.supplementProgress });
+  },
+
+  _supplementFindGameId() {
+    var that = this;
+    // Try fetching games to find FAB game ID
+    wx.request({
+      url: that._JUSTTCG_BASE + '/games',
+      method: 'GET',
+      header: { 'x-api-key': that._JUSTTCG_KEY },
+      success: function(res) {
+        if (res.statusCode !== 200 || !res.data || !res.data.data) {
+          that.setData({ supplementRunning: false, supplementProgress: '获取游戏列表失败' });
+          return;
+        }
+        var games = res.data.data;
+        var fabGame = null;
+        for (var i = 0; i < games.length; i++) {
+          var g = games[i];
+          var name = (g.name || '').toLowerCase();
+          if (name.indexOf('flesh') >= 0 || name.indexOf('fab') >= 0) {
+            fabGame = g;
+            break;
+          }
+        }
+        if (!fabGame) {
+          that.setData({ supplementRunning: false, supplementProgress: '未找到 FAB 游戏' });
+          console.log('Available games:', JSON.stringify(games.map(function(g) { return g.id + ':' + g.name; })));
+          return;
+        }
+        console.log('Found FAB game:', fabGame.id, fabGame.name, 'cards_count:', fabGame.cards_count);
+        that._fabGameId = fabGame.id;
+        that._supplementTotal = fabGame.cards_count || 0;
+        that._supplementWritten = 0;
+        that._supplementSkipped = 0;
+        that._supplementOffset = 0;
+        that._supplementPaused = false;
+        that.setData({ supplementProgress: '找到 ' + fabGame.name + '（' + that._supplementTotal + ' 张卡）' });
+        // Start fetching cards
+        setTimeout(function() { that._supplementFetchBatch(); }, 1000);
+      },
+      fail: function() {
+        that.setData({ supplementRunning: false, supplementProgress: '网络错误' });
+      }
+    });
+  },
+
+  _supplementFetchBatch() {
+    var that = this;
+    if (this._supplementPaused) return;
+
+    var limit = 20; // Free tier safe batch size
+    var offset = this._supplementOffset;
+
+    that.setData({
+      supplementProgress: '拉取卡牌 ' + offset + '/' + that._supplementTotal + ' · 新增 ' + that._supplementWritten + ' 张'
+    });
+
+    wx.request({
+      url: that._JUSTTCG_BASE + '/cards',
+      method: 'GET',
+      header: { 'x-api-key': that._JUSTTCG_KEY },
+      data: { game: that._fabGameId, limit: limit, offset: offset },
+      timeout: 15000,
+      success: function(res) {
+        if (res.statusCode === 429) {
+          that.setData({ supplementProgress: '频率限制，等待 60 秒... 已新增 ' + that._supplementWritten + ' 张' });
+          setTimeout(function() { that._supplementFetchBatch(); }, 60000);
+          return;
+        }
+        if (res.statusCode !== 200 || !res.data || !res.data.data) {
+          that.setData({ supplementRunning: false, supplementProgress: 'API 错误 HTTP ' + res.statusCode });
+          return;
+        }
+
+        var cards = res.data.data;
+        if (cards.length === 0) {
+          // Done
+          that.setData({
+            supplementRunning: false,
+            supplementProgress: '完成！新增 ' + that._supplementWritten + ' 张，跳过 ' + that._supplementSkipped + ' 张'
+          });
+          that.onRefreshDbStats();
+          return;
+        }
+
+        // Send to cloud function to write missing cards
+        wx.cloud.callFunction({
+          name: 'importCards',
+          data: { action: 'writeJustTcgCards', cards: cards }
+        }).then(function(cfRes) {
+          var r = cfRes.result || {};
+          that._supplementWritten += (r.written || 0);
+          that._supplementSkipped += (r.skipped || 0);
+          that._supplementOffset += cards.length;
+
+          var hasMore = res.data.meta && res.data.meta.hasMore;
+          if (hasMore && !that._supplementPaused) {
+            // Rate limit: wait 7 seconds between batches
+            setTimeout(function() { that._supplementFetchBatch(); }, 7000);
+          } else {
+            that.setData({
+              supplementRunning: false,
+              supplementProgress: '完成！新增 ' + that._supplementWritten + ' 张，跳过 ' + that._supplementSkipped + ' 张'
+            });
+            that.onRefreshDbStats();
+          }
+        }).catch(function(err) {
+          console.error('Supplement write error:', err);
+          that._supplementOffset += cards.length;
+          setTimeout(function() { that._supplementFetchBatch(); }, 7000);
+        });
+      },
+      fail: function() {
+        that.setData({ supplementProgress: '网络错误，10 秒后重试...' });
+        setTimeout(function() { that._supplementFetchBatch(); }, 10000);
       }
     });
   },
