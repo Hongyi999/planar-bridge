@@ -15,8 +15,8 @@ Page({
     var sysInfo = wx.getSystemInfoSync();
     this.setData({ statusBarHeight: sysInfo.statusBarHeight || 20 });
 
-    // Initialize voice recognition plugin
-    this._initVoice();
+    // Initialize native recorder
+    this._initRecorder();
   },
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
@@ -87,71 +87,81 @@ Page({
     });
   },
 
-  // --- Voice Search ---
-  _initVoice() {
+  // --- Voice Search (native recorder + cloud STT) ---
+  _initRecorder() {
     var that = this;
-    // Try to use the built-in speech recognition plugin
-    try {
-      var plugin = requirePlugin('WechatSI');
-      this._voicePlugin = plugin;
-      this._voiceManager = plugin.getRecordRecognitionManager();
-      this._voiceManager.onRecognize = function(res) {
-        // Partial result
-        if (res.result) {
-          that.setData({ searchValue: res.result });
-        }
-      };
-      this._voiceManager.onStop = function(res) {
-        that.setData({ isRecording: false });
-        if (res.result) {
-          that.setData({ searchValue: res.result });
-          // Auto search
-          wx.navigateTo({
-            url: '/pages/results/results?query=' + encodeURIComponent(res.result.trim())
+    this._recorder = wx.getRecorderManager();
+
+    this._recorder.onStop(function(res) {
+      that.setData({ isRecording: false });
+      if (!res.tempFilePath) {
+        wx.showToast({ title: '录音失败', icon: 'none' });
+        return;
+      }
+      // Upload audio and call cloud function for speech-to-text
+      wx.showLoading({ title: '正在识别语音...' });
+      wx.cloud.uploadFile({
+        cloudPath: 'voice-search/' + Date.now() + '.mp3',
+        filePath: res.tempFilePath,
+        success: function(upRes) {
+          wx.cloud.callFunction({
+            name: 'voiceToText',
+            data: { fileID: upRes.fileID }
+          }).then(function(cfRes) {
+            wx.hideLoading();
+            var text = (cfRes.result && cfRes.result.text) || '';
+            if (text.trim()) {
+              that.setData({ searchValue: text.trim() });
+              wx.navigateTo({
+                url: '/pages/results/results?query=' + encodeURIComponent(text.trim())
+              });
+            } else {
+              wx.showToast({ title: '未能识别语音', icon: 'none' });
+            }
+          }).catch(function(err) {
+            wx.hideLoading();
+            console.error('Voice STT error:', err);
+            wx.showToast({ title: '语音识别失败', icon: 'none' });
           });
-        } else {
-          wx.showToast({ title: '未能识别语音', icon: 'none' });
+        },
+        fail: function(err) {
+          wx.hideLoading();
+          console.error('Voice upload error:', err);
+          wx.showToast({ title: '上传录音失败', icon: 'none' });
         }
-      };
-      this._voiceManager.onError = function(err) {
-        that.setData({ isRecording: false });
-        console.error('Voice error:', err);
-        wx.showToast({ title: '语音识别失败', icon: 'none' });
-      };
-    } catch (e) {
-      console.warn('Voice plugin not available:', e);
-      this._voicePlugin = null;
-    }
+      });
+    });
+
+    this._recorder.onError(function(err) {
+      that.setData({ isRecording: false });
+      console.error('Recorder error:', err);
+      wx.showToast({ title: '录音出错', icon: 'none' });
+    });
   },
 
   onVoiceSearch() {
     var that = this;
-    if (!this._voicePlugin) {
-      wx.showToast({ title: '语音搜索插件未配置', icon: 'none' });
-      return;
-    }
 
     if (this.data.isRecording) {
       // Stop recording
-      this._voiceManager.stop();
+      this._recorder.stop();
       this.setData({ isRecording: false });
       return;
     }
 
-    // Request microphone permission
+    // Request microphone permission then start
     wx.authorize({
       scope: 'scope.record',
       success: function() {
-        that._voiceManager.start({ lang: 'zh_CN' });
+        that._recorder.start({
+          duration: 10000,
+          sampleRate: 16000,
+          numberOfChannels: 1,
+          encodeBitRate: 48000,
+          format: 'mp3'
+        });
         that.setData({ isRecording: true });
         wx.showToast({ title: '请说出卡牌名称...', icon: 'none', duration: 3000 });
-        // Auto-stop after 10 seconds
-        that._voiceTimer = setTimeout(function() {
-          if (that.data.isRecording) {
-            that._voiceManager.stop();
-            that.setData({ isRecording: false });
-          }
-        }, 10000);
       },
       fail: function() {
         wx.showModal({
