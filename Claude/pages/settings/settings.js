@@ -759,8 +759,9 @@ Page({
       method: 'GET',
       header: { 'x-api-key': that._JUSTTCG_KEY },
       success: function(res) {
+        console.log('Games API response:', res.statusCode, JSON.stringify(res.data).substring(0, 500));
         if (res.statusCode !== 200 || !res.data || !res.data.data) {
-          that.setData({ supplementRunning: false, supplementProgress: '获取游戏列表失败' });
+          that.setData({ supplementRunning: false, supplementProgress: '获取游戏列表失败 (HTTP ' + res.statusCode + ')' });
           return;
         }
         var games = res.data.data;
@@ -789,8 +790,9 @@ Page({
         // Start fetching cards
         setTimeout(function() { that._supplementFetchBatch(); }, 1000);
       },
-      fail: function() {
-        that.setData({ supplementRunning: false, supplementProgress: '网络错误' });
+      fail: function(err) {
+        console.error('Games API fail:', JSON.stringify(err));
+        that.setData({ supplementRunning: false, supplementProgress: '网络错误: ' + (err.errMsg || '未知') });
       }
     });
   },
