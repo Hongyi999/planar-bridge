@@ -1,56 +1,30 @@
-var PLACEHOLDERS = [
-  '搜索 Ninja 的传奇装备',
-  'Rosetta 系列全部卡牌',
-  '价格超过 50 美元的神话卡',
-  'Guardian 的防御反应卡',
-  '有 Go again 效果的攻击行动',
-  '费恩达尔的春之外衣',
-  '10 美元以下的威严装备',
-  'Wizard 的瞬发法术',
-  'Welcome to Rathe 的武器卡',
-  '最贵的 Assassin 卡牌'
-];
-
 Page({
   data: {
     statusBarHeight: 20,
     searchValue: '',
     searchFocus: false,
-    currentPlaceholder: PLACEHOLDERS[0]
+    placeholders: [
+      '搜索 Ninja 的传奇装备',
+      'Rosetta 系列全部卡牌',
+      '价格超过 50 美元的神话卡',
+      'Guardian 的防御反应卡',
+      '有 Go again 效果的攻击行动',
+      '费恩达尔的春之外衣',
+      '10 美元以下的威严装备',
+      'Wizard 的瞬发法术',
+      'Welcome to Rathe 的武器卡',
+      '最贵的 Assassin 卡牌'
+    ]
   },
   onLoad() {
     var sysInfo = wx.getSystemInfoSync();
     this.setData({ statusBarHeight: sysInfo.statusBarHeight || 20 });
-    this._placeholderIndex = 0;
   },
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 0 });
     }
-    this._startPlaceholderRotation();
   },
-  onHide() {
-    this._stopPlaceholderRotation();
-  },
-  onUnload() {
-    this._stopPlaceholderRotation();
-  },
-
-  _startPlaceholderRotation() {
-    this._stopPlaceholderRotation();
-    var that = this;
-    this._placeholderTimer = setInterval(function() {
-      that._placeholderIndex = (that._placeholderIndex + 1) % PLACEHOLDERS.length;
-      that.setData({ currentPlaceholder: PLACEHOLDERS[that._placeholderIndex] });
-    }, 3500);
-  },
-  _stopPlaceholderRotation() {
-    if (this._placeholderTimer) {
-      clearInterval(this._placeholderTimer);
-      this._placeholderTimer = null;
-    }
-  },
-
   onSearch(e) {
     var query = e.detail.value;
     if (query && query.trim()) {

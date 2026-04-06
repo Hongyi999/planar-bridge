@@ -18,7 +18,7 @@
 
     <!-- Search bar -->
     <view class="hero-search">
-      <search-bar value="{{searchValue}}" focus="{{searchFocus}}" placeholder="{{currentPlaceholder}}" bind:search="onSearch" bind:camera="onCameraSearch" />
+      <search-bar value="{{searchValue}}" focus="{{searchFocus}}" placeholders="{{placeholders}}" bind:search="onSearch" bind:camera="onCameraSearch" />
     </view>
 
     <!-- Detail line -->

@@ -1,16 +1,24 @@
 <view class="search-bar {{compact ? 'compact' : ''}}" bindtap="onTap">
   <!-- Left icon: magnifying glass -->
   <image class="search-icon-img" src="/assets/icons/tab-search.svg" mode="aspectFit" />
-  <input
-    class="search-input"
-    value="{{value}}"
-    placeholder="{{placeholder}}"
-    placeholder-class="search-placeholder"
-    confirm-type="search"
-    focus="{{focus}}"
-    bindinput="onInput"
-    bindconfirm="onConfirm"
-  />
+  <view class="search-input-wrap">
+    <input
+      class="search-input"
+      value="{{value}}"
+      placeholder=" "
+      confirm-type="search"
+      focus="{{focus}}"
+      bindinput="onInput"
+      bindconfirm="onConfirm"
+    />
+    <!-- Animated placeholder overlay (hidden when user has input) -->
+    <view wx:if="{{!value}}" class="placeholder-scroll">
+      <view class="placeholder-track {{animating ? 'slide-up' : ''}}">
+        <text class="placeholder-text">{{currentPlaceholder}}</text>
+        <text class="placeholder-text">{{nextPlaceholder}}</text>
+      </view>
+    </view>
+  </view>
   <!-- Right plus icon: home only, for camera/album -->
   <image wx:if="{{!compact}}" class="search-icon-img plus-icon" src="/assets/icons/icon-plus.svg" mode="aspectFit" catchtap="onCameraTap" />
 </view>
