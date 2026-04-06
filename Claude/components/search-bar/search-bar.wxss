@@ -46,6 +46,7 @@
   text-align: left;
   position: relative;
   z-index: 2;
+  background: transparent;
 }
 
 /* Animated placeholder */
@@ -79,4 +80,5 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: left;
 }
