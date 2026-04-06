@@ -21,19 +21,7 @@
       <search-bar value="{{searchValue}}" focus="{{searchFocus}}" placeholder="{{currentPlaceholder}}" bind:search="onSearch" bind:camera="onCameraSearch" />
     </view>
 
-    <!-- Suggestion chips -->
-    <view class="chips-row">
-      <view
-        wx:for="{{chips}}"
-        wx:key="index"
-        class="chip chip-{{item.type}}"
-        data-query="{{item.query}}"
-        data-text="{{item.text}}"
-        bindtap="onChipTap"
-      >{{item.text}}</view>
-    </view>
-
-    <!-- Detail line (moved below chips) -->
+    <!-- Detail line -->
     <view class="hero-sub-detail">实时价格 · 系列浏览 · 个人收藏</view>
   </view>
 </view>

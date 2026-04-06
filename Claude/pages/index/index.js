@@ -16,13 +16,7 @@ Page({
     statusBarHeight: 20,
     searchValue: '',
     searchFocus: false,
-    currentPlaceholder: PLACEHOLDERS[0],
-    chips: [
-      { text: '传奇装备', type: 'gold', query: 'legendary equipment' },
-      { text: '威严攻击', type: 'purple', query: 'majestic attack action' },
-      { text: 'Ninja 英雄', type: 'green', query: 'ninja hero' },
-      { text: 'Rosetta 新卡', type: 'gold', query: 'rosetta' }
-    ]
+    currentPlaceholder: PLACEHOLDERS[0]
   },
   onLoad() {
     var sysInfo = wx.getSystemInfoSync();
@@ -65,14 +59,6 @@ Page({
       });
     }
   },
-  onChipTap(e) {
-    var text = e.currentTarget.dataset.text;
-    this.setData({ searchValue: text });
-    wx.navigateTo({
-      url: '/pages/results/results?query=' + encodeURIComponent(text)
-    });
-  },
-
   // --- Camera/Image Search ---
   onCameraSearch() {
     var that = this;
