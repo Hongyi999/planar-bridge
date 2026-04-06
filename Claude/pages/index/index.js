@@ -3,7 +3,9 @@ Page({
     statusBarHeight: 20,
     searchValue: '',
     searchFocus: false,
+    searchPlaceholder: '',
     isRecording: false,
+    voiceBars: [8, 8, 8, 8, 8, 8, 8],
     chips: [
       { text: '传奇装备', type: 'gold', query: 'legendary equipment' },
       { text: '威严攻击', type: 'purple', query: 'majestic attack action' },
@@ -14,8 +16,6 @@ Page({
   onLoad() {
     var sysInfo = wx.getSystemInfoSync();
     this.setData({ statusBarHeight: sysInfo.statusBarHeight || 20 });
-
-    // Initialize native recorder
     this._initRecorder();
   },
   onShow() {
@@ -50,12 +50,10 @@ Page({
       success: function(res) {
         var tempFilePath = res.tempFiles[0].tempFilePath;
         wx.showLoading({ title: '正在识别卡牌...' });
-        // Upload image to cloud storage
         wx.cloud.uploadFile({
           cloudPath: 'search-images/' + Date.now() + '.jpg',
           filePath: tempFilePath,
           success: function(upRes) {
-            // Call aiSearch with image
             wx.cloud.callFunction({
               name: 'aiSearch',
               data: { imageFileID: upRes.fileID }
@@ -63,18 +61,21 @@ Page({
               wx.hideLoading();
               var result = cfRes.result || {};
               if (result.results && result.results.length > 0) {
-                // Navigate to results with the recognized query
                 var query = result.recognizedQuery || '图片搜索';
                 wx.navigateTo({
                   url: '/pages/results/results?query=' + encodeURIComponent(query) + '&imageFileID=' + encodeURIComponent(upRes.fileID)
                 });
               } else {
-                wx.showToast({ title: result.summary || '未能识别卡牌', icon: 'none' });
+                var summary = result.summary || '';
+                var msg = /Error|Cannot|undefined|null/i.test(summary)
+                  ? '未能识别图片中的卡牌，换一张试试'
+                  : (summary || '未能识别卡牌，换一张图片试试');
+                wx.showToast({ title: msg, icon: 'none', duration: 2500 });
               }
             }).catch(function(err) {
               wx.hideLoading();
               console.error('Image search error:', err);
-              wx.showToast({ title: '识别失败，请重试', icon: 'none' });
+              wx.showToast({ title: '未能识别图片中的卡牌，换一张试试', icon: 'none' });
             });
           },
           fail: function(err) {
@@ -87,19 +88,35 @@ Page({
     });
   },
 
-  // --- Voice Search (native recorder + cloud STT) ---
+  // --- Voice Search ---
   _initRecorder() {
     var that = this;
     this._recorder = wx.getRecorderManager();
 
+    // Real-time audio frame for waveform animation
+    this._recorder.onFrameRecorded(function(res) {
+      if (!res.frameBuffer || !that.data.isRecording) return;
+      var data = new Int16Array(res.frameBuffer);
+      var sum = 0;
+      for (var i = 0; i < data.length; i++) sum += data[i] * data[i];
+      var rms = Math.sqrt(sum / data.length);
+      var level = Math.min(48, Math.max(8, rms / 200));
+      var bars = [];
+      for (var j = 0; j < 7; j++) {
+        bars.push(Math.round(Math.max(8, level * (0.4 + Math.random() * 0.8))));
+      }
+      that.setData({ voiceBars: bars });
+    });
+
+    // Recording stopped — upload and recognize
     this._recorder.onStop(function(res) {
-      that.setData({ isRecording: false });
+      that.setData({ isRecording: false, voiceBars: [8, 8, 8, 8, 8, 8, 8] });
       if (!res.tempFilePath) {
         wx.showToast({ title: '录音失败', icon: 'none' });
         return;
       }
-      // Upload audio and call cloud function for speech-to-text
-      wx.showLoading({ title: '正在识别语音...' });
+      // Show "recognizing" state in placeholder
+      that.setData({ searchPlaceholder: '识别中...' });
       wx.cloud.uploadFile({
         cloudPath: 'voice-search/' + Date.now() + '.mp3',
         filePath: res.tempFilePath,
@@ -108,24 +125,23 @@ Page({
             name: 'voiceToText',
             data: { fileID: upRes.fileID }
           }).then(function(cfRes) {
-            wx.hideLoading();
-            var text = (cfRes.result && cfRes.result.text) || '';
+            that.setData({ searchPlaceholder: '' });
+            var result = cfRes.result || {};
+            var text = result.name || result.text || '';
             if (text.trim()) {
-              that.setData({ searchValue: text.trim() });
-              wx.navigateTo({
-                url: '/pages/results/results?query=' + encodeURIComponent(text.trim())
-              });
+              // Fill search box, activate focus — user presses enter to search
+              that.setData({ searchValue: text.trim(), searchFocus: true });
             } else {
-              wx.showToast({ title: '未能识别语音', icon: 'none' });
+              wx.showToast({ title: '未能识别语音，请重试', icon: 'none' });
             }
           }).catch(function(err) {
-            wx.hideLoading();
+            that.setData({ searchPlaceholder: '' });
             console.error('Voice STT error:', err);
             wx.showToast({ title: '语音识别失败', icon: 'none' });
           });
         },
         fail: function(err) {
-          wx.hideLoading();
+          that.setData({ searchPlaceholder: '' });
           console.error('Voice upload error:', err);
           wx.showToast({ title: '上传录音失败', icon: 'none' });
         }
@@ -133,7 +149,7 @@ Page({
     });
 
     this._recorder.onError(function(err) {
-      that.setData({ isRecording: false });
+      that.setData({ isRecording: false, voiceBars: [8, 8, 8, 8, 8, 8, 8], searchPlaceholder: '' });
       console.error('Recorder error:', err);
       wx.showToast({ title: '录音出错', icon: 'none' });
     });
@@ -143,13 +159,11 @@ Page({
     var that = this;
 
     if (this.data.isRecording) {
-      // Stop recording
       this._recorder.stop();
       this.setData({ isRecording: false });
       return;
     }
 
-    // Request microphone permission then start
     wx.authorize({
       scope: 'scope.record',
       success: function() {
@@ -158,10 +172,10 @@ Page({
           sampleRate: 16000,
           numberOfChannels: 1,
           encodeBitRate: 48000,
-          format: 'mp3'
+          format: 'mp3',
+          frameSize: 1
         });
         that.setData({ isRecording: true });
-        wx.showToast({ title: '请说出卡牌名称...', icon: 'none', duration: 3000 });
       },
       fail: function() {
         wx.showModal({

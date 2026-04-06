@@ -139,7 +139,7 @@ exports.main = async (event) => {
       };
     } catch (imgErr) {
       console.error('Image search error:', imgErr);
-      return { filters: {}, results: [], resultCount: 0, summary: '图片识别失败: ' + imgErr.message, recognizedQuery: '' };
+      return { filters: {}, results: [], resultCount: 0, summary: '未能识别图片中的卡牌，换一张图片试试', recognizedQuery: '' };
     }
   }
 
