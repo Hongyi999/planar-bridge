@@ -1,0 +1,51 @@
+<nav-bar title="今日记录"></nav-bar>
+
+<view class="page-container">
+  <!-- 日期和问候 -->
+  <view class="greeting-section">
+    <text class="greeting-date">{{dateCN}}</text>
+    <text class="greeting-text">{{greeting}}</text>
+  </view>
+
+  <!-- 分类快捷入口 -->
+  <view class="category-bar">
+    <view
+      wx:for="{{categories}}"
+      wx:key="key"
+      class="category-chip"
+      style="background: {{item.color}}22; color: {{item.color}};"
+      bindtap="onQuickAdd"
+      data-category="{{item.key}}"
+    >
+      <text class="chip-icon">{{item.icon}}</text>
+      <text class="chip-text">{{item.name}}</text>
+    </view>
+  </view>
+
+  <!-- 今日记录列表 -->
+  <view wx:if="{{loading}}" class="loading-state">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{records.length === 0}}" class="empty-state">
+    <text class="empty-icon">🌟</text>
+    <text class="empty-text">今天还没有记录</text>
+    <text class="empty-hint">点击上方分类开始记录吧</text>
+  </view>
+
+  <view wx:else class="record-list">
+    <view class="record-count">今日已记录 {{records.length}} 条</view>
+    <intake-card
+      wx:for="{{records}}"
+      wx:key="_id"
+      item="{{item}}"
+      bind:tap="onCardTap"
+      style="animation-delay: {{index * 0.05}}s"
+    />
+  </view>
+</view>
+
+<!-- 悬浮添加按钮 -->
+<view class="fab" bindtap="onAddTap">
+  <text class="fab-icon">+</text>
+</view>

@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "nav-bar": "/components/nav-bar/nav-bar",
+    "intake-card": "/components/intake-card/intake-card"
+  }
+}

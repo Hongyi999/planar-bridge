@@ -1,0 +1,63 @@
+.filter-bar {
+  white-space: nowrap;
+  margin-bottom: 32rpx;
+  padding-bottom: 8rpx;
+}
+.filter-chip {
+  display: inline-block;
+  padding: 12rpx 28rpx;
+  border-radius: var(--radius-full);
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  background: var(--color-bg-card);
+  margin-right: 16rpx;
+  transition: all 0.2s ease;
+}
+.filter-chip.active {
+  background: var(--color-primary);
+  color: #ffffff;
+}
+.filter-chip:active {
+  transform: scale(0.95);
+}
+
+.date-group {
+  margin-bottom: 32rpx;
+}
+.date-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+  padding: 0 4rpx;
+}
+.date-label {
+  font-size: var(--font-base);
+  font-weight: 600;
+  color: var(--color-text);
+}
+.date-count {
+  font-size: var(--font-xs);
+  color: var(--color-text-hint);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 0;
+}
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 24rpx;
+}
+.empty-text {
+  font-size: var(--font-lg);
+  color: var(--color-text-hint);
+}
+
+.loading-state {
+  text-align: center;
+  padding: 120rpx 0;
+  color: var(--color-text-hint);
+}

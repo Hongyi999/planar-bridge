@@ -1,0 +1,72 @@
+<nav-bar title="{{isEdit ? '编辑记录' : '添加记录'}}" showBack="{{true}}"></nav-bar>
+
+<view class="page-container">
+  <!-- 分类选择 -->
+  <view class="section">
+    <text class="section-title">选择分类</text>
+    <view class="category-grid">
+      <view
+        wx:for="{{categories}}"
+        wx:key="key"
+        class="cat-option {{selectedCategory === item.key ? 'selected' : ''}}"
+        style="{{selectedCategory === item.key ? 'background:' + item.color + '22; border-color:' + item.color : ''}}"
+        bindtap="onSelectCategory"
+        data-key="{{item.key}}"
+      >
+        <text class="cat-option-icon">{{item.icon}}</text>
+        <text class="cat-option-name" style="{{selectedCategory === item.key ? 'color:' + item.color : ''}}">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 标题 -->
+  <view class="section">
+    <text class="section-title">标题</text>
+    <input
+      class="input-field"
+      placeholder="输入内容标题"
+      value="{{title}}"
+      bindinput="onTitleInput"
+    />
+  </view>
+
+  <!-- 备注 -->
+  <view class="section">
+    <text class="section-title">备注（可选）</text>
+    <textarea
+      class="textarea-field"
+      placeholder="记录你的感想、收获..."
+      value="{{note}}"
+      bindinput="onNoteInput"
+      auto-height
+      maxlength="500"
+    />
+  </view>
+
+  <!-- 评分 -->
+  <view class="section">
+    <text class="section-title">评分（可选）</text>
+    <view class="rating-bar">
+      <view
+        wx:for="{{[1,2,3,4,5]}}"
+        wx:key="*this"
+        class="rating-star"
+        bindtap="onRating"
+        data-score="{{item}}"
+      >
+        <text class="star {{item <= rating ? 'filled' : ''}}">★</text>
+      </view>
+      <text wx:if="{{rating > 0}}" class="rating-clear" bindtap="onClearRating">清除</text>
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <button class="submit-btn" bindtap="onSubmit" disabled="{{submitting}}">
+    {{submitting ? '保存中...' : (isEdit ? '保存修改' : '添加记录')}}
+  </button>
+
+  <!-- 删除按钮（编辑模式） -->
+  <button wx:if="{{isEdit}}" class="delete-btn" bindtap="onDelete">
+    删除记录
+  </button>
+</view>

@@ -1,0 +1,66 @@
+/* ===== 设计令牌 — 活泼可爱橙色系 ===== */
+page {
+  /* 主色调 */
+  --color-primary: #fa8c16;
+  --color-primary-light: #FFF7ED;
+  --color-primary-dark: #d46b08;
+  --color-primary-bg: #FFF1E6;
+
+  /* 分类色 */
+  --color-podcast: #722ed1;
+  --color-video: #eb2f96;
+  --color-movie: #1890ff;
+  --color-book: #52c41a;
+  --color-idea: #faad14;
+
+  /* 语义色 */
+  --color-success: #52c41a;
+  --color-warning: #faad14;
+  --color-error: #ff4d4f;
+
+  /* 中性色 */
+  --color-text: #333333;
+  --color-text-secondary: #666666;
+  --color-text-hint: #999999;
+  --color-border: #f0f0f0;
+  --color-bg: #FFF7ED;
+  --color-bg-card: #ffffff;
+
+  /* 字体 */
+  --font-xs: 22rpx;
+  --font-sm: 24rpx;
+  --font-base: 28rpx;
+  --font-lg: 32rpx;
+  --font-xl: 36rpx;
+  --font-xxl: 44rpx;
+
+  /* 间距 */
+  --spacing-xs: 8rpx;
+  --spacing-sm: 16rpx;
+  --spacing-md: 24rpx;
+  --spacing-lg: 32rpx;
+  --spacing-xl: 48rpx;
+
+  /* 圆角 */
+  --radius-sm: 12rpx;
+  --radius-md: 20rpx;
+  --radius-lg: 28rpx;
+  --radius-full: 999rpx;
+
+  /* 阴影 */
+  --shadow-sm: 0 2rpx 12rpx rgba(250, 140, 22, 0.08);
+  --shadow-md: 0 4rpx 20rpx rgba(250, 140, 22, 0.12);
+
+  /* 底部安全区 */
+  --safe-bottom: env(safe-area-inset-bottom);
+
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--font-base);
+}
+
+/* 全局工具类 */
+.page-container {
+  padding: 0 32rpx;
+  padding-bottom: calc(120rpx + var(--safe-bottom));
+}

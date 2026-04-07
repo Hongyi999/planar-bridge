@@ -1,0 +1,112 @@
+.section {
+  margin-bottom: 36rpx;
+}
+.section-title {
+  font-size: var(--font-base);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.category-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+.cat-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx 0;
+  width: calc(20% - 13rpx);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-card);
+  border: 2rpx solid var(--color-border);
+  transition: all 0.2s ease;
+}
+.cat-option.selected {
+  border-width: 3rpx;
+}
+.cat-option:active {
+  transform: scale(0.95);
+}
+.cat-option-icon {
+  font-size: 40rpx;
+  margin-bottom: 6rpx;
+}
+.cat-option-name {
+  font-size: var(--font-xs);
+  color: var(--color-text-secondary);
+}
+
+.input-field {
+  background: var(--color-bg-card);
+  border: 2rpx solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 24rpx;
+  font-size: var(--font-base);
+  width: 100%;
+  box-sizing: border-box;
+}
+.input-field:focus {
+  border-color: var(--color-primary);
+}
+
+.textarea-field {
+  background: var(--color-bg-card);
+  border: 2rpx solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 24rpx;
+  font-size: var(--font-base);
+  width: 100%;
+  min-height: 160rpx;
+  box-sizing: border-box;
+}
+
+.rating-bar {
+  display: flex;
+  align-items: center;
+}
+.rating-star {
+  padding: 8rpx;
+}
+.star {
+  font-size: 48rpx;
+  color: #e0e0e0;
+  transition: color 0.15s ease;
+}
+.star.filled {
+  color: #faad14;
+}
+.rating-clear {
+  margin-left: 24rpx;
+  font-size: var(--font-sm);
+  color: var(--color-text-hint);
+}
+
+.submit-btn {
+  background: var(--color-primary) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: var(--radius-lg) !important;
+  font-size: var(--font-lg) !important;
+  padding: 24rpx 0 !important;
+  margin-top: 48rpx;
+}
+.submit-btn:active {
+  opacity: 0.85;
+}
+.submit-btn[disabled] {
+  opacity: 0.5;
+}
+
+.delete-btn {
+  background: transparent !important;
+  color: var(--color-error) !important;
+  border: 2rpx solid var(--color-error) !important;
+  border-radius: var(--radius-lg) !important;
+  font-size: var(--font-base) !important;
+  padding: 20rpx 0 !important;
+  margin-top: 24rpx;
+}

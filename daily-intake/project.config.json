@@ -1,0 +1,19 @@
+{
+  "miniprogramRoot": "./",
+  "cloudfunctionRoot": "cloudfunctions/",
+  "appid": "wxe42be5154e5beff8",
+  "projectname": "daily-intake",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "preloadBackgroundData": false,
+    "minified": true,
+    "newFeature": true,
+    "autoAudits": false,
+    "coverView": true
+  },
+  "compileType": "miniprogram",
+  "condition": {}
+}
