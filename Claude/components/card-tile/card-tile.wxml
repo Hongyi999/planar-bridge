@@ -1,0 +1,25 @@
+<view class="card-tile {{show ? 'show' : ''}}" bindtap="onTap" style="animation-delay: {{index * 100}}ms">
+  <!-- Card image -->
+  <view class="card-img" style="background: linear-gradient(135deg, #EBE7DA, #E0DBCC)">
+    <image wx:if="{{card.cloudImageId || card.imageUrl}}" class="card-real-img" src="{{card.cloudImageId || card.imageUrl}}" mode="aspectFill" lazy-load />
+    <view wx:else class="card-placeholder font-heading">{{card.name}}</view>
+    <!-- Rarity badge -->
+    <view class="rarity-badge rarity-{{card.rarity}}">
+      {{card.rarity === 'Legendary' ? 'L' : card.rarity === 'Majestic' ? 'M' : card.rarity === 'Rare' ? 'R' : card.rarity === 'Common' ? 'C' : card.rarity === 'Fabled' ? 'F' : card.rarity === 'Super Rare' ? 'S' : 'P'}}
+    </view>
+    <!-- Star button -->
+    <view class="star-btn" catchtap="onStarTap">
+      <image class="star-icon" src="/assets/icons/{{isFav ? 'star-filled' : 'star-outline'}}.svg" mode="aspectFit" />
+    </view>
+  </view>
+  <!-- Card info -->
+  <view class="card-info">
+    <view class="card-name font-heading">{{card.name}}</view>
+    <view class="card-name-cn" wx:if="{{card.nameCN}}">{{card.nameCN}}</view>
+    <view class="card-meta">{{card.classCN || card.class}} · {{card.typeCN || card.type}}{{card.subtype ? ' — ' + card.subtype : ''}} · {{card.setCode}}</view>
+    <view class="card-price-row" wx:if="{{card.priceMid != null}}">
+      <text class="card-price font-mono {{card.priceTrend > 0 ? 'price-up' : card.priceTrend < 0 ? 'price-down' : 'price-flat'}}">${{card.priceMid}}</text>
+      <text class="card-trend {{card.priceTrend > 0 ? 'price-up' : card.priceTrend < 0 ? 'price-down' : 'price-flat'}}">{{card.priceTrend > 0 ? '▲ ' + card.priceTrend + '%' : card.priceTrend < 0 ? '▼ ' + (-card.priceTrend) + '%' : '— 0%'}}</text>
+    </view>
+  </view>
+</view>

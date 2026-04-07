@@ -1,0 +1,8 @@
+<view class="tab-bar">
+  <block wx:for="{{list}}" wx:key="index">
+    <view class="tab-item {{selected === index ? 'active' : ''}}" data-index="{{index}}" bindtap="switchTab">
+      <image class="tab-icon-img" src="{{selected === index ? item.iconActive : item.iconNormal}}" mode="aspectFit" />
+      <text class="tab-text" style="color: {{selected === index ? '#9B8644' : '#A09A8C'}}">{{item.text}}</text>
+    </view>
+  </block>
+</view>

@@ -1,0 +1,191 @@
+.thinking-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.ts-step {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 28rpx;
+  background: #FDFCF8;
+  border: 2rpx solid #E8E3D8;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateX(-20rpx);
+  animation: slideIn 0.4s ease-out forwards;
+}
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.ts-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #9B864408, transparent);
+  animation: shimmer 2.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+.ts-icon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ts-icon-purple {
+  background: #6B4C8A10;
+  border: 2rpx solid #6B4C8A18;
+}
+
+.ts-icon-gold {
+  background: #9B86440A;
+  border: 2rpx solid #9B864418;
+}
+
+.ts-icon-green {
+  background: #3D7A5E0A;
+  border: 2rpx solid #3D7A5E18;
+}
+
+/* Clock icon */
+.icon-clock {
+  position: relative;
+  width: 28rpx;
+  height: 28rpx;
+}
+
+.clock-face {
+  width: 28rpx;
+  height: 28rpx;
+  border: 3rpx solid #6B4C8A;
+  border-radius: 50%;
+}
+
+.clock-hand {
+  position: absolute;
+  top: 8rpx;
+  left: 13rpx;
+  width: 3rpx;
+  height: 10rpx;
+  background: #6B4C8A;
+  transform-origin: bottom center;
+  transform: rotate(30deg);
+  border-radius: 2rpx;
+}
+
+/* Search icon small */
+.icon-search-sm {
+  position: relative;
+  width: 28rpx;
+  height: 28rpx;
+}
+
+.search-sm-circle {
+  width: 18rpx;
+  height: 18rpx;
+  border: 3rpx solid #9B8644;
+  border-radius: 50%;
+}
+
+.search-sm-handle {
+  position: absolute;
+  bottom: 2rpx;
+  right: 2rpx;
+  width: 10rpx;
+  height: 3rpx;
+  background: #9B8644;
+  transform: rotate(45deg);
+  border-radius: 2rpx;
+}
+
+/* Dollar icon */
+.icon-dollar {
+  width: 28rpx;
+  height: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dollar-sign {
+  font-family: "SF Mono", "Menlo", monospace;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #3D7A5E;
+}
+
+/* Body */
+.ts-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.ts-label {
+  font-size: 24rpx;
+  font-weight: 600;
+  margin-bottom: 2rpx;
+}
+
+.ts-meta {
+  font-size: 20rpx;
+  color: #A09A8C;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Status */
+.ts-status {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.ts-check {
+  width: 32rpx;
+  height: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.check-mark {
+  width: 16rpx;
+  height: 10rpx;
+  border-left: 4rpx solid #3D7A5E;
+  border-bottom: 4rpx solid #3D7A5E;
+  transform: rotate(-45deg);
+  margin-top: -4rpx;
+}
+
+.ts-spinner {
+  width: 28rpx;
+  height: 28rpx;
+  border: 4rpx solid #3D7A5E;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

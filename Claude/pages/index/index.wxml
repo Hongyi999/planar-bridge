@@ -1,0 +1,27 @@
+<view class="hero-page">
+  <!-- Background grid lines -->
+  <view class="bg-lines"></view>
+
+  <!-- Center content -->
+  <view class="hero-content">
+    <!-- Logo -->
+    <view class="logo-row">
+      <image class="logo-img" src="/assets/icons/logo-bridge.svg" mode="aspectFit" />
+      <text class="logo-text font-heading">PLANAR BRIDGE</text>
+    </view>
+
+    <!-- Heading -->
+    <view class="hero-heading font-heading">你在找什么卡牌？</view>
+
+    <!-- Subtitle -->
+    <view class="hero-sub">输入或拍照找到你想要的卡</view>
+
+    <!-- Search bar -->
+    <view class="hero-search">
+      <search-bar value="{{searchValue}}" focus="{{searchFocus}}" placeholders="{{placeholders}}" bind:search="onSearch" bind:camera="onCameraSearch" />
+    </view>
+
+    <!-- Detail line -->
+    <view class="hero-sub-detail">实时价格 · 系列浏览 · 个人收藏</view>
+  </view>
+</view>

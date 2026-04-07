@@ -1,0 +1,315 @@
+.settings-page {
+  min-height: 100vh;
+  background: #F2EFE4;
+  padding: 24rpx 32rpx 160rpx;
+}
+
+.page-title {
+  display: block;
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #2C2A22;
+  letter-spacing: -0.01em;
+  margin-bottom: 6rpx;
+}
+
+.page-subtitle {
+  display: block;
+  font-size: 24rpx;
+  color: #A09A8C;
+  margin-bottom: 40rpx;
+}
+
+.settings-group {
+  margin-bottom: 32rpx;
+}
+
+.group-title {
+  font-size: 22rpx;
+  color: #A09A8C;
+  font-weight: 500;
+  padding: 0 8rpx;
+  margin-bottom: 12rpx;
+  letter-spacing: 0.06em;
+}
+
+/* Standard settings item (row) */
+.settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FDFCF8;
+  border: 2rpx solid #E8E3D8;
+  border-radius: 24rpx;
+  padding: 24rpx 28rpx;
+  margin-bottom: 12rpx;
+  transition: border-color 0.2s;
+}
+
+.settings-item:active {
+  border-color: #9B864430;
+}
+
+/* Column layout settings item */
+.settings-item-col {
+  background: #FDFCF8;
+  border: 2rpx solid #E8E3D8;
+  border-radius: 24rpx;
+  padding: 24rpx 28rpx;
+  margin-bottom: 12rpx;
+}
+
+.item-left {
+  flex: 1;
+}
+
+.item-label {
+  display: block;
+  font-size: 28rpx;
+  color: #2C2A22;
+  font-weight: 500;
+}
+
+.item-desc {
+  display: block;
+  font-size: 22rpx;
+  color: #A09A8C;
+  margin-top: 4rpx;
+}
+
+.item-arrow {
+  color: #C8C2B4;
+  font-size: 32rpx;
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+.item-refresh {
+  font-size: 22rpx;
+  color: #9B8644;
+  font-weight: 500;
+  padding: 6rpx 16rpx;
+  border: 2rpx solid #9B864430;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+}
+
+.batch-status-list {
+  padding: 12rpx 32rpx 20rpx;
+}
+
+.batch-status-item {
+  display: block;
+  font-size: 22rpx;
+  color: #8C8678;
+  line-height: 1.6;
+}
+
+/* Toggle button group */
+.item-toggle {
+  display: flex;
+  background: #F2EFE4;
+  border-radius: 16rpx;
+  overflow: hidden;
+  border: 2rpx solid #E8E3D8;
+  flex-shrink: 0;
+}
+
+.toggle-btn {
+  font-size: 22rpx;
+  color: #A09A8C;
+  padding: 10rpx 24rpx;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.toggle-btn.active {
+  background: #9B8644;
+  color: #FDFCF8;
+}
+
+/* Checkbox grid */
+.checkbox-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  width: calc(50% - 8rpx);
+  padding: 8rpx 0;
+}
+
+.checkbox-box {
+  width: 36rpx;
+  height: 36rpx;
+  border: 2rpx solid #D6D0C2;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  background: #FDFCF8;
+}
+
+.checkbox-box.checked {
+  background: #9B8644;
+  border-color: #9B8644;
+}
+
+.checkbox-tick {
+  width: 14rpx;
+  height: 8rpx;
+  border-left: 3rpx solid #FDFCF8;
+  border-bottom: 3rpx solid #FDFCF8;
+  transform: rotate(-45deg);
+  margin-top: -4rpx;
+}
+
+.checkbox-label {
+  font-size: 24rpx;
+  color: #4A4636;
+}
+
+/* Footer */
+.settings-footer {
+  text-align: center;
+  padding-top: 80rpx;
+}
+
+.footer-logo-img {
+  display: block;
+  width: 100rpx;
+  height: 80rpx;
+  margin: 0 auto 16rpx;
+  opacity: 0.35;
+}
+
+.footer-name {
+  display: block;
+  font-size: 22rpx;
+  color: #9B864460;
+  letter-spacing: 0.15em;
+  margin-bottom: 4rpx;
+}
+
+.footer-tagline {
+  display: block;
+  font-size: 20rpx;
+  color: #C8C2B4;
+}
+
+/* Export modal */
+.export-modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.export-modal {
+  width: 620rpx;
+  background: #FDFCF8;
+  border-radius: 32rpx;
+  padding: 40rpx;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.export-modal-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #2C2A22;
+  margin-bottom: 28rpx;
+  text-align: center;
+}
+.export-step-label {
+  display: block;
+  font-size: 24rpx;
+  color: #A09A8C;
+  margin-bottom: 16rpx;
+  font-weight: 500;
+}
+.export-list-select {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+.export-list-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 16rpx 20rpx;
+  background: #F2EFE4;
+  border-radius: 16rpx;
+}
+.export-list-name {
+  flex: 1;
+  font-size: 26rpx;
+  color: #2C2A22;
+  font-weight: 500;
+}
+.export-list-count {
+  font-size: 22rpx;
+  color: #A09A8C;
+}
+.export-format-row {
+  display: flex;
+  gap: 16rpx;
+}
+.export-format-btn {
+  flex: 1;
+  padding: 20rpx;
+  border: 2rpx solid #E8E3D8;
+  border-radius: 20rpx;
+  text-align: center;
+  background: #FDFCF8;
+}
+.export-format-btn.active {
+  border-color: #9B8644;
+  background: #9B86440A;
+}
+.efb-label {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #2C2A22;
+  margin-bottom: 4rpx;
+}
+.efb-desc {
+  display: block;
+  font-size: 20rpx;
+  color: #A09A8C;
+}
+.export-actions {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 32rpx;
+}
+.export-btn-cancel {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx;
+  border-radius: 24rpx;
+  font-size: 28rpx;
+  color: #6B6355;
+  background: #F2EFE4;
+}
+.export-btn-confirm {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx;
+  border-radius: 24rpx;
+  font-size: 28rpx;
+  color: #fff;
+  background: #9B8644;
+  font-weight: 600;
+}

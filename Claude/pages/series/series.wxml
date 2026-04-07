@@ -1,0 +1,46 @@
+<view class="series-page">
+  <!-- Title -->
+  <text class="page-title font-heading">全部系列</text>
+  <text class="page-subtitle">补充包 · 扩展包 · 历史合集</text>
+
+  <!-- Sort toggle -->
+  <view class="sort-toggle">
+    <view class="sort-btn {{sortMode === 'chrono' ? 'active' : ''}} sort-btn-left" bindtap="onSortChrono">按时间顺序</view>
+    <view class="sort-btn {{sortMode === 'alpha' ? 'active' : ''}} sort-btn-right" bindtap="onSortAlpha">按字母顺序</view>
+  </view>
+
+  <!-- Series list -->
+  <view class="series-list">
+    <block wx:for="{{seriesGroups}}" wx:key="year">
+      <!-- Year divider -->
+      <view class="year-divider">
+        <text class="year-text font-heading">{{item.year}}</text>
+      </view>
+
+      <!-- Set items -->
+      <view
+        wx:for="{{item.sets}}"
+        wx:for-item="set"
+        wx:key="code"
+        class="set-item"
+        data-code="{{set.code}}"
+        data-name="{{set.name}}"
+        data-name-cn="{{set.nameCN}}"
+        bindtap="onSetTap"
+      >
+        <!-- Icon badge -->
+        <view class="set-icon">
+          <text class="set-abbr font-heading">{{set.abbr}}</text>
+        </view>
+        <!-- Info -->
+        <view class="set-info">
+          <text class="set-name font-heading">{{set.name}}</text>
+          <text class="set-tags">{{set.tags}} · {{set.cards}} 张卡</text>
+        </view>
+        <!-- Code -->
+        <text class="set-code font-mono">{{set.code}}</text>
+        <text class="set-arrow">›</text>
+      </view>
+    </block>
+  </view>
+</view>

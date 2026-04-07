@@ -1,0 +1,175 @@
+<view class="settings-page">
+  <text class="page-title font-heading">设置</text>
+  <text class="page-subtitle">个性化你的卡牌搜索体验</text>
+
+  <!-- Search preferences -->
+  <view class="settings-group">
+    <view class="group-title">搜索偏好</view>
+    <view class="settings-item" bindtap="onSortPicker">
+      <view class="item-left">
+        <text class="item-label">默认排序</text>
+        <text class="item-desc">{{sortOptions[sortIndex]}}</text>
+      </view>
+      <text class="item-arrow">›</text>
+    </view>
+    <view class="settings-item" bindtap="onToggleSearchLang">
+      <view class="item-left">
+        <text class="item-label">搜索语言</text>
+        <text class="item-desc">{{searchLangOptions[searchLangIndex]}}</text>
+      </view>
+      <text class="item-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- Display preferences -->
+  <view class="settings-group">
+    <view class="group-title">显示偏好</view>
+    <view class="settings-item" bindtap="onTogglePriceCurrency">
+      <view class="item-left">
+        <text class="item-label">价格货币</text>
+        <text class="item-desc">{{currency === 'USD' ? 'USD ($)' : 'CNY (¥)'}}</text>
+      </view>
+      <view class="item-toggle">
+        <view class="toggle-btn {{currency === 'USD' ? 'active' : ''}}" data-currency="USD" bindtap="onSetCurrency">USD</view>
+        <view class="toggle-btn {{currency === 'CNY' ? 'active' : ''}}" data-currency="CNY" bindtap="onSetCurrency">CNY</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Export settings -->
+  <view class="settings-group">
+    <view class="group-title">导出字段</view>
+    <view class="settings-item-col">
+      <text class="item-desc" style="margin-bottom: 16rpx;">选择导出时包含的信息</text>
+      <view class="checkbox-grid">
+        <view class="checkbox-item" wx:for="{{exportFields}}" wx:key="key" data-key="{{item.key}}" bindtap="onToggleExportField">
+          <view class="checkbox-box {{item.checked ? 'checked' : ''}}">
+            <view wx:if="{{item.checked}}" class="checkbox-tick"></view>
+          </view>
+          <text class="checkbox-label">{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Export actions -->
+  <view class="settings-group">
+    <view class="group-title">导出收藏</view>
+    <view class="settings-item" bindtap="onExportStart">
+      <view class="item-left">
+        <text class="item-label">选择列表并导出</text>
+        <text class="item-desc">选择需要导出的列表，支持 Markdown 和 Excel 格式</text>
+      </view>
+      <text class="item-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- Export modal -->
+  <view class="export-modal-mask" wx:if="{{showExportModal}}" bindtap="onExportCancel">
+    <view class="export-modal" catchtap="onExportNoop">
+      <text class="export-modal-title font-heading">导出收藏列表</text>
+
+      <!-- Step 1: Select lists -->
+      <text class="export-step-label">选择要导出的列表</text>
+      <view class="export-list-select">
+        <view class="export-list-item" wx:for="{{exportLists}}" wx:key="id" data-index="{{index}}" bindtap="onToggleExportList">
+          <view class="checkbox-box {{item.selected ? 'checked' : ''}}">
+            <view wx:if="{{item.selected}}" class="checkbox-tick"></view>
+          </view>
+          <text class="export-list-name">{{item.name}}</text>
+          <text class="export-list-count">{{item.cardCount}} 张卡</text>
+        </view>
+      </view>
+
+      <!-- Step 2: Format selection -->
+      <text class="export-step-label" style="margin-top: 24rpx;">选择导出格式</text>
+      <view class="export-format-row">
+        <view class="export-format-btn {{exportFormat === 'text' ? 'active' : ''}}" data-format="text" bindtap="onSetExportFormat">
+          <text class="efb-label">Markdown</text>
+          <text class="efb-desc">复制到剪贴板（.md 格式）</text>
+        </view>
+        <view class="export-format-btn {{exportFormat === 'csv' ? 'active' : ''}}" data-format="csv" bindtap="onSetExportFormat">
+          <text class="efb-label">Excel</text>
+          <text class="efb-desc">生成 .xls 文件预览</text>
+        </view>
+      </view>
+
+      <!-- Actions -->
+      <view class="export-actions">
+        <view class="export-btn-cancel" bindtap="onExportCancel">取消</view>
+        <view class="export-btn-confirm" bindtap="onExportConfirm">导出</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Card Database Import (Admin only — tap "关于" 5 times to unlock) -->
+  <view class="settings-group" wx:if="{{adminMode}}">
+    <view class="group-title">卡牌数据库（管理）</view>
+    <view class="settings-item">
+      <view class="item-left">
+        <text class="item-label">数据库状态</text>
+        <text class="item-desc">{{dbCardCount}} 张卡牌 · {{dbSetCount}} 个系列 · {{dbImageCount}} 张图片</text>
+      </view>
+      <view class="item-refresh" bindtap="onRefreshDbStats">刷新</view>
+    </view>
+    <view class="settings-item" bindtap="{{batchUpdateRunning ? 'onPauseBatchUpdate' : 'onBatchUpdate'}}">
+      <view class="item-left">
+        <text class="item-label">一键更新全部</text>
+        <text class="item-desc">{{batchUpdateStep || '自动执行：导入卡牌→系列→补充→图片→价格'}}</text>
+      </view>
+      <view wx:if="{{batchUpdateRunning}}" class="item-refresh" style="color:#c0392b;">暂停</view>
+      <text wx:else class="item-arrow">›</text>
+    </view>
+    <!-- Sub-step progress (visible during or after batch update) -->
+    <view wx:if="{{batchUpdateRunning || batchUpdateStep}}" class="batch-status-list">
+      <text class="batch-status-item" wx:if="{{imageImportProgress}}">图片: {{imageImportProgress}}</text>
+      <text class="batch-status-item" wx:if="{{priceUpdateProgress}}">价格: {{priceUpdateProgress}}</text>
+      <text class="batch-status-item" wx:if="{{supplementProgress}}">补充: {{supplementProgress}}</text>
+    </view>
+  </view>
+
+  <!-- Data management -->
+  <view class="settings-group">
+    <view class="group-title">数据管理</view>
+    <view class="settings-item" bindtap="onClearCache">
+      <view class="item-left">
+        <text class="item-label">清除缓存</text>
+        <text class="item-desc">当前缓存: {{cacheSize}}</text>
+      </view>
+      <text class="item-arrow">›</text>
+    </view>
+    <view class="settings-item" bindtap="onResetSettings">
+      <view class="item-left">
+        <text class="item-label">恢复默认设置</text>
+        <text class="item-desc">重置所有偏好设置为初始状态</text>
+      </view>
+      <text class="item-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- About -->
+  <view class="settings-group">
+    <view class="group-title">关于</view>
+    <view class="settings-item" bindtap="onAbout">
+      <view class="item-left">
+        <text class="item-label">关于 Planar Bridge</text>
+        <text class="item-desc">版本 {{version}}</text>
+      </view>
+      <text class="item-arrow">›</text>
+    </view>
+    <view class="settings-item" bindtap="onFeedback">
+      <view class="item-left">
+        <text class="item-label">意见反馈</text>
+        <text class="item-desc">帮助我们改进产品</text>
+      </view>
+      <text class="item-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- Footer -->
+  <view class="settings-footer">
+    <image class="footer-logo-img" src="/assets/icons/logo-bridge.svg" mode="aspectFit" />
+    <text class="footer-name font-heading">PLANAR BRIDGE</text>
+    <text class="footer-tagline">AI-powered FAB Card Search</text>
+  </view>
+</view>

@@ -1,0 +1,232 @@
+/* ========== PlanarBridge Global Theme ========== */
+
+page {
+  --bg-primary: #F2EFE4;
+  --bg-card: #FDFCF8;
+  --bg-subtle: #EBE7DA;
+  --border: #E8E3D8;
+  --border-strong: #D6D0C2;
+
+  --gold: #9B8644;
+  --gold-light: #BFA855;
+  --gold-bg: #9B86440A;
+  --gold-border: #9B864420;
+
+  --text-primary: #2C2A22;
+  --text-secondary: #6B6355;
+  --text-tertiary: #A09A8C;
+  --text-hint: #C8C2B4;
+
+  --green: #3D7A5E;
+  --red: #C4544A;
+  --purple: #6B4C8A;
+
+  --gold-tint: #9B86440D;
+  --purple-tint: #6B4C8A0D;
+  --green-tint: #3D7A5E0D;
+
+  --font-heading: "Songti SC", Georgia, "Noto Serif SC", "STSong", "SimSun", serif;
+  --font-body: "PingFang SC", -apple-system, "Helvetica Neue", "Microsoft YaHei", sans-serif;
+  --font-mono: "SF Mono", "Menlo", "Consolas", monospace;
+
+  --radius-sm: 8rpx;
+  --radius-md: 16rpx;
+  --radius-lg: 24rpx;
+  --radius-xl: 32rpx;
+  --radius-card: 28rpx;
+  --radius-pill: 40rpx;
+
+  --space-xs: 8rpx;
+  --space-sm: 16rpx;
+  --space-md: 24rpx;
+  --space-lg: 32rpx;
+  --space-xl: 48rpx;
+
+  background-color: #F2EFE4;
+  color: #2C2A22;
+  font-family: "PingFang SC", -apple-system, "Helvetica Neue", "Microsoft YaHei", sans-serif;
+  font-size: 28rpx;
+  line-height: 1.5;
+}
+
+/* ========== Common Utilities ========== */
+
+.font-heading {
+  font-family: "Songti SC", Georgia, "Noto Serif SC", "STSong", "SimSun", serif;
+}
+
+.font-mono {
+  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+}
+
+.text-gold { color: #9B8644; }
+.text-green { color: #3D7A5E; }
+.text-red { color: #C4544A; }
+.text-purple { color: #6B4C8A; }
+.text-secondary { color: #6B6355; }
+.text-tertiary { color: #A09A8C; }
+.text-hint { color: #C8C2B4; }
+
+.bg-primary { background-color: #F2EFE4; }
+.bg-card { background-color: #FDFCF8; }
+.bg-subtle { background-color: #EBE7DA; }
+
+/* Card base style */
+.card {
+  background-color: #FDFCF8;
+  border: 1rpx solid #E8E3D8;
+  border-radius: 28rpx;
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: #9B8644;
+  color: #FDFCF8;
+  border: none;
+  border-radius: 26rpx;
+  padding: 24rpx 32rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  font-family: "PingFang SC", -apple-system, "Helvetica Neue", "Microsoft YaHei", sans-serif;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.btn-primary:active {
+  background-color: #8B7A3E;
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background-color: #F2EFE4;
+  color: #2C2A22;
+  border: 3rpx solid #D6D0C2;
+  border-radius: 26rpx;
+  padding: 24rpx 32rpx;
+  font-size: 28rpx;
+  text-align: center;
+}
+
+.btn-secondary:active {
+  border-color: #9B864480;
+}
+
+/* Chip base */
+.chip {
+  padding: 12rpx 24rpx;
+  border-radius: 40rpx;
+  font-size: 22rpx;
+  display: inline-flex;
+  align-items: center;
+}
+
+.chip-gold {
+  background-color: #9B86440D;
+  border: 1rpx solid #9B864425;
+  color: #8B7A3E;
+}
+
+.chip-purple {
+  background-color: #6B4C8A0D;
+  border: 1rpx solid #6B4C8A20;
+  color: #6B4C8A;
+}
+
+.chip-green {
+  background-color: #3D7A5E0D;
+  border: 1rpx solid #3D7A5E20;
+  color: #3D7A5E;
+}
+
+/* Price trend */
+.price-up { color: #3D7A5E; }
+.price-down { color: #C4544A; }
+.price-flat { color: #A09A8C; }
+
+/* Navigation bar for non-tab pages */
+.custom-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  padding: 0 24rpx;
+  background-color: #F2EFE4;
+}
+
+.nav-btn-group {
+  display: flex;
+  align-items: center;
+  background: #FDFCF8;
+  border: 2rpx solid #D6D0C2;
+  border-radius: 32rpx;
+  overflow: hidden;
+}
+
+.nav-btn {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-btn:active {
+  background-color: #EBE7DA;
+}
+
+.nav-divider {
+  width: 2rpx;
+  height: 32rpx;
+  background-color: #D6D0C2;
+}
+
+.nav-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Songti SC", Georgia, "Noto Serif SC", "STSong", serif;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #2C2A22;
+  letter-spacing: 0.04em;
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+/* Fade in animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.4s ease-out forwards;
+}

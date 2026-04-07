@@ -1,0 +1,160 @@
+<!-- Loading state -->
+<view class="detail-loading" wx:if="{{isLoading}}">
+  <view class="loading-dot-row">
+    <view class="loading-dot"></view>
+    <view class="loading-dot"></view>
+    <view class="loading-dot"></view>
+  </view>
+  <text class="loading-text">加载卡牌信息...</text>
+</view>
+
+<!-- Error state -->
+<view class="detail-error" wx:elif="{{!card}}">
+  <text class="error-icon">⚠</text>
+  <text class="error-text">未找到该卡牌</text>
+  <view class="error-btn" bindtap="goBack">返回</view>
+</view>
+
+<view class="detail-page" wx:else
+  bindtouchstart="onPageTouchStart"
+  bindtouchmove="onPageTouchMove"
+  bindtouchend="onPageTouchEnd"
+>
+  <!-- Hero area -->
+  <view class="detail-hero"
+    style="height: {{heroHeight}}rpx; padding-top: {{navTop + navHeight + 20}}px;"
+    bindtap="onHeroTap"
+  >
+    <!-- Decorative circles -->
+    <view class="deco-circle deco-1"></view>
+    <view class="deco-circle deco-2"></view>
+
+    <!-- Navigation -->
+    <view class="custom-nav" style="top: {{navTop}}px; height: {{navHeight}}px;">
+      <view class="nav-btn-group" style="height: {{navHeight}}px; border-radius: {{navHeight / 2}}px;">
+        <view class="nav-btn" style="width: {{navHeight * 1.2}}px; height: {{navHeight}}px;" catchtap="goBack">
+          <image class="nav-icon" src="/assets/icons/nav-back.svg" mode="aspectFit" />
+        </view>
+        <view class="nav-divider"></view>
+        <view class="nav-btn" style="width: {{navHeight * 1.2}}px; height: {{navHeight}}px;" catchtap="goHome">
+          <image class="nav-icon" src="/assets/icons/nav-home.svg" mode="aspectFit" />
+        </view>
+      </view>
+    </view>
+
+    <!-- Card image or placeholder -->
+    <view class="detail-card-visual" style="transform: scale({{heroHeight > 588 ? 1 + (heroHeight - 588) / 680 : 1}}); transition: {{heroHeight === 588 ? 'transform 0.3s ease-out' : 'none'}};">
+      <image wx:if="{{card.cloudImageId || card.imageUrl}}" class="detail-card-image" src="{{card.cloudImageId || card.imageUrl}}" mode="aspectFit" />
+      <view wx:else class="detail-card-placeholder" style="background: linear-gradient(145deg, #EDE9DC, #E4DFCF);">
+        <text class="dcp-name font-heading">{{card.name}}</text>
+        <text class="dcp-name-cn" wx:if="{{card.nameCN}}">{{card.nameCN}}</text>
+        <text class="dcp-meta">{{card.setCode}} · {{card.rarityCN || card.rarity}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Drag handle -->
+  <view class="sheet-handle-wrap">
+    <view class="sheet-handle-bar"></view>
+  </view>
+
+  <!-- Detail sheet (page scroll instead of scroll-view) -->
+  <view class="detail-sheet">
+    <!-- Header: name + price -->
+    <view class="detail-header">
+      <view class="dh-left">
+        <text class="dh-name font-heading">{{card.name}}</text>
+        <text class="dh-name-cn" wx:if="{{card.nameCN}}">{{card.nameCN}}</text>
+        <view class="dh-type">
+          <text>{{card.classCN || card.class}} · {{card.typeCN || card.type}}{{card.subtype ? ' — ' + card.subtype : ''}} · </text>
+          <text class="dh-rarity">{{card.rarityCN || card.rarity}}</text>
+        </view>
+      </view>
+      <view class="dh-right" wx:if="{{card.priceMid != null}}">
+        <text class="dh-price font-mono {{card.priceTrend > 0 ? 'price-up' : card.priceTrend < 0 ? 'price-down' : 'price-flat'}}">${{card.priceMid}}</text>
+        <text class="dh-trend {{card.priceTrend > 0 ? 'price-up' : card.priceTrend < 0 ? 'price-down' : 'price-flat'}}">
+          {{card.priceTrend > 0 ? '▲ ' + card.priceTrend + '%' : card.priceTrend < 0 ? '▼ ' + (-card.priceTrend) + '%' : '— 0%'}}
+        </text>
+      </view>
+    </view>
+
+    <!-- Stat chips -->
+    <view class="stat-row">
+      <view class="stat-chip">
+        <text class="stat-label">费用</text>
+        <text class="stat-value">{{card.cost !== null ? card.cost : '—'}}</text>
+      </view>
+      <view class="stat-chip">
+        <text class="stat-label">{{card.type === 'Attack Action' ? '力量' : '防御'}}</text>
+        <text class="stat-value stat-blue">{{card.type === 'Attack Action' ? (card.power !== null ? card.power : '—') : (card.defense !== null ? card.defense : '—')}}</text>
+      </view>
+      <view class="stat-chip">
+        <text class="stat-label">智力</text>
+        <text class="stat-value">{{card.intelligence != null ? card.intelligence : (card.intellect != null ? card.intellect : '—')}}</text>
+      </view>
+      <view class="stat-chip">
+        <text class="stat-label">生命</text>
+        <text class="stat-value">{{card.health != null ? card.health : (card.life != null ? card.life : '—')}}</text>
+      </view>
+    </view>
+
+    <!-- Card text -->
+    <view class="card-text-box">
+      <text class="card-text-content">{{card.text}}</text>
+    </view>
+
+    <!-- Price row (only show if prices available) -->
+    <view class="price-row" wx:if="{{card.priceMid != null}}">
+      <view class="price-cell">
+        <text class="price-label">TCG 最低</text>
+        <text class="price-value font-mono">${{card.priceLow}}</text>
+      </view>
+      <view class="price-cell">
+        <text class="price-label">TCG 中位</text>
+        <text class="price-value font-mono">${{card.priceMid}}</text>
+      </view>
+      <view class="price-cell">
+        <text class="price-label">TCG 市场</text>
+        <text class="price-value font-mono">${{card.priceMarket}}</text>
+      </view>
+    </view>
+
+    <!-- Action row -->
+    <view class="action-row">
+      <view class="{{isInCollection ? 'btn-collected' : 'btn-primary'}} action-btn-main" catchtap="onAddToList">{{isInCollection ? '已收藏 · 管理列表' : '加入收藏列表'}}</view>
+      <view class="action-btn-link" catchtap="onCopyLink">
+        <view class="link-icon">
+          <view class="link-arrow"></view>
+          <view class="link-box"></view>
+        </view>
+      </view>
+    </view>
+
+    <view class="bottom-spacer"></view>
+  </view>
+
+  <!-- Multi-select list modal -->
+  <view class="modal-mask" wx:if="{{showListModal}}" catchtap="onModalCancel">
+    <view class="modal-content" catchtap="onModalNoop">
+      <text class="modal-title font-heading">选择收藏列表</text>
+      <view class="modal-list">
+        <view
+          wx:for="{{modalLists}}"
+          wx:key="id"
+          class="modal-list-item"
+          data-index="{{index}}"
+          bindtap="onToggleModalList"
+        >
+          <view class="modal-checkbox {{item.checked ? 'modal-checkbox-checked' : ''}}">
+            <text wx:if="{{item.checked}}">✓</text>
+          </view>
+          <text class="modal-list-name">{{item.name}}</text>
+        </view>
+      </view>
+      <view class="modal-actions">
+        <view class="modal-btn-cancel" bindtap="onModalCancel">取消</view>
+        <view class="modal-btn-confirm" bindtap="onModalConfirm">确定</view>
+      </view>
+    </view>
+  </view>
+</view>

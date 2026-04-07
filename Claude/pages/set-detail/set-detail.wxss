@@ -1,0 +1,381 @@
+.set-detail-page,
+.set-detail-page view,
+.set-detail-page scroll-view {
+  box-sizing: border-box;
+}
+
+.set-detail-page {
+  min-height: 100vh;
+  background: #F2EFE4;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Navigation */
+.custom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  padding-left: 16rpx;
+  background: #F2EFE4;
+}
+
+.nav-btn-group {
+  display: flex;
+  align-items: center;
+  background: rgba(253, 252, 248, 0.85);
+  border: 1rpx solid #D6D0C2;
+  overflow: hidden;
+  z-index: 2;
+  backdrop-filter: blur(10px);
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-btn:active {
+  background: rgba(235, 231, 218, 0.6);
+}
+
+.nav-divider {
+  width: 1rpx;
+  height: 50%;
+  background: #D6D0C2;
+}
+
+.nav-icon {
+  width: 36rpx;
+  height: 36rpx;
+}
+
+.nav-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #2C2A22;
+  letter-spacing: 0.04em;
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Set header */
+.set-header {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: #F2EFE4;
+  padding: 16rpx 28rpx 12rpx;
+}
+
+.set-header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.set-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.set-header-code {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #9B8644;
+}
+
+.set-header-count {
+  font-size: 22rpx;
+  color: #A09A8C;
+}
+
+.set-header-name-cn {
+  display: block;
+  font-size: 22rpx;
+  color: #6B6355;
+  margin-top: 4rpx;
+}
+
+.meta-actions {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.view-toggle {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-toggle-icon {
+  width: 32rpx;
+  height: 32rpx;
+}
+
+/* Scroll area */
+.set-scroll {
+  height: 100vh;
+  padding: 0 20rpx;
+  overflow-x: hidden;
+}
+
+/* Card grid (image-only, MTGso style) */
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+}
+
+.card-grid.show {
+  opacity: 1;
+}
+
+.card-grid-item {
+  border-radius: 16rpx;
+  overflow: hidden;
+  position: relative;
+}
+
+.card-grid-img {
+  width: 100%;
+  display: block;
+  border-radius: 16rpx;
+  animation: fadeIn 0.35s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.card-grid-placeholder {
+  width: 100%;
+  padding-bottom: 140%;
+  position: relative;
+  background: linear-gradient(135deg, #EBE7DA, #E0DBCC);
+  border-radius: 16rpx;
+  border: 2rpx solid #9B864430;
+}
+
+.card-grid-placeholder text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 22rpx;
+  color: #9B8644;
+  text-align: center;
+  width: 80%;
+  word-break: break-word;
+}
+
+/* Favorite star on grid cards */
+.grid-star-btn {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+  width: 56rpx;
+  height: 56rpx;
+  background: rgba(253, 252, 248, 0.7);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.grid-star-btn:active {
+  background: rgba(253, 252, 248, 0.95);
+}
+
+.grid-star-icon {
+  width: 32rpx;
+  height: 32rpx;
+}
+
+/* Card list view */
+.card-list-view {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-list-view.show {
+  opacity: 1;
+}
+
+.card-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 20rpx;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #E8E3D8;
+}
+
+.card-list-item:last-child {
+  border-bottom: none;
+}
+
+.card-list-item:active {
+  background: #F8F5EC;
+}
+
+.cli-thumb {
+  width: 80rpx;
+  height: 112rpx;
+  border-radius: 10rpx;
+  flex-shrink: 0;
+  border: 2rpx solid #9B864420;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rpx;
+  overflow: hidden;
+}
+
+.cli-thumb-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 10rpx;
+}
+
+.cli-thumb-text {
+  font-size: 10rpx;
+  color: #9B8644;
+  text-align: center;
+  font-weight: 600;
+  line-height: 1.2;
+  word-break: break-all;
+}
+
+.cli-info {
+  flex: 1;
+  min-width: 0;
+  padding-top: 4rpx;
+}
+
+.cli-name {
+  display: block;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #2C2A22;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cli-name-cn {
+  display: block;
+  font-size: 20rpx;
+  color: #6B6355;
+}
+
+.cli-meta {
+  display: block;
+  font-size: 20rpx;
+  color: #A09A8C;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cli-price {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.cli-price-value {
+  display: block;
+  font-weight: 600;
+  font-size: 26rpx;
+  color: #2C2A22;
+}
+
+.cli-trend {
+  display: block;
+  font-size: 18rpx;
+}
+
+/* Skeleton loading cards */
+.skeleton-card {
+  border-radius: 16rpx;
+  padding-bottom: 140%;
+  background: #E8E3D8;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #E8E3D8 25%, #F2EFE4 50%, #E8E3D8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Loading */
+.loading-more {
+  display: flex;
+  justify-content: center;
+  gap: 16rpx;
+  padding: 40rpx 0;
+}
+
+.r-loading-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #9B8644;
+  animation: rDotPulse 1.2s ease-in-out infinite;
+}
+
+.r-loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.r-loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes rDotPulse {
+  0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 80rpx 40rpx;
+}
+
+.empty-state.show {
+  opacity: 1;
+}
+
+.empty-text {
+  display: block;
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 32rpx;
+  color: #6B6355;
+}
+
+.bottom-spacer {
+  height: 60rpx;
+}

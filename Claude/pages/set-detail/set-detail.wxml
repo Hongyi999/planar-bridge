@@ -1,0 +1,88 @@
+<view class="set-detail-page">
+  <!-- Custom navigation bar -->
+  <view class="custom-nav" style="top: {{navTop}}px; height: {{navHeight}}px;">
+    <view class="nav-btn-group" style="height: {{navHeight}}px; border-radius: {{navHeight / 2}}px;">
+      <view class="nav-btn" style="width: {{navHeight * 1.2}}px; height: {{navHeight}}px;" bindtap="goBack">
+        <image class="nav-icon" src="/assets/icons/nav-back.svg" mode="aspectFit" />
+      </view>
+      <view class="nav-divider"></view>
+      <view class="nav-btn" style="width: {{navHeight * 1.2}}px; height: {{navHeight}}px;" bindtap="goHome">
+        <image class="nav-icon" src="/assets/icons/nav-home.svg" mode="aspectFit" />
+      </view>
+    </view>
+    <text class="nav-title font-heading">{{setName}}</text>
+  </view>
+
+  <!-- Header area -->
+  <view class="set-header" style="padding-top: {{navFullHeight}}px;">
+    <view class="set-header-inner">
+      <view class="set-header-left">
+        <text class="set-header-code font-mono">{{setCode}}</text>
+        <text class="set-header-count">{{cards.length}} 张卡牌{{hasMore ? '+' : ''}}</text>
+      </view>
+      <view class="meta-actions">
+        <view class="view-toggle" bindtap="onToggleView">
+          <image class="view-toggle-icon" src="/assets/icons/{{viewMode === 'grid' ? 'view-list' : 'view-grid'}}.svg" mode="aspectFit" />
+        </view>
+      </view>
+    </view>
+    <text class="set-header-name-cn" wx:if="{{setNameCN}}">{{setNameCN}}</text>
+  </view>
+
+  <!-- Scrollable card list -->
+  <scroll-view scroll-y class="set-scroll" style="padding-top: {{navFullHeight + 56}}px;" bindscrolltolower="onScrollToLower" lower-threshold="200">
+    <!-- Loading skeleton -->
+    <view class="card-grid show" wx:if="{{isLoading}}">
+      <view class="skeleton-card" wx:for="{{[1,2,3,4,5,6]}}" wx:key="*this">
+        <view class="skeleton-shimmer"></view>
+      </view>
+    </view>
+
+    <!-- Card grid (image-only, MTGso style) -->
+    <view class="card-grid show" wx:if="{{!isLoading && viewMode === 'grid'}}">
+      <view wx:for="{{cards}}" wx:key="_id" class="card-grid-item" data-id="{{item._id || item.id}}" bindtap="onCardTap">
+        <image wx:if="{{item.cloudImageId || item.imageUrl}}" class="card-grid-img" src="{{item.cloudImageId || item.imageUrl}}" mode="widthFix" lazy-load />
+        <view wx:else class="card-grid-placeholder font-heading">
+          <text>{{item.name}}</text>
+        </view>
+        <!-- Favorite star -->
+        <view class="grid-star-btn" catchtap="onStarTap" data-id="{{item._id || item.id}}" data-index="{{index}}">
+          <image class="grid-star-icon" src="/assets/icons/{{item._isFav ? 'star-filled' : 'star-outline'}}.svg" mode="aspectFit" />
+        </view>
+      </view>
+    </view>
+
+    <!-- Card list view -->
+    <view class="card-list-view show" wx:if="{{!isLoading && viewMode === 'list'}}">
+      <view wx:for="{{cards}}" wx:key="_id" class="card-list-item" data-id="{{item._id || item.id}}" bindtap="onCardTap">
+        <view class="cli-thumb" style="background: #EDE9DC">
+          <image wx:if="{{item.cloudImageId || item.imageUrl}}" class="cli-thumb-img" src="{{item.cloudImageId || item.imageUrl}}" mode="aspectFill" lazy-load />
+          <text wx:else class="cli-thumb-text font-heading">{{item.name}}</text>
+        </view>
+        <view class="cli-info">
+          <text class="cli-name font-heading">{{item.name}}</text>
+          <text class="cli-name-cn" wx:if="{{item.nameCN}}">{{item.nameCN}}</text>
+          <text class="cli-meta">{{item.classCN || item.class}} · {{item.typeCN || item.type}} · {{item.cardCode}}</text>
+        </view>
+        <view class="cli-price" wx:if="{{item.priceMid != null}}">
+          <text class="cli-price-value font-mono">${{item.priceMid}}</text>
+          <text class="cli-trend {{item.priceTrend > 0 ? 'price-up' : item.priceTrend < 0 ? 'price-down' : 'price-flat'}}">{{item.priceTrend > 0 ? '▲' + item.priceTrend + '%' : item.priceTrend < 0 ? '▼' + (-item.priceTrend) + '%' : '—'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Loading more -->
+    <view class="loading-more" wx:if="{{isLoadingMore}}">
+      <view class="r-loading-dot"></view>
+      <view class="r-loading-dot"></view>
+      <view class="r-loading-dot"></view>
+    </view>
+
+    <!-- Empty state -->
+    <view class="empty-state show" wx:if="{{!isLoading && cards.length === 0}}">
+      <text class="empty-text">该系列暂无卡牌数据</text>
+    </view>
+
+    <view class="bottom-spacer"></view>
+  </scroll-view>
+</view>
