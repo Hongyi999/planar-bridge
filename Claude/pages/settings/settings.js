@@ -579,7 +579,7 @@ Page({
   },
 
   // --- Price Sync (JustTCG) ---
-  _JUSTTCG_KEY: 'tcg_28fccf805c324d6bb7a3247c95ec39aa',
+  _JUSTTCG_KEY: 'tcg_42778f99df49474188696375021301ce',
   _JUSTTCG_BASE: 'https://api.justtcg.com/functions/v1',
 
   // Price update tiers by rarity
