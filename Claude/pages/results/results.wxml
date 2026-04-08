@@ -64,8 +64,11 @@
     <!-- Card grid (image-only) -->
     <view class="card-grid {{showResults ? 'show' : ''}}" wx:if="{{!isLoading && viewMode === 'grid'}}">
       <view wx:for="{{results}}" wx:key="id" class="card-grid-item" data-id="{{item.id || item._id}}" bindtap="onCardTap">
-        <image wx:if="{{item.cloudImageId || item.imageUrl}}" class="card-grid-img" src="{{item.cloudImageId || item.imageUrl}}" mode="widthFix" lazy-load binderror="onImgError" data-index="{{index}}" />
-        <view wx:else class="card-grid-placeholder font-heading">
+        <view class="card-grid-loading {{item._imgLoaded ? 'hidden' : ''}}" wx:if="{{item.cloudImageId || item.imageUrl}}">
+          <view class="skeleton-shimmer"></view>
+        </view>
+        <image wx:if="{{item.cloudImageId || item.imageUrl}}" class="card-grid-img {{item._imgLoaded ? 'loaded' : ''}}" src="{{item.cloudImageId || item.imageUrl}}" mode="widthFix" lazy-load bindload="onImgLoad" binderror="onImgError" data-index="{{index}}" />
+        <view wx:if="{{item._imgFailed || (!item.cloudImageId && !item.imageUrl)}}" class="card-grid-placeholder font-heading">
           <text>{{item.name}}</text>
         </view>
         <!-- Favorite star -->

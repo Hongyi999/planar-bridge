@@ -1,8 +1,11 @@
 <view class="card-tile {{show ? 'show' : ''}}" bindtap="onTap" style="animation-delay: {{index * 100}}ms">
   <!-- Card image -->
-  <view class="card-img" style="background: linear-gradient(135deg, #EBE7DA, #E0DBCC)">
-    <image wx:if="{{card.cloudImageId || card.imageUrl}}" class="card-real-img" src="{{card.cloudImageId || card.imageUrl}}" mode="aspectFill" lazy-load />
-    <view wx:else class="card-placeholder font-heading">{{card.name}}</view>
+  <view class="card-img">
+    <view class="card-img-shimmer {{imgLoaded ? 'hidden' : ''}}" wx:if="{{card.cloudImageId || card.imageUrl}}">
+      <view class="shimmer-inner"></view>
+    </view>
+    <image wx:if="{{card.cloudImageId || card.imageUrl}}" class="card-real-img {{imgLoaded ? 'loaded' : ''}}" src="{{card.cloudImageId || card.imageUrl}}" mode="aspectFill" lazy-load bindload="onImgLoad" binderror="onImgError" />
+    <view wx:if="{{imgFailed || (!card.cloudImageId && !card.imageUrl)}}" class="card-placeholder font-heading">{{card.name}}</view>
     <!-- Rarity badge -->
     <view class="rarity-badge rarity-{{card.rarity}}">
       {{card.rarity === 'Legendary' ? 'L' : card.rarity === 'Majestic' ? 'M' : card.rarity === 'Rare' ? 'R' : card.rarity === 'Common' ? 'C' : card.rarity === 'Fabled' ? 'F' : card.rarity === 'Super Rare' ? 'S' : 'P'}}

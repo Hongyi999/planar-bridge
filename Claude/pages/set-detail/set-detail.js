@@ -70,6 +70,22 @@ Page({
     }
   },
 
+  onImgLoad: function(e) {
+    var index = e.currentTarget.dataset.index;
+    var key = 'cards[' + index + ']._imgLoaded';
+    var update = {};
+    update[key] = true;
+    this.setData(update);
+  },
+
+  onImgError: function(e) {
+    var index = e.currentTarget.dataset.index;
+    var update = {};
+    update['cards[' + index + ']._imgLoaded'] = true;
+    update['cards[' + index + ']._imgFailed'] = true;
+    this.setData(update);
+  },
+
   onToggleView: function() {
     this.setData({ viewMode: this.data.viewMode === 'grid' ? 'list' : 'grid' });
   },

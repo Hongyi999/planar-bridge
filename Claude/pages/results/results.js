@@ -143,6 +143,22 @@ Page({
     wx.switchTab({ url: '/pages/index/index' });
   },
 
+  onImgLoad: function(e) {
+    var index = e.currentTarget.dataset.index;
+    var key = 'results[' + index + ']._imgLoaded';
+    var update = {};
+    update[key] = true;
+    this.setData(update);
+  },
+
+  onImgError: function(e) {
+    var index = e.currentTarget.dataset.index;
+    var update = {};
+    update['results[' + index + ']._imgLoaded'] = true;
+    update['results[' + index + ']._imgFailed'] = true;
+    this.setData(update);
+  },
+
   onToggleView: function() {
     this.setData({ viewMode: this.data.viewMode === 'grid' ? 'list' : 'grid' });
   },
