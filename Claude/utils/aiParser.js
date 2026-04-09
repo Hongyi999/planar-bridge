@@ -160,11 +160,13 @@ function mergeFilters(base, added) {
  * Returns { filters, results, resultCount, summary, aiUsed }
  * If preFilters is provided, sends structured filters directly (skip AI re-parsing).
  */
-function aiSearch(query, sortField, sortOrder, preFilters) {
+function aiSearch(query, sortField, sortOrder, preFilters, page) {
   var data = {
     query: query,
     sortField: sortField || 'priceMid',
-    sortOrder: sortOrder || 'desc'
+    sortOrder: sortOrder || 'desc',
+    page: page || 1,
+    pageSize: 20
   };
   if (preFilters) {
     data.filters = preFilters;

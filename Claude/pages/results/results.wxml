@@ -53,7 +53,7 @@
   </view>
 
   <!-- Scrollable card results -->
-  <scroll-view scroll-y class="results-scroll" style="padding-top: {{headerHeight}}px;">
+  <scroll-view scroll-y class="results-scroll" style="padding-top: {{headerHeight}}px;" bindscrolltolower="onScrollToLower" lower-threshold="300">
     <!-- Loading skeleton -->
     <view class="card-grid show" wx:if="{{isLoading && showResults}}">
       <view class="skeleton-card" wx:for="{{[1,2,3,4,5,6]}}" wx:key="*this">
@@ -101,6 +101,13 @@
     <view class="empty-state {{showResults && !isLoading && resultCount === 0 ? 'show' : ''}}" wx:if="{{!isLoading && resultCount === 0}}">
       <text class="empty-text">未找到匹配卡牌</text>
       <text class="empty-hint">尝试其他关键词，如「传奇装备」或「威严攻击」</text>
+    </view>
+
+    <!-- Loading more -->
+    <view class="loading-more" wx:if="{{isLoadingMore}}">
+      <view class="r-loading-dot"></view>
+      <view class="r-loading-dot"></view>
+      <view class="r-loading-dot"></view>
     </view>
 
     <view class="bottom-spacer"></view>

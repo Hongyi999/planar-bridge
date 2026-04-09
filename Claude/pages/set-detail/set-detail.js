@@ -19,10 +19,19 @@ Page({
     viewMode: 'grid'
   },
 
+  _favSet: null,
+
   onLoad: function(options) {
     var that = this;
     var sysInfo = wx.getSystemInfoSync();
     var menuBtn = wx.getMenuButtonBoundingClientRect();
+
+    // Build favorites set once for O(1) lookups
+    that._favSet = {};
+    var lists = storageUtil.getLists();
+    lists.forEach(function(list) {
+      list.cards.forEach(function(id) { that._favSet[id] = true; });
+    });
 
     that.setData({
       statusBarHeight: sysInfo.statusBarHeight || 20,
@@ -46,9 +55,10 @@ Page({
 
     cloudDB.getCardsBySet(that.data.setCode, that.data.page, that.data.pageSize)
       .then(function(results) {
+        var favSet = that._favSet || {};
         results.forEach(function(card) {
           var cardId = card._id || card.id;
-          card._isFav = storageUtil.isCardFavorited(cardId);
+          card._isFav = !!favSet[cardId];
         });
         var cards = that.data.cards.concat(results);
         that.setData({
@@ -99,6 +109,7 @@ Page({
     var id = e.currentTarget.dataset.id;
     var index = e.currentTarget.dataset.index;
     var isFav = storageUtil.toggleFavorite(id);
+    if (isFav) { this._favSet[id] = true; } else { delete this._favSet[id]; }
     var key = 'cards[' + index + ']._isFav';
     var update = {};
     update[key] = isFav;
