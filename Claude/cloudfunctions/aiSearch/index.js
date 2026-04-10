@@ -220,9 +220,11 @@ exports.main = async (event) => {
     if (page === 1) {
       try {
         var countRes = await db.collection('cards').where(dbQuery).count();
-        totalCount = countRes.total;
+        if (countRes && typeof countRes.total === 'number' && countRes.total > 0) {
+          totalCount = countRes.total;
+        }
       } catch (ce) {
-        totalCount = results.data.length;
+        console.error('count() failed:', ce);
       }
     }
   } catch (e) {
@@ -244,10 +246,10 @@ exports.main = async (event) => {
         });
         summary = sumResult.content;
       } catch (e) {
-        summary = _buildFallbackSummary(query, results.data);
+        summary = _buildFallbackSummary(query, results.data, count);
       }
     } else {
-      summary = _buildFallbackSummary(query, results.data);
+      summary = _buildFallbackSummary(query, results.data, count);
     }
   }
 
@@ -263,8 +265,8 @@ exports.main = async (event) => {
   };
 };
 
-function _buildFallbackSummary(query, cards) {
-  var count = cards.length;
+function _buildFallbackSummary(query, cards, totalCount) {
+  var count = (totalCount != null) ? totalCount : cards.length;
   if (count === 0) return '未找到匹配「' + query + '」的卡牌，请尝试其他关键词。';
   var types = [];
   var sets = [];

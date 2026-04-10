@@ -1,4 +1,7 @@
 <view class="results-page">
+  <!-- Background grid lines -->
+  <view class="bg-lines"></view>
+
   <!-- Custom navigation bar -->
   <view class="custom-nav" style="top: {{navTop}}px; height: {{navHeight}}px;">
     <view class="nav-btn-group" style="height: {{navHeight}}px; border-radius: {{navHeight / 2}}px;">
@@ -13,47 +16,50 @@
     <text class="nav-title font-heading">搜索结果</text>
   </view>
 
-  <!-- Fixed header area -->
-  <view class="results-fixed-header" style="top: {{navFullHeight}}px;">
+  <!-- Fixed header area (collapses on scroll) -->
+  <view class="results-fixed-header {{collapsed ? 'collapsed' : ''}}" style="top: {{navFullHeight}}px;">
     <!-- Search bar compact -->
     <view class="search-compact">
       <search-bar value="{{query}}" compact="{{true}}" bind:search="onSearch" />
     </view>
 
-    <!-- Thinking strip -->
-    <view class="thinking-section">
-      <thinking-strip steps="{{thinkingSteps}}" bind:complete="onThinkingComplete" />
-    </view>
-
-    <!-- AI Summary -->
-    <view class="summary-card {{showResults ? 'show' : ''}}" wx:if="{{summary}}">
-      <view class="summary-header">
-        <text class="summary-label font-heading">AI 搜索摘要</text>
-        <text class="summary-count font-mono">{{resultCount}} 个结果</text>
+    <!-- Collapsible content -->
+    <view class="header-collapsible">
+      <!-- Thinking strip -->
+      <view class="thinking-section">
+        <thinking-strip steps="{{thinkingSteps}}" bind:complete="onThinkingComplete" />
       </view>
-      <text class="summary-text">{{summary}}</text>
-    </view>
 
-    <!-- Results meta -->
-    <view class="results-meta {{showResults ? 'show' : ''}}" wx:if="{{!isLoading}}">
-      <text class="meta-left">{{resultCount}} 个结果 · 按名称排序</text>
-      <view class="meta-actions">
-        <view class="view-toggle" bindtap="onToggleView">
-          <image class="view-toggle-icon" src="/assets/icons/{{viewMode === 'grid' ? 'view-list' : 'view-grid'}}.svg" mode="aspectFit" />
+      <!-- AI Summary -->
+      <view class="summary-card {{showResults ? 'show' : ''}}" wx:if="{{summary}}">
+        <view class="summary-header">
+          <text class="summary-label font-heading">AI 搜索摘要</text>
+          <text class="summary-count font-mono">{{resultCount}} 个结果</text>
+        </view>
+        <text class="summary-text">{{summary}}</text>
+      </view>
+
+      <!-- Results meta -->
+      <view class="results-meta {{showResults ? 'show' : ''}}" wx:if="{{!isLoading}}">
+        <text class="meta-left">{{resultCount}} 个结果 · 按名称排序</text>
+        <view class="meta-actions">
+          <view class="view-toggle" bindtap="onToggleView">
+            <image class="view-toggle-icon" src="/assets/icons/{{viewMode === 'grid' ? 'view-list' : 'view-grid'}}.svg" mode="aspectFit" />
+          </view>
         </view>
       </view>
-    </view>
 
-    <!-- Loading dots -->
-    <view class="results-loading-dots" wx:if="{{isLoading && showResults}}">
-      <view class="r-loading-dot"></view>
-      <view class="r-loading-dot"></view>
-      <view class="r-loading-dot"></view>
+      <!-- Loading dots -->
+      <view class="results-loading-dots" wx:if="{{isLoading && showResults}}">
+        <view class="r-loading-dot"></view>
+        <view class="r-loading-dot"></view>
+        <view class="r-loading-dot"></view>
+      </view>
     </view>
   </view>
 
   <!-- Scrollable card results -->
-  <scroll-view scroll-y class="results-scroll" style="padding-top: {{headerHeight}}px;" bindscrolltolower="onScrollToLower" lower-threshold="300">
+  <scroll-view scroll-y class="results-scroll" style="padding-top: {{headerHeight}}px;" bindscroll="onScroll" bindscrolltolower="onScrollToLower" lower-threshold="300">
     <!-- Loading skeleton -->
     <view class="card-grid show" wx:if="{{isLoading && showResults}}">
       <view class="skeleton-card" wx:for="{{[1,2,3,4,5,6]}}" wx:key="*this">

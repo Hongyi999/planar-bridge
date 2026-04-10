@@ -9,10 +9,12 @@
       confirm-type="search"
       focus="{{focus}}"
       bindinput="onInput"
+      bindfocus="onFocus"
+      bindblur="onBlur"
       bindconfirm="onConfirm"
     />
-    <!-- Animated placeholder overlay (hidden when user has input) -->
-    <view wx:if="{{!value}}" class="placeholder-scroll">
+    <!-- Animated placeholder overlay (hidden when user has input or focused) -->
+    <view wx:if="{{!value && !isFocused}}" class="placeholder-scroll">
       <view class="placeholder-track {{animating ? 'slide-up' : ''}}">
         <text class="placeholder-text">{{currentPlaceholder}}</text>
         <text class="placeholder-text">{{nextPlaceholder}}</text>

@@ -48,7 +48,8 @@ Page({
     hasMore: true,
     page: 1,
     viewMode: 'grid',
-    headerHeight: 200
+    headerHeight: 200,
+    collapsed: false
   },
 
   _favSet: null,
@@ -122,7 +123,7 @@ Page({
       if (isFirst) {
         update.filters = result.filters || lf;
         update.summary = result.summary || '';
-        update.resultCount = result.resultCount || allResults.length;
+        update.resultCount = (typeof result.resultCount === 'number') ? result.resultCount : allResults.length;
         update.isLoading = false;
       }
       that.setData(update);
@@ -154,6 +155,17 @@ Page({
   onScrollToLower: function() {
     if (this.data.hasMore && !this.data.isLoadingMore && !this.data.isLoading) {
       this._loadPage(this.data.page + 1);
+    }
+  },
+
+  onScroll: function(e) {
+    var top = e.detail.scrollTop;
+    var shouldCollapse = top > 40;
+    if (shouldCollapse !== this.data.collapsed) {
+      var that = this;
+      this.setData({ collapsed: shouldCollapse }, function() {
+        that._measureHeader();
+      });
     }
   },
 
