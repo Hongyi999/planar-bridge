@@ -121,9 +121,13 @@ Page({
         isLoadingMore: false
       };
       if (isFirst) {
+        var serverCount = (typeof result.resultCount === 'number') ? result.resultCount : allResults.length;
+        // Always regenerate summary locally with the real total count to avoid
+        // any server-side summary mismatch (e.g. stale fallback using page size).
+        var clientSummary = aiParser.generateSummary(that.data.query, allResults, serverCount);
         update.filters = result.filters || lf;
-        update.summary = result.summary || '';
-        update.resultCount = (typeof result.resultCount === 'number') ? result.resultCount : allResults.length;
+        update.summary = clientSummary;
+        update.resultCount = serverCount;
         update.isLoading = false;
       }
       that.setData(update);
@@ -162,10 +166,10 @@ Page({
     var top = e.detail.scrollTop;
     var shouldCollapse = top > 40;
     if (shouldCollapse !== this.data.collapsed) {
-      var that = this;
-      this.setData({ collapsed: shouldCollapse }, function() {
-        that._measureHeader();
-      });
+      var update = { collapsed: shouldCollapse };
+      var targetH = shouldCollapse ? this._collapsedHeaderHeight : this._fullHeaderHeight;
+      if (targetH) update.headerHeight = targetH;
+      this.setData(update);
     }
   },
 
@@ -176,14 +180,27 @@ Page({
 
   _measureHeader: function() {
     var that = this;
-    setTimeout(function() {
-      var query = wx.createSelectorQuery();
-      query.select('.results-fixed-header').boundingClientRect(function(rect) {
-        if (rect) {
-          that.setData({ headerHeight: rect.bottom });
-        }
-      }).exec();
-    }, 100);
+    setTimeout(function() { that._measureHeaderNow(); }, 100);
+  },
+
+  _measureHeaderNow: function() {
+    var that = this;
+    var query = wx.createSelectorQuery();
+    query.select('.results-fixed-header').boundingClientRect();
+    query.select('.search-compact').boundingClientRect();
+    query.exec(function(res) {
+      var update = {};
+      if (res[0]) {
+        that._fullHeaderHeight = res[0].bottom;
+      }
+      if (res[1]) {
+        // Collapsed = below search bar + breathing room for padding
+        that._collapsedHeaderHeight = res[1].bottom + 16;
+      }
+      var h = that.data.collapsed ? that._collapsedHeaderHeight : that._fullHeaderHeight;
+      if (h) update.headerHeight = h;
+      if (Object.keys(update).length) that.setData(update);
+    });
   },
 
   onSearch: function(e) {

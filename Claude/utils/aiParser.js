@@ -82,8 +82,8 @@ function parseQuery(query) {
   return filters;
 }
 
-function generateSummary(query, results) {
-  var count = results.length;
+function generateSummary(query, results, totalCount) {
+  var count = (typeof totalCount === 'number') ? totalCount : results.length;
   if (count === 0) return '未找到匹配的卡牌，请尝试其他搜索词。';
 
   var types = {};
@@ -96,7 +96,7 @@ function generateSummary(query, results) {
   var typeStr = Object.keys(types).slice(0, 3).join('、');
   var setStr = Object.keys(sets).slice(0, 3).join('、');
 
-  return '找到 ' + count + ' 张匹配卡牌，类型包括 ' + typeStr + '，来自 ' + setStr + ' 系列。已获取 TCGPlayer 最新市价。';
+  return '找到 ' + count + ' 张匹配卡牌，类型包括 ' + typeStr + '，来自 ' + setStr + ' 系列。';
 }
 
 function getThinkingSteps(query, filters) {

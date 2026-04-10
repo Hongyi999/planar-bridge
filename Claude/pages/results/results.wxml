@@ -1,7 +1,4 @@
 <view class="results-page">
-  <!-- Background grid lines -->
-  <view class="bg-lines"></view>
-
   <!-- Custom navigation bar -->
   <view class="custom-nav" style="top: {{navTop}}px; height: {{navHeight}}px;">
     <view class="nav-btn-group" style="height: {{navHeight}}px; border-radius: {{navHeight / 2}}px;">

@@ -6,25 +6,14 @@
 
 .results-page {
   min-height: 100vh;
-  background: #F2EFE4;
+  background-color: #F2EFE4;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 54rpx, rgba(155, 134, 68, 0.09) 54rpx, rgba(155, 134, 68, 0.09) 56rpx),
+    repeating-linear-gradient(90deg, transparent, transparent 54rpx, rgba(155, 134, 68, 0.09) 54rpx, rgba(155, 134, 68, 0.09) 56rpx);
+  background-attachment: fixed;
   overflow-x: hidden;
   width: 100%;
   position: relative;
-}
-
-/* Grid background — matches homepage */
-.bg-lines {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  opacity: 0.04;
-  background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 78rpx, #9B8644 78rpx, #9B8644 80rpx),
-    repeating-linear-gradient(90deg, transparent, transparent 78rpx, #9B8644 78rpx, #9B8644 80rpx);
-  pointer-events: none;
-  z-index: 0;
 }
 
 /* Navigation */
@@ -113,6 +102,8 @@
   overflow-x: hidden;
   position: relative;
   z-index: 1;
+  background: transparent;
+  transition: padding-top 0.3s ease;
 }
 
 .search-compact {
