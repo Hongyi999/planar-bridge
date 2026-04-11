@@ -13,47 +13,50 @@
     <text class="nav-title font-heading">搜索结果</text>
   </view>
 
-  <!-- Fixed header area -->
-  <view class="results-fixed-header" style="top: {{navFullHeight}}px;">
+  <!-- Fixed header area (collapses on scroll) -->
+  <view class="results-fixed-header {{collapsed ? 'collapsed' : ''}}" style="top: {{navFullHeight}}px;">
     <!-- Search bar compact -->
     <view class="search-compact">
       <search-bar value="{{query}}" compact="{{true}}" bind:search="onSearch" />
     </view>
 
-    <!-- Thinking strip -->
-    <view class="thinking-section">
-      <thinking-strip steps="{{thinkingSteps}}" bind:complete="onThinkingComplete" />
-    </view>
-
-    <!-- AI Summary -->
-    <view class="summary-card {{showResults ? 'show' : ''}}" wx:if="{{summary}}">
-      <view class="summary-header">
-        <text class="summary-label font-heading">AI 搜索摘要</text>
-        <text class="summary-count font-mono">{{resultCount}} 个结果</text>
+    <!-- Collapsible content -->
+    <view class="header-collapsible">
+      <!-- Thinking strip -->
+      <view class="thinking-section">
+        <thinking-strip steps="{{thinkingSteps}}" bind:complete="onThinkingComplete" />
       </view>
-      <text class="summary-text">{{summary}}</text>
-    </view>
 
-    <!-- Results meta -->
-    <view class="results-meta {{showResults ? 'show' : ''}}" wx:if="{{!isLoading}}">
-      <text class="meta-left">{{resultCount}} 个结果 · 按名称排序</text>
-      <view class="meta-actions">
-        <view class="view-toggle" bindtap="onToggleView">
-          <image class="view-toggle-icon" src="/assets/icons/{{viewMode === 'grid' ? 'view-list' : 'view-grid'}}.svg" mode="aspectFit" />
+      <!-- AI Summary -->
+      <view class="summary-card {{showResults ? 'show' : ''}}" wx:if="{{summary}}">
+        <view class="summary-header">
+          <text class="summary-label font-heading">AI 搜索摘要</text>
+          <text class="summary-count font-mono">{{resultCount}} 个结果</text>
+        </view>
+        <text class="summary-text">{{summary}}</text>
+      </view>
+
+      <!-- Results meta -->
+      <view class="results-meta {{showResults ? 'show' : ''}}" wx:if="{{!isLoading}}">
+        <text class="meta-left">{{resultCount}} 个结果 · 按名称排序</text>
+        <view class="meta-actions">
+          <view class="view-toggle" bindtap="onToggleView">
+            <image class="view-toggle-icon" src="/assets/icons/{{viewMode === 'grid' ? 'view-list' : 'view-grid'}}.svg" mode="aspectFit" />
+          </view>
         </view>
       </view>
-    </view>
 
-    <!-- Loading dots -->
-    <view class="results-loading-dots" wx:if="{{isLoading && showResults}}">
-      <view class="r-loading-dot"></view>
-      <view class="r-loading-dot"></view>
-      <view class="r-loading-dot"></view>
+      <!-- Loading dots -->
+      <view class="results-loading-dots" wx:if="{{isLoading && showResults}}">
+        <view class="r-loading-dot"></view>
+        <view class="r-loading-dot"></view>
+        <view class="r-loading-dot"></view>
+      </view>
     </view>
   </view>
 
   <!-- Scrollable card results -->
-  <scroll-view scroll-y class="results-scroll" style="padding-top: {{headerHeight}}px;">
+  <scroll-view scroll-y class="results-scroll" style="padding-top: {{headerHeight}}px;" bindscroll="onScroll" bindscrolltolower="onScrollToLower" lower-threshold="300">
     <!-- Loading skeleton -->
     <view class="card-grid show" wx:if="{{isLoading && showResults}}">
       <view class="skeleton-card" wx:for="{{[1,2,3,4,5,6]}}" wx:key="*this">
@@ -64,8 +67,11 @@
     <!-- Card grid (image-only) -->
     <view class="card-grid {{showResults ? 'show' : ''}}" wx:if="{{!isLoading && viewMode === 'grid'}}">
       <view wx:for="{{results}}" wx:key="id" class="card-grid-item" data-id="{{item.id || item._id}}" bindtap="onCardTap">
-        <image wx:if="{{item.cloudImageId || item.imageUrl}}" class="card-grid-img" src="{{item.cloudImageId || item.imageUrl}}" mode="widthFix" lazy-load binderror="onImgError" data-index="{{index}}" />
-        <view wx:else class="card-grid-placeholder font-heading">
+        <view class="card-grid-loading {{item._imgLoaded ? 'hidden' : ''}}" wx:if="{{item.cloudImageId || item.imageUrl}}">
+          <view class="skeleton-shimmer"></view>
+        </view>
+        <image wx:if="{{item.cloudImageId || item.imageUrl}}" class="card-grid-img {{item._imgLoaded ? 'loaded' : ''}}" src="{{item.cloudImageId || item.imageUrl}}" mode="widthFix" lazy-load bindload="onImgLoad" binderror="onImgError" data-index="{{index}}" />
+        <view wx:if="{{item._imgFailed || (!item.cloudImageId && !item.imageUrl)}}" class="card-grid-placeholder font-heading">
           <text>{{item.name}}</text>
         </view>
         <!-- Favorite star -->
@@ -98,6 +104,13 @@
     <view class="empty-state {{showResults && !isLoading && resultCount === 0 ? 'show' : ''}}" wx:if="{{!isLoading && resultCount === 0}}">
       <text class="empty-text">未找到匹配卡牌</text>
       <text class="empty-hint">尝试其他关键词，如「传奇装备」或「威严攻击」</text>
+    </view>
+
+    <!-- Loading more -->
+    <view class="loading-more" wx:if="{{isLoadingMore}}">
+      <view class="r-loading-dot"></view>
+      <view class="r-loading-dot"></view>
+      <view class="r-loading-dot"></view>
     </view>
 
     <view class="bottom-spacer"></view>

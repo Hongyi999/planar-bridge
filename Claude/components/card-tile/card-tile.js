@@ -7,7 +7,9 @@ Component({
   },
   data: {
     isFav: false,
-    show: false
+    show: false,
+    imgLoaded: false,
+    imgFailed: false
   },
   lifetimes: {
     attached() {
@@ -29,6 +31,12 @@ Component({
     }
   },
   methods: {
+    onImgLoad: function() {
+      this.setData({ imgLoaded: true });
+    },
+    onImgError: function() {
+      this.setData({ imgFailed: true, imgLoaded: true });
+    },
     onTap() {
       wx.navigateTo({
         url: '/pages/detail/detail?id=' + (this.properties.card.id || this.properties.card._id)

@@ -8,7 +8,8 @@ Component({
   data: {
     currentPlaceholder: '',
     nextPlaceholder: '',
-    animating: false
+    animating: false,
+    isFocused: false
   },
   lifetimes: {
     attached() {
@@ -63,6 +64,14 @@ Component({
     },
     onInput(e) {
       this.setData({ value: e.detail.value });
+    },
+    onFocus() {
+      this.setData({ isFocused: true });
+      this._stopRotation();
+    },
+    onBlur() {
+      this.setData({ isFocused: false });
+      if (!this.data.value) this._startRotation();
     },
     onConfirm(e) {
       this.triggerEvent('search', { value: e.detail.value || this.data.value });

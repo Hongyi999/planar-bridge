@@ -6,9 +6,14 @@
 
 .results-page {
   min-height: 100vh;
-  background: #F2EFE4;
+  background-color: #F2EFE4;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 54rpx, rgba(155, 134, 68, 0.09) 54rpx, rgba(155, 134, 68, 0.09) 56rpx),
+    repeating-linear-gradient(90deg, transparent, transparent 54rpx, rgba(155, 134, 68, 0.09) 54rpx, rgba(155, 134, 68, 0.09) 56rpx);
+  background-attachment: fixed;
   overflow-x: hidden;
   width: 100%;
+  position: relative;
 }
 
 /* Navigation */
@@ -20,7 +25,8 @@
   display: flex;
   align-items: center;
   padding-left: 16rpx;
-  background: #F2EFE4;
+  background: rgba(242, 239, 228, 0.88);
+  backdrop-filter: blur(12px);
 }
 
 .nav-btn-group {
@@ -70,9 +76,23 @@
   left: 0;
   right: 0;
   z-index: 50;
-  background: #F2EFE4;
+  background: rgba(242, 239, 228, 0.88);
+  backdrop-filter: blur(12px);
   padding: 0 20rpx;
   padding-bottom: 8rpx;
+}
+
+.header-collapsible {
+  max-height: 1000rpx;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.25s ease;
+  opacity: 1;
+}
+
+.results-fixed-header.collapsed .header-collapsible {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Content */
@@ -80,6 +100,10 @@
   height: 100vh;
   padding: 0 20rpx;
   overflow-x: hidden;
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  transition: padding-top 0.3s ease;
 }
 
 .search-compact {
@@ -137,13 +161,15 @@
   40% { opacity: 1; transform: scale(1.2); }
 }
 
-/* Summary */
+/* Summary — transparent with subtle top/bottom lines, blends with bg grid */
 .summary-card {
-  background: #FDFCF8;
-  border: 3rpx solid #9B864420;
-  border-radius: 32rpx;
-  padding: 28rpx;
-  margin-bottom: 24rpx;
+  background: transparent;
+  border: none;
+  border-top: 1rpx solid #9B864430;
+  border-bottom: 1rpx solid #9B864430;
+  border-radius: 0;
+  padding: 24rpx 8rpx;
+  margin-bottom: 20rpx;
   opacity: 0;
   transform: translateY(20rpx);
   transition: opacity 0.5s ease-out, transform 0.5s ease-out;
@@ -237,16 +263,32 @@
   position: relative;
 }
 
+.card-grid-loading {
+  width: 100%;
+  padding-bottom: 140%;
+  position: relative;
+  border-radius: 16rpx;
+  overflow: hidden;
+  background: linear-gradient(135deg, #EBE7DA, #E0DBCC);
+  transition: opacity 0.3s ease;
+}
+
+.card-grid-loading.hidden {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .card-grid-img {
   width: 100%;
   display: block;
   border-radius: 16rpx;
-  animation: fadeIn 0.35s ease-in forwards;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.card-grid-img.loaded {
+  opacity: 1;
 }
 
 .card-grid-placeholder {

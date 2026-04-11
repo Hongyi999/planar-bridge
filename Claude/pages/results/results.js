@@ -44,9 +44,17 @@ Page({
     results: [],
     showResults: false,
     isLoading: false,
+    isLoadingMore: false,
+    hasMore: true,
+    page: 1,
     viewMode: 'grid',
-    headerHeight: 200
+    headerHeight: 200,
+    collapsed: false
   },
+
+  _favSet: null,
+  _sortPref: null,
+  _localFilters: null,
 
   onLoad: function(options) {
     var that = this;
@@ -55,9 +63,19 @@ Page({
     var query = decodeURIComponent(options.query || '');
     var sortPref = getSortPreference();
 
+    // Cache sort pref and local filters for pagination
+    that._sortPref = sortPref;
+    that._localFilters = aiParser.parseQuery(query);
+
+    // Build favorites set once for O(1) lookups
+    that._favSet = {};
+    var lists = storageUtil.getLists();
+    lists.forEach(function(list) {
+      list.cards.forEach(function(id) { that._favSet[id] = true; });
+    });
+
     // Show thinking steps immediately
-    var localFilters = aiParser.parseQuery(query);
-    var steps = aiParser.getThinkingSteps(query, localFilters);
+    var steps = aiParser.getThinkingSteps(query, that._localFilters);
 
     that.setData({
       statusBarHeight: sysInfo.statusBarHeight || 20,
@@ -69,44 +87,90 @@ Page({
       isLoading: true
     });
 
-    // Try cloud AI search first, fallback to local
-    aiParser.aiSearch(query, sortPref.field, sortPref.order).then(function(result) {
+    that._loadPage(1);
+  },
+
+  _loadPage: function(page) {
+    var that = this;
+    var isFirst = page === 1;
+
+    if (!isFirst && (!that.data.hasMore || that.data.isLoadingMore)) return;
+    if (!isFirst) that.setData({ isLoadingMore: true });
+
+    var sortPref = that._sortPref;
+
+    aiParser.aiSearch(that.data.query, sortPref.field, sortPref.order, null, page).then(function(result) {
       var results = result.results || [];
       // Apply local price filters as safety net
-      if (localFilters.priceMin || localFilters.priceMax) {
+      var lf = that._localFilters;
+      if (lf.priceMin || lf.priceMax) {
         results = results.filter(function(card) {
-          if (localFilters.priceMin && card.priceMid < localFilters.priceMin) return false;
-          if (localFilters.priceMax && card.priceMid > localFilters.priceMax) return false;
+          if (lf.priceMin && card.priceMid < lf.priceMin) return false;
+          if (lf.priceMax && card.priceMid > lf.priceMax) return false;
           return true;
         });
       }
       results = sortResults(results, sortPref);
       that._markFavorites(results);
-      that.setData({
-        filters: result.filters || localFilters,
-        summary: result.summary || '',
-        resultCount: results.length,
-        results: results,
-        isLoading: false
-      });
-      that._measureHeader();
+
+      var allResults = isFirst ? results : that.data.results.concat(results);
+      var update = {
+        results: allResults,
+        page: page,
+        hasMore: result.hasMore !== false,
+        isLoadingMore: false
+      };
+      if (isFirst) {
+        var serverCount = (typeof result.resultCount === 'number') ? result.resultCount : allResults.length;
+        // Always regenerate summary locally with the real total count to avoid
+        // any server-side summary mismatch (e.g. stale fallback using page size).
+        var clientSummary = aiParser.generateSummary(that.data.query, allResults, serverCount);
+        update.filters = result.filters || lf;
+        update.summary = clientSummary;
+        update.resultCount = serverCount;
+        update.isLoading = false;
+      }
+      that.setData(update);
+      if (isFirst) that._measureHeader();
     }).catch(function() {
-      // Fallback to local search
-      var filters = aiParser.parseQuery(query);
+      if (!isFirst) {
+        that.setData({ isLoadingMore: false });
+        return;
+      }
+      // Fallback to local search (first page only)
+      var filters = that._localFilters;
       var results = cardData.searchCards(filters);
       results = sortResults(results, sortPref);
       that._markFavorites(results);
-      var summary = aiParser.generateSummary(query, results);
+      var summary = aiParser.generateSummary(that.data.query, results);
 
       that.setData({
         filters: filters,
         summary: summary,
         resultCount: results.length,
         results: results,
-        isLoading: false
+        isLoading: false,
+        hasMore: false
       });
       that._measureHeader();
     });
+  },
+
+  onScrollToLower: function() {
+    if (this.data.hasMore && !this.data.isLoadingMore && !this.data.isLoading) {
+      this._loadPage(this.data.page + 1);
+    }
+  },
+
+  onScroll: function(e) {
+    var top = e.detail.scrollTop;
+    var shouldCollapse = top > 40;
+    if (shouldCollapse !== this.data.collapsed) {
+      var update = { collapsed: shouldCollapse };
+      var targetH = shouldCollapse ? this._collapsedHeaderHeight : this._fullHeaderHeight;
+      if (targetH) update.headerHeight = targetH;
+      this.setData(update);
+    }
   },
 
   onThinkingComplete: function() {
@@ -116,14 +180,27 @@ Page({
 
   _measureHeader: function() {
     var that = this;
-    setTimeout(function() {
-      var query = wx.createSelectorQuery();
-      query.select('.results-fixed-header').boundingClientRect(function(rect) {
-        if (rect) {
-          that.setData({ headerHeight: rect.bottom });
-        }
-      }).exec();
-    }, 100);
+    setTimeout(function() { that._measureHeaderNow(); }, 100);
+  },
+
+  _measureHeaderNow: function() {
+    var that = this;
+    var query = wx.createSelectorQuery();
+    query.select('.results-fixed-header').boundingClientRect();
+    query.select('.search-compact').boundingClientRect();
+    query.exec(function(res) {
+      var update = {};
+      if (res[0]) {
+        that._fullHeaderHeight = res[0].bottom;
+      }
+      if (res[1]) {
+        // Collapsed = below search bar + breathing room for padding
+        that._collapsedHeaderHeight = res[1].bottom + 16;
+      }
+      var h = that.data.collapsed ? that._collapsedHeaderHeight : that._fullHeaderHeight;
+      if (h) update.headerHeight = h;
+      if (Object.keys(update).length) that.setData(update);
+    });
   },
 
   onSearch: function(e) {
@@ -143,6 +220,22 @@ Page({
     wx.switchTab({ url: '/pages/index/index' });
   },
 
+  onImgLoad: function(e) {
+    var index = e.currentTarget.dataset.index;
+    var key = 'results[' + index + ']._imgLoaded';
+    var update = {};
+    update[key] = true;
+    this.setData(update);
+  },
+
+  onImgError: function(e) {
+    var index = e.currentTarget.dataset.index;
+    var update = {};
+    update['results[' + index + ']._imgLoaded'] = true;
+    update['results[' + index + ']._imgFailed'] = true;
+    this.setData(update);
+  },
+
   onToggleView: function() {
     this.setData({ viewMode: this.data.viewMode === 'grid' ? 'list' : 'grid' });
   },
@@ -156,6 +249,8 @@ Page({
     var id = e.currentTarget.dataset.id;
     var index = e.currentTarget.dataset.index;
     var isFav = storageUtil.toggleFavorite(id);
+    // Keep cached favSet in sync
+    if (isFav) { this._favSet[id] = true; } else { delete this._favSet[id]; }
     var key = 'results[' + index + ']._isFav';
     var update = {};
     update[key] = isFav;
@@ -164,9 +259,10 @@ Page({
   },
 
   _markFavorites: function(results) {
+    var favSet = this._favSet || {};
     results.forEach(function(card) {
       var cardId = card.id || card._id;
-      card._isFav = storageUtil.isCardFavorited(cardId);
+      card._isFav = !!favSet[cardId];
     });
     return results;
   }

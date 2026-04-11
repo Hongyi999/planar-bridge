@@ -77,6 +77,8 @@ function fallbackParse(query) {
 
 exports.main = async (event) => {
   const { query, sortField, sortOrder, imageFileID } = event;
+  const page = event.page || 1;
+  const pageSize = event.pageSize || 20;
 
   // --- Image search: identify card from photo ---
   if (imageFileID) {
@@ -126,7 +128,9 @@ exports.main = async (event) => {
       const imgResults = await db.collection('cards')
         .where({ name: nameQuery })
         .orderBy('name', 'asc')
-        .limit(50)
+        .limit(pageSize)
+        .skip((page - 1) * pageSize)
+        .field({ name: true, nameCN: true, class: true, classCN: true, type: true, typeCN: true, subtype: true, rarity: true, setCode: true, priceMid: true, priceTrend: true, cloudImageId: true, imageUrl: true, cardCode: true })
         .get();
 
       return {
@@ -195,50 +199,74 @@ exports.main = async (event) => {
     dbQuery.keywords = _.in(filters.keywords);
   }
 
-  // Step 3: Query database
+  // Step 3: Query database with pagination
   var sort = sortField || 'name';
   var order = sortOrder || 'asc';
   var results;
   try {
-    results = await db.collection('cards')
+    // First page: also get total count
+    var queryRef = db.collection('cards')
       .where(dbQuery)
-      .orderBy(sort, order)
-      .limit(50)
+      .orderBy(sort, order);
+
+    results = await queryRef
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .field({ name: true, nameCN: true, class: true, classCN: true, type: true, typeCN: true, subtype: true, rarity: true, setCode: true, priceMid: true, priceTrend: true, cloudImageId: true, imageUrl: true, cardCode: true })
       .get();
+
+    // Get total count on first page for summary
+    var totalCount = results.data.length;
+    if (page === 1) {
+      try {
+        var countRes = await db.collection('cards').where(dbQuery).count();
+        if (countRes && typeof countRes.total === 'number' && countRes.total > 0) {
+          totalCount = countRes.total;
+        }
+      } catch (ce) {
+        console.error('count() failed:', ce);
+      }
+    }
   } catch (e) {
     return { filters, results: [], resultCount: 0, summary: '数据库查询失败: ' + e.message, aiUsed };
   }
 
-  // Step 4: Generate summary
-  var count = results.data.length;
-  if (aiUsed) {
-    try {
-      const ai = cloud.extend.AI;
-      const sumResult = await ai.bot.sendMessage({
-        botId: BOT_ID,
-        msg: '用一句简短中文（不超过50字）总结搜索结果：\n查询: "' + query + '"\n' +
-          '找到 ' + count + ' 张卡牌' +
-          (count > 0 ? '，包括: ' + results.data.slice(0, 3).map(function(c) { return c.nameCN || c.name; }).join('、') : '')
-      });
-      summary = sumResult.content;
-    } catch (e) {
-      summary = _buildFallbackSummary(query, results.data);
+  // Step 4: Generate summary (first page only)
+  var count = (page === 1) ? totalCount : results.data.length;
+  var hasMore = results.data.length === pageSize;
+  if (page === 1) {
+    if (aiUsed) {
+      try {
+        const ai = cloud.extend.AI;
+        const sumResult = await ai.bot.sendMessage({
+          botId: BOT_ID,
+          msg: '用一句简短中文（不超过50字）总结搜索结果：\n查询: "' + query + '"\n' +
+            '找到 ' + count + ' 张卡牌' +
+            (count > 0 ? '，包括: ' + results.data.slice(0, 3).map(function(c) { return c.nameCN || c.name; }).join('、') : '')
+        });
+        summary = sumResult.content;
+      } catch (e) {
+        summary = _buildFallbackSummary(query, results.data, count);
+      }
+    } else {
+      summary = _buildFallbackSummary(query, results.data, count);
     }
-  } else {
-    summary = _buildFallbackSummary(query, results.data);
   }
 
   return {
     filters: filters,
     results: results.data,
     resultCount: count,
+    hasMore: hasMore,
+    page: page,
+    pageSize: pageSize,
     summary: summary,
     aiUsed: aiUsed
   };
 };
 
-function _buildFallbackSummary(query, cards) {
-  var count = cards.length;
+function _buildFallbackSummary(query, cards, totalCount) {
+  var count = (totalCount != null) ? totalCount : cards.length;
   if (count === 0) return '未找到匹配「' + query + '」的卡牌，请尝试其他关键词。';
   var types = [];
   var sets = [];
