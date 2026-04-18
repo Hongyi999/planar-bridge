@@ -1,6 +1,7 @@
 var storageUtil = require('../../utils/storage.js');
 var cardData = require('../../utils/cardData.js');
 var cloudDB = require('../../utils/cloudDB.js');
+var admin = require('../../utils/admin.js');
 
 var DEFAULT_SETTINGS = {
   sortIndex: 0,
@@ -42,7 +43,7 @@ function saveSettings(settings) {
 
 Page({
   data: {
-    version: '1.0.0',
+    version: '1.1.0',
     cacheSize: '0 KB',
     dbCardCount: '—',
     dbSetCount: '—',
@@ -66,7 +67,9 @@ Page({
     batchUpdateRunning: false,
     batchUpdateStep: '',
     adminMode: false,
-    _adminTapCount: 0
+    _adminTapCount: 0,
+    _myOpenid: '',
+    _bootstrapMode: false
   },
 
   onLoad() {
@@ -83,6 +86,15 @@ Page({
           exportFields: settings.exportFields
         });
       }
+    });
+
+    // 静默获取身份：已是管理员则自动解锁管理面板
+    admin.getAuthInfo().then(function(info) {
+      that.setData({
+        adminMode: !!info.isAdmin,
+        _myOpenid: info.openid || '',
+        _bootstrapMode: !!info.bootstrapMode
+      });
     });
   },
 
@@ -1371,26 +1383,95 @@ Page({
   // --- About ---
   onAbout() {
     var that = this;
-    var count = this.data._adminTapCount + 1;
-    if (count >= 5 && !this.data.adminMode) {
-      this.setData({ adminMode: true, _adminTapCount: 0 });
-      wx.showToast({ title: '已开启管理模式', icon: 'none' });
+
+    // 已是管理员：直接显示关于弹窗（管理面板本身已自动解锁）
+    if (this.data.adminMode) {
+      wx.showModal({
+        title: 'Planar Bridge v1.1.0',
+        content: 'AI 驱动的 Flesh and Blood TCG 卡牌搜索与收藏管理工具。\n\n数据来源: TCGPlayer\nAI 引擎: 腾讯混元\n框架: 微信小程序云开发',
+        showCancel: false,
+        confirmText: '好的'
+      });
       return;
     }
+
+    var count = this.data._adminTapCount + 1;
+
+    // 5 次点击：尝试解锁管理员
+    if (count >= 5) {
+      this.setData({ _adminTapCount: 0 });
+      that._tryUnlockAdmin();
+      return;
+    }
+
     this.setData({ _adminTapCount: count });
-    // Reset tap counter after 3 seconds
     if (this._adminTimer) clearTimeout(this._adminTimer);
     this._adminTimer = setTimeout(function() {
       that.setData({ _adminTapCount: 0 });
     }, 3000);
+
     if (count === 1) {
       wx.showModal({
-        title: 'Planar Bridge v1.0.0',
+        title: 'Planar Bridge v1.1.0',
         content: 'AI 驱动的 Flesh and Blood TCG 卡牌搜索与收藏管理工具。\n\n数据来源: TCGPlayer\nAI 引擎: 腾讯混元\n框架: 微信小程序云开发',
         showCancel: false,
         confirmText: '好的'
       });
     }
+  },
+
+  _tryUnlockAdmin() {
+    var that = this;
+    wx.showLoading({ title: '校验权限...', mask: true });
+    admin.invalidate(); // 强制刷新，忽略缓存
+    admin.getAuthInfo().then(function(info) {
+      wx.hideLoading();
+      that.setData({
+        adminMode: !!info.isAdmin,
+        _myOpenid: info.openid || '',
+        _bootstrapMode: !!info.bootstrapMode
+      });
+
+      if (info.isAdmin) {
+        if (info.bootstrapMode) {
+          // 首次部署：白名单为空，显示 openid 供用户配置
+          wx.showModal({
+            title: '首次配置管理员',
+            content: '当前管理员白名单为空（bootstrap 模式，临时放行所有用户）。\n\n请复制下方 openid，填入 login/index.js 和 importCards/index.js 的 ADMIN_OPENIDS 数组，重新部署以锁定权限：\n\n' + (info.openid || '(无法获取 openid)'),
+            confirmText: '复制 openid',
+            cancelText: '知道了',
+            success: function(res) {
+              if (res.confirm && info.openid) {
+                wx.setClipboardData({
+                  data: info.openid,
+                  success: function() {
+                    wx.showToast({ title: 'openid 已复制', icon: 'none' });
+                  }
+                });
+              }
+            }
+          });
+        } else {
+          wx.showToast({ title: '已开启管理模式', icon: 'success' });
+        }
+      } else {
+        // 非管理员：显示 openid 便于联系管理员加入白名单
+        wx.showModal({
+          title: '非管理员',
+          content: '仅白名单内的管理员可进入数据库管理。\n\n你的 openid：\n' + (info.openid || '(获取失败)') + '\n\n如需申请权限，请联系管理员将此 openid 加入白名单。',
+          confirmText: '复制 openid',
+          cancelText: '知道了',
+          success: function(res) {
+            if (res.confirm && info.openid) {
+              wx.setClipboardData({ data: info.openid });
+            }
+          }
+        });
+      }
+    }).catch(function() {
+      wx.hideLoading();
+      wx.showToast({ title: '校验失败，请重试', icon: 'none' });
+    });
   },
 
   onFeedback() {
