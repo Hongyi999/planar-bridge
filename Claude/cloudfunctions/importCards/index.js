@@ -5,6 +5,32 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 var db = cloud.database();
 var _ = db.command;
 
+// --- 管理员权限校验 ---
+// 保持与 login/index.js 中的 ADMIN_OPENIDS 同步！
+var ADMIN_OPENIDS = [
+  // 'o-xxxxxxxxxxxxxxxxxxxxxxx',
+];
+
+// 返回 true 表示放行：白名单为空（bootstrap 模式）或 openid 在白名单内
+function isAdminCaller() {
+  try {
+    var openid = cloud.getWXContext().OPENID || '';
+    if (ADMIN_OPENIDS.length === 0) return true;
+    return ADMIN_OPENIDS.indexOf(openid) >= 0;
+  } catch (e) {
+    return false;
+  }
+}
+
+// 受保护 action 列表
+var ADMIN_ACTIONS = [
+  'writeSets',
+  'writeCards',
+  'updateCardImage',
+  'updateCardPrices',
+  'writeJustTcgCards'
+];
+
 // Use jsDelivr CDN (works from China), with GitHub raw as fallback
 var CARD_JSON_URLS = [
   'https://cdn.jsdelivr.net/gh/the-fab-cube/flesh-and-blood-cards@develop/json/english/card.json',
@@ -367,6 +393,15 @@ async function importSets(sets) {
  */
 exports.main = async function(event) {
   var action = event.action || 'stats';
+
+  // 受保护 action 需要管理员身份
+  if (ADMIN_ACTIONS.indexOf(action) >= 0 && !isAdminCaller()) {
+    return {
+      success: false,
+      error: '无权限执行该操作（需管理员身份）',
+      code: 'FORBIDDEN'
+    };
+  }
 
   if (action === 'stats') {
     var cardCount = await db.collection('cards').count();
